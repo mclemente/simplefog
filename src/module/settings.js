@@ -1,4 +1,3 @@
-import API from "./api.js";
 import SimplefogLayer from "./classes/SimplefogLayer.js";
 import config from "./config.js";
 import CONSTANTS from "./constants.js";
@@ -66,14 +65,6 @@ export const registerSettings = function () {
 		onChange: SimplefogLayer.refreshZIndex,
 	});
 	// ========================================================================
-	game.settings.register(CONSTANTS.MODULE_NAME, "debug", {
-		name: `${CONSTANTS.MODULE_NAME}.setting.debug.name`,
-		hint: `${CONSTANTS.MODULE_NAME}.setting.debug.hint`,
-		scope: "client",
-		config: true,
-		default: false,
-		type: Boolean,
-	});
 	// const settings = defaultSettings();
 	// for (const [settingName, settingValue] of Object.entries(settings)) {
 	//   game.settings.register(CONSTANTS.MODULE_NAME, settingName, settingValue);
