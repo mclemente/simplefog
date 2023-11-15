@@ -5,7 +5,6 @@ import SimplefogLayer from "./classes/SimplefogLayer.js";
 import SimplefogMigrations from "./classes/SimplefogMigrations.js";
 import SimplefogNotification from "./classes/SimplefogNotification.js";
 import config from "./config.js";
-import CONSTANTS from "./constants.js";
 import {
 	addSimplefogControlToggleListener,
 	addSimplefogOpacityToggleListener,
@@ -13,20 +12,11 @@ import {
 import { registerSettings } from "./settings.js";
 
 Hooks.once("init", async () => {
-	console.log(`${CONSTANTS.MODULE_NAME} | Initializing ${CONSTANTS.MODULE_NAME}`);
-	// Register custom module settings
 	registerSettings();
 	initHooks();
-	// Preload Handlebars templates
-	// await preloadTemplates();
 });
 
 Hooks.once("ready", async () => {
-	// // Do anything once the module is ready
-	// if (!game.modules.get('lib-wrapper')?.active && game.user?.isGM) {
-	//   error(`The '${CONSTANTS.MODULE_NAME}' module requires to install and activate the 'libWrapper' module.`, true);
-	//   return;
-	// }
 	readyHooks();
 });
 
