@@ -474,18 +474,13 @@ export default class MaskLayer extends InteractionLayer {
 	 * @param data {Object}       PIXI Object to be used as brush
 	 */
 	composite(brush) {
-		if (isNewerVersion(game.version, "10.999")) {
-			const opt = {
-				renderTexture: this.maskTexture,
-				clear: false,
-				transform: null,
-				skipUpdateTransform: false
-			};
-			canvas.app.renderer.render(brush, opt);
-		}
-		else {
-			canvas.app.renderer.render(brush, this.maskTexture, false, null, false);
-		}
+		const opt = {
+			renderTexture: this.maskTexture,
+			clear: false,
+			transform: null,
+			skipUpdateTransform: false
+		};
+		canvas.app.renderer.render(brush, opt);
 	}
 
 	/**
@@ -536,11 +531,7 @@ export default class MaskLayer extends InteractionLayer {
 	 */
 	activate() {
 		super.activate();
-    if (isNewerVersion(game.version, "10.999")) {
-      this.eventMode = "static";
-    } else {
-      this.interactive = true;
-    }
+		this.eventMode = "static";
 	}
 
 	/**
@@ -548,11 +539,7 @@ export default class MaskLayer extends InteractionLayer {
 	 */
 	deactivate() {
 		super.deactivate();
-    if (isNewerVersion(game.version, "10.999")) {
-      this.eventMode = "passive";
-    } else {
-      this.interactive = false;
-    }
+		this.eventMode = "passive";
 	}
 
 	async draw() {

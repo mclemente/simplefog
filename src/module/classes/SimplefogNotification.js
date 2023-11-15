@@ -9,12 +9,7 @@ export default class SimplefogNotification {
 	static checkVersion() {
     let packageVersion;
 
-    if (isNewerVersion(game.version, "9")) {
-      packageVersion = game.modules.get("simplefog").version;
-    }
-    else {
-      packageVersion = game.modules.get("simplefog").data.version;
-    }
+	packageVersion = game.modules.get("simplefog").version;
 
 		if (
 			game.user.isGM
