@@ -4,7 +4,6 @@ import SimplefogHUDControlLayer from "./classes/SimplefogHUDControlLayer.js";
 import SimplefogLayer from "./classes/SimplefogLayer.js";
 import SimplefogMigrations from "./classes/SimplefogMigrations.js";
 import SimplefogNotification from "./classes/SimplefogNotification.js";
-import config from "./config.js";
 import {
 	addSimplefogControlToggleListener,
 	addSimplefogOpacityToggleListener,
