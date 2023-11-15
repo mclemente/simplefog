@@ -18,7 +18,7 @@ export function simplefogLog(data, force = false) {
 			// eslint-disable-next-line no-console
 			else console.log("Simplefog |", data);
 		}
-	} catch (e) {}
+	} catch(e) {}
 }
 
 export function simplefogLogDebug(...args) {
@@ -136,9 +136,9 @@ export function addSimplefogControlToggleListener() {
 		let controlName = getNewControlName();
 		let toolName = game.settings.get("simplefog", "toolHotKeys");
 
-		$("li.scene-control[data-control=" + controlName + "]")?.click();
+		$(`li.scene-control[data-control=${controlName}]`)?.click();
 		setTimeout(function () {
-			$("ol.sub-controls.active li.control-tool[data-tool=" + toolName + "]")?.click();
+			$(`ol.sub-controls.active li.control-tool[data-tool=${toolName}]`)?.click();
 		}, 500);
 	});
 }
@@ -230,7 +230,7 @@ export function dmToGM(message) {
 }
 
 export function dmToAllGM(message) {
-	var dm_ids = [];
+	let dm_ids = [];
 	for (let indexA = 0; indexA < game.users.length; indexA++) {
 		if (game.users[indexA].value.isGM) {
 			dm_ids.push(game.users[indexA].key);

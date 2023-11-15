@@ -26,21 +26,6 @@ const loadJson = (path) => {
 	}
 };
 
-const typescript = require(`typescript`);
-// const createLiteral = typescript.createLiteral;
-const createLiteral = typescript.factory.createStringLiteral;
-const factory = typescript.factory;
-const isExportDeclaration = typescript.isExportDeclaration;
-const isImportDeclaration = typescript.isImportDeclaration;
-const isStringLiteral = typescript.isStringLiteral;
-const LiteralExpression = typescript.LiteralExpression;
-const Node = typescript.Node;
-const TransformationContext = typescript.TransformationContext;
-const TSTransformer = typescript.Transformer;
-const TransformerFactory = typescript.TransformerFactory;
-const visitEachChild = typescript.visitEachChild;
-const visitNode = typescript.visitNode;
-
 const less = require(`gulp-less`);
 const sass = require(`gulp-sass`)(require(`sass`));
 
@@ -48,9 +33,7 @@ const sass = require(`gulp-sass`)(require(`sass`));
 const browserify = require(`browserify`);
 const tsify = require(`tsify`);
 
-const ts = require(`gulp-typescript`);
 const git = require(`gulp-git`);
-const jest = require(`gulp-jest`).default;
 
 const argv = require(`yargs`).argv;
 
@@ -156,49 +139,9 @@ const createTransformer = () => {
 	};
 };
 
-const tsConfig = ts.createProject(`tsconfig.json`, {
-	getCustomTransformers: (_program) => ({
-		after: [createTransformer()],
-	}),
-});
-
 /********************/
 /*		BUILD		*/
 /********************/
-
-/**
- * Build TypeScript
- */
-function buildTS() {
-	return (
-		gulp
-			.src(`src/**/*.ts`)
-			.pipe(tsConfig())
-
-			// // eslint() attaches the lint output to the `eslint` property
-			// // of the file object so it can be used by other modules.
-			// .pipe(eslint())
-			// // eslint.format() outputs the lint results to the console.
-			// // Alternatively use eslint.formatEach() (see Docs).
-			// .pipe(eslint.format())
-			// // To have the process exit with an error code (1) on
-			// // lint error, return the stream and pipe to failAfterError last.
-			// .pipe(eslint.failAfterError())
-
-			.pipe(gulp.dest(`dist`))
-	);
-}
-
-// function buildTS() {
-//     const debug = process.env.npm_lifecycle_event !== `package`;
-//     const res = tsConfig.src()
-//         .pipe(sourcemaps.init())
-//         .pipe(tsConfig());
-
-//     return res.js
-//         .pipe(sourcemaps.write(``, { debug: debug, includeContent: true, sourceRoot: `./ts/src` }))
-//         .pipe(gulp.dest(`dist`));
-// }
 
 /**
  * Build JavaScript
@@ -402,8 +345,6 @@ const cleanDist = async () => {
  * Watch for changes for each build step
  */
 const buildWatch = () => {
-	// gulp.watch(`src/**/*.ts`, { ignoreInitial: false }, gulp.series(buildTS, bundleModule));
-	gulp.watch(`src/**/*.ts`, { ignoreInitial: false }, gulp.series(buildTS));
 	gulp.watch(`src/**/*.less`, { ignoreInitial: false }, buildLess);
 	gulp.watch(`src/**/*.sass`, { ignoreInitial: false }, buildSASS);
 	gulp.watch(
@@ -664,17 +605,8 @@ const updateManifest = (cb) => {
 		cb(err);
 	}
 };
-const test = () => {
-	return gulp.src(`src/__tests__`).pipe(
-		jest({
-			preprocessorIgnorePatterns: [`dist/`, `node_modules/`],
-			automock: false,
-		})
-	);
-};
 
-// const execBuild = gulp.parallel(buildTS, buildLess, copyFiles); // MOD 4535992
-const execBuild = gulp.parallel(buildTS, buildJS, buildMJS, buildCSS, buildLess, buildSASS, copyFiles);
+const execBuild = gulp.parallel(buildJS, buildMJS, buildCSS, buildLess, buildSASS, copyFiles);
 
 exports.build = gulp.series(clean, execBuild);
 exports.bundle = gulp.series(clean, execBuild, bundleModule, cleanDist);

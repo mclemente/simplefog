@@ -1,10 +1,11 @@
 /*
  * Provides a mechanism to send whisper to GM when new version installed.
  */
-import { dmToGM } from "../js/helpers.js";
+import { dmToGM } from "../helpers.js";
 
 export default class SimplefogNotification {
 	constructor() {}
+
 	static checkVersion() {
     let packageVersion;
 
@@ -16,8 +17,8 @@ export default class SimplefogNotification {
     }
 
 		if (
-			game.user.isGM &&
-			game.user.getFlag("simplefog", "versionNotification") !== packageVersion
+			game.user.isGM
+			&& game.user.getFlag("simplefog", "versionNotification") !== packageVersion
 		) {
 			// GM has never seen current version message
 

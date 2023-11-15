@@ -1,6 +1,0 @@
-Grid
-*****************************
-
-Background Image Scale: 2.25
-Grid Size: 54
-Background Image Offset: 52x40

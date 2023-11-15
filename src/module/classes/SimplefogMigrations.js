@@ -2,7 +2,7 @@
  * Provides for the ability to check and run migration code for changes to data
  */
 /* eslint-disable max-len */
-import { dmToGM, simplefogLog, simplefogLogDebug } from "../js/helpers.js";
+import { dmToGM, simplefogLog, simplefogLogDebug } from "../helpers.js";
 
 export default class SimplefogMigrations {
 	static check() {
@@ -50,10 +50,8 @@ export default class SimplefogMigrations {
 						// Round decimal values
 						if (history.events[i][j].x) history.events[i][j].x = Math.round(history.events[i][j].x);
 						if (history.events[i][j].x) history.events[i][j].y = Math.round(history.events[i][j].y);
-						if (history.events[i][j].height)
-							history.events[i][j].height = Math.round(history.events[i][j].height);
-						if (history.events[i][j].width)
-							history.events[i][j].width = Math.round(history.events[i][j].width);
+						if (history.events[i][j].height) history.events[i][j].height = Math.round(history.events[i][j].height);
+						if (history.events[i][j].width) history.events[i][j].width = Math.round(history.events[i][j].width);
 						// Remove unnecessary visible & alpha props
 						if (history.events[i][j].visible) delete history.events[i][j].visible;
 						if (history.events[i][j].alpha) delete history.events[i][j].alpha;

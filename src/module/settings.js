@@ -1,7 +1,7 @@
 import API from "./api.js";
-import CONSTANTS from "./constants.js";
+import SimplefogLayer from "./classes/SimplefogLayer.js";
 import config from "./config.js";
-import SimplefogLayer from "../classes/SimplefogLayer.js";
+import CONSTANTS from "./constants.js";
 export const registerSettings = function () {
 	game.settings.registerMenu(CONSTANTS.MODULE_NAME, "resetAllSettings", {
 		name: `${CONSTANTS.MODULE_NAME}.setting.reset.name`,
@@ -84,15 +84,15 @@ export const registerSettings = function () {
 };
 class ResetSettingsDialog extends FormApplication {
 	constructor(...args) {
-		//@ts-ignore
+		// @ts-ignore
 		super(...args);
-		//@ts-ignore
+		// @ts-ignore
 		return new Dialog({
 			title: game.i18n.localize(`${CONSTANTS.MODULE_NAME}.dialogs.resetsettings.title`),
 			content:
-				'<p style="margin-bottom:1rem;">' +
-				game.i18n.localize(`${CONSTANTS.MODULE_NAME}.dialogs.resetsettings.content`) +
-				"</p>",
+				`<p style="margin-bottom:1rem;">${
+				game.i18n.localize(`${CONSTANTS.MODULE_NAME}.dialogs.resetsettings.content`)
+				}</p>`,
 			buttons: {
 				confirm: {
 					icon: '<i class="fas fa-check"></i>',
@@ -110,6 +110,7 @@ class ResetSettingsDialog extends FormApplication {
 			default: "cancel",
 		});
 	}
+
 	async _updateObject(event, formData) {
 		// do nothing
 	}
@@ -121,7 +122,7 @@ async function applyDefaultSettings() {
 	// }
 	const settings2 = otherSettings(true);
 	for (const [name, data] of Object.entries(settings2)) {
-		//@ts-ignore
+		// @ts-ignore
 		await game.settings.set(CONSTANTS.MODULE_NAME, name, data.default);
 	}
 }

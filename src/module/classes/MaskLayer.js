@@ -5,7 +5,7 @@
  * and replaying the mask / undo etc.
  */
 
-import { simplefogLog, simplefogLogDebug } from "../js/helpers.js";
+import { simplefogLog, simplefogLogDebug } from "../helpers.js";
 
 export default class MaskLayer extends InteractionLayer {
 	constructor(layername) {
@@ -42,7 +42,7 @@ export default class MaskLayer extends InteractionLayer {
 	}
 
 	static get layerOptions() {
-		//@ts-ignore
+		// @ts-ignore
 		return mergeObject(super.layerOptions, {
 			// ToDo: is ugly hack still needed?
 			// Ugly hack - render at very high zindex and then re-render at layer init with layerZindex value
@@ -91,7 +91,7 @@ export default class MaskLayer extends InteractionLayer {
 			this.fogColorLayer.filters = [];
 		}
 
-		//So you can hit escape on the keyboard and it will bring up the menu
+		// So you can hit escape on the keyboard and it will bring up the menu
 		this._controlled = {};
 
 		this.maskTexture = MaskLayer.getMaskTexture();
@@ -206,7 +206,7 @@ export default class MaskLayer extends InteractionLayer {
 			const texture = await loadTexture(fogImageOverlayFilePath);
 			this.fogImageOverlayLayer.texture = texture;
 			// If player, don't set tint
-			//if (!game.user.isGM) canvas[this.layername].setColorTint(null);
+			// if (!game.user.isGM) canvas[this.layername].setColorTint(null);
 		} else {
 			this.fogImageOverlayLayer.texture = undefined;
 		}
@@ -323,7 +323,7 @@ export default class MaskLayer extends InteractionLayer {
 		// Prevent calling update when no lights loaded
 		if (!canvas.sight?.light?.los?.geometry) return;
 		// Update sight layer
-		//ToDo: Determine replacement for canvas.sight.refresh()
+		// ToDo: Determine replacement for canvas.sight.refresh()
 		canvas.perception.refresh();
 	}
 
@@ -495,7 +495,7 @@ export default class MaskLayer extends InteractionLayer {
 				clear: false,
 				transform: null,
 				skipUpdateTransform: false
-			}
+			};
 			canvas.app.renderer.render(brush, opt);
 		}
 		else {
@@ -540,12 +540,12 @@ export default class MaskLayer extends InteractionLayer {
 		this.visible = !v;
 		this.setSetting("visible", !v);
 
-		//If first time, set autofog to opposite so it doesn't reapply it.
+		// If first time, set autofog to opposite so it doesn't reapply it.
 		let history = canvas.scene.getFlag(this.layername, "history");
 
 		if (history === undefined) {
 			this.setSetting("autoFog", !v);
-			return;
+
 		}
 	}
 

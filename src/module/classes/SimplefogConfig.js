@@ -1,4 +1,4 @@
-import { webToHex, hexToWeb } from "../js/helpers.js";
+import { hexToWeb, webToHex } from "../helpers.js";
 
 export default class SimplefogConfig extends FormApplication {
 	static get defaultOptions() {
@@ -70,8 +70,7 @@ export default class SimplefogConfig extends FormApplication {
 					"fogImageOverlayGMAlpha",
 					"fogImageOverlayPlayerAlpha",
 				].includes(key)
-			)
-				val /= 100;
+			) val /= 100;
 			// If setting is a color value, convert webcolor to hex before saving
 			if (["gmColorTint", "playerColorTint"].includes(key)) val = webToHex(val);
 			// Save settings to scene
@@ -90,7 +89,7 @@ export default class SimplefogConfig extends FormApplication {
 		}
 
 		// Update sight layer
-		//ToDo: Determine replacement for canvas.sight.refresh()
+		// ToDo: Determine replacement for canvas.sight.refresh()
 		canvas.perception.refresh();
 	}
 }
