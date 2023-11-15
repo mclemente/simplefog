@@ -1,4 +1,3 @@
-import API from "./api.js";
 import BrushControls from "./classes/BrushControls.js";
 import SimplefogConfig from "./classes/SimplefogConfig.js";
 import SimplefogHUDControlLayer from "./classes/SimplefogHUDControlLayer.js";
@@ -20,11 +19,6 @@ Hooks.once("init", async () => {
 	initHooks();
 	// Preload Handlebars templates
 	// await preloadTemplates();
-});
-
-Hooks.once("setup", function () {
-	// Do anything after initialization but before ready
-	setupHooks();
 });
 
 Hooks.once("ready", async () => {
@@ -104,12 +98,6 @@ export const initHooks = () => {
 	}
 };
 
-export const setupHooks = () => {
-	// Set api the standard league way
-	// @ts-ignore
-	setApi(API);
-};
-
 /*
  * Apply compatibility patches
  */
@@ -137,41 +125,6 @@ export const readyHooks = async () => {
 	addSimplefogControlToggleListener();
 	addSimplefogOpacityToggleListener();
 };
-
-// from main.js
-
-/**
- * Initialization helper, to set API.
- * @param api to set to game module.
- */
-export function setApi(api) {
-	const data = game.modules.get(CONSTANTS.MODULE_NAME);
-	data.api = api;
-}
-/**
- * Returns the set API.
- * @returns Api from games module.
- */
-export function getApi() {
-	const data = game.modules.get(CONSTANTS.MODULE_NAME);
-	return data.api;
-}
-/**
- * Initialization helper, to set Socket.
- * @param socket to set to game module.
- */
-export function setSocket(socket) {
-	const data = game.modules.get(CONSTANTS.MODULE_NAME);
-	data.socket = socket;
-}
-/*
- * Returns the set socket.
- * @returns Socket from games module.
- */
-export function getSocket() {
-	const data = game.modules.get(CONSTANTS.MODULE_NAME);
-	return data.socket;
-}
 
 // from controls.js
 
