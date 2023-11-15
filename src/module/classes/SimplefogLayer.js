@@ -4,12 +4,11 @@
  */
 
 import { Layout } from "../../libs/hexagons.js";
-import { hexObjsToArr, hexToPercent, simplefogLog, simplefogLogDebug } from "../helpers.js";
+import { hexObjsToArr, hexToPercent } from "../helpers.js";
 import MaskLayer from "./MaskLayer.js";
 
 export default class SimplefogLayer extends MaskLayer {
 	constructor() {
-		simplefogLogDebug("SimplefogLayer.constructor");
 		super("simplefog");
 
 		// Register event listerenrs
@@ -47,7 +46,6 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	initSimplefog() {
-		simplefogLogDebug("SimplefogLayer.init");
 		// Preview brush objects
 		this.boxPreview = this.brush({
 			shape: this.BRUSH_TYPES.BOX,
@@ -95,7 +93,6 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	canvasInit() {
-		simplefogLogDebug("SimplefogLayer.canvasInit");
 		// Set default flags if they dont exist already
 		Object.keys(this.DEFAULTS).forEach((key) => {
 			if (!game.user.isGM) return;
@@ -227,7 +224,6 @@ export default class SimplefogLayer extends MaskLayer {
 	 * Sets the active tool & shows preview for brush & grid tools
 	 */
 	setActiveTool(tool) {
-		simplefogLogDebug("SimplefogLayer.setActiveTool");
 		this.clearActiveTool();
 		this.activeTool = tool;
 		this.setPreviewTint();
@@ -717,7 +713,6 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	async draw() {
-		simplefogLogDebug("SimplefogLayer.draw");
 		super.draw();
 		this.initSimplefog();
 

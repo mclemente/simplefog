@@ -2,13 +2,11 @@
  * Provides for the ability to check and run migration code for changes to data
  */
 /* eslint-disable max-len */
-import { dmToGM, simplefogLog, simplefogLogDebug } from "../helpers.js";
+import { dmToGM } from "../helpers.js";
 
 export default class SimplefogMigrations {
 	static check() {
-		simplefogLogDebug("SimplefogMigrations.check");
 		if (!game.user.isGM) return;
-		simplefogLog("Checking migrations");
 		const ver = game.settings.get("simplefog", "migrationVersion");
 		if (ver === 1) {
 			SimplefogMigrations.migration2();
@@ -22,7 +20,6 @@ export default class SimplefogMigrations {
 	 * - Deletes any unnecessary visible & alpha props
 	 */
 	static migration1() {
-		simplefogLog("Performing migration #1", true);
 		game.scenes.forEach(async (s) => {
 			// Check if scene has simplefog history
 			if (s.data.flags?.simplefog?.history?.events) {
@@ -68,7 +65,6 @@ export default class SimplefogMigrations {
 	 * Major data changes from v9 to v10
 	 */
 	static migration2() {
-		simplefogLog("Performing migration #2", true);
 		game.scenes.forEach(async (s) => {
 			// Migrate all variables to new names, otherwise set to defaults
 			if (s.flags?.simplefog?.gmAlpha) {

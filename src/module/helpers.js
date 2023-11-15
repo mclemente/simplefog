@@ -1,33 +1,6 @@
 import CONSTANTS from "./constants.js";
 
 // ======================================
-// LOGGER UTILITY
-// =======================================
-
-/**
- * Prints formatted console msg if string, otherwise dumps object
- * @param data {String | Object} Output to be dumped
- * @param force {Boolean}        Log output even if CONFIG.debug.simplefog = false
- */
-export function simplefogLog(data, force = false) {
-	try {
-		const isDebugging = game.modules.get("_dev-mode")?.api?.getPackageDebugValue(CONSTANTS.MODULE_NAME);
-		if (force || isDebugging) {
-			// eslint-disable-next-line no-console
-			if (typeof data === "string") console.log(`Simplefog | ${data}`);
-			// eslint-disable-next-line no-console
-			else console.log("Simplefog |", data);
-		}
-	} catch(e) {}
-}
-
-export function simplefogLogDebug(...args) {
-	if (game.settings.get(CONSTANTS.MODULE_NAME, "debug")) {
-		console.debug("Simplefog-DEBUG |", ...args);
-	}
-}
-
-// ======================================
 // PIXI UTILITY
 // =======================================
 

@@ -10,8 +10,6 @@ import CONSTANTS from "./constants.js";
 import {
 	addSimplefogControlToggleListener,
 	addSimplefogOpacityToggleListener,
-	simplefogLog,
-	simplefogLogDebug,
 } from "./helpers.js";
 import { registerSettings } from "./settings.js";
 
@@ -43,7 +41,6 @@ Hooks.once("devModeReady", ({ registerPackageDebugFlag }) => {
 });
 
 Hooks.once("canvasInit", () => {
-	simplefogLogDebug("simplefog.canvasInit");
 	if (isNewerVersion(game.version, "10")) {
 		canvas.simplefog.canvasInit();
 	} else if (isNewerVersion(game.version, "9")) {
@@ -88,9 +85,6 @@ Hooks.once("canvasInit", () => {
 });
 
 export const initHooks = () => {
-	// eslint-disable-next-line no-console
-	simplefogLog("Initializing simplefog", true);
-
 	if (isNewerVersion(game.version, "10")) {
 		CONFIG.Canvas.layers.simplefog = { group: "interface", layerClass: SimplefogLayer };
 		CONFIG.Canvas.layers.simplefogHUDControls = { group: "interface", layerClass: SimplefogHUDControlLayer };
@@ -185,7 +179,6 @@ export function getSocket() {
  * Add control buttons
  */
 Hooks.on("getSceneControlButtons", (controls) => {
-	simplefogLogDebug("controls.getSceneControlButtons");
 	if (!game.user.isGM) return;
 	controls.push({
 		name: "simplefog",
@@ -280,7 +273,6 @@ Hooks.on("getSceneControlButtons", (controls) => {
  * and switching active brush flag
  */
 Hooks.on("renderSceneControls", (controls) => {
-	simplefogLogDebug("controls.renderSceneControls");
 	// Switching to layer
 	if (canvas.simplefog != null) {
 		if (controls.activeControl == "simplefog" && controls.activeTool != undefined) {
@@ -317,7 +309,6 @@ function setBrushControlPos() {
  * Toggle Simple Fog
  */
 function toggleSimpleFog() {
-	simplefogLogDebug("controls.toggleSimpleFog");
 	if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
 		let dg = Dialog.confirm({
 			title: game.i18n.localize("SIMPLEFOG.disableFog"),
