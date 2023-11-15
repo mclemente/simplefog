@@ -1,16 +1,11 @@
 import SimplefogLayer from "./classes/SimplefogLayer.js";
-import config from "./config.js";
 export const registerSettings = function () {
-	config.forEach((cfg) => {
-		game.settings.register("simplefog", cfg.name, cfg.data);
-	});
-	game.settings.register("simplefog", "confirmFogDisable", {
-		name: "Confirm Disabling of Scene Simplefog",
-		hint: "When enabled, a confirmation dialog will be displayed before Simplefog can be toggled off for a scene",
+	game.settings.register("simplefog", "migrationVersion", {
+		name: "Simplefog Migration Version",
 		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean,
+		config: false,
+		type: Number,
+		default: 0,
 	});
 	// Register global config settings
 	game.settings.register("simplefog", "confirmFogDisable", {
