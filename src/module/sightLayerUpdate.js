@@ -18,8 +18,8 @@ function _getCanvasCoords(placeable) {
 
 	try {
 		return {
-			x: Math.round(grid / 2 + p.x),
-			y: Math.round(grid / 2 + p.y),
+			x: Math.round((grid / 2) + p.x),
+			y: Math.round((grid / 2) + p.y),
 		};
 	} catch(error) {
 		return {
