@@ -82,14 +82,11 @@ export default class SimplefogConfig extends FormApplication {
 		});
 
 		// If save button was clicked, close app
-		if (event.submitter?.name === "submit") {
-			Object.values(ui.windows).forEach((val) => {
-				if (val.id === "simplefog-scene-config") val.close();
-			});
+		if (["submit", "saveDefaults"].includes(event.submitter?.name)) {
+			this.close();
 		}
 
 		// Update sight layer
-		// ToDo: Determine replacement for canvas.sight.refresh()
 		canvas.perception.refresh();
 	}
 }
