@@ -14,7 +14,6 @@ export default class SimplefogLayer extends MaskLayer {
 		// Register event listerenrs
 		Hooks.on("ready", () => {
 			this._registerMouseListeners();
-			this._registerKeyboardListeners();
 		});
 
 		this.DEFAULTS = Object.assign(this.DEFAULTS, {
@@ -193,31 +192,6 @@ export default class SimplefogLayer extends MaskLayer {
 		this.addListener("pointermove", this._pointerMove);
 		this.dragging = false;
 		this.brushing = false;
-	}
-
-	/**
-	 * Adds the keyboard listeners to the layer
-	 */
-	_registerKeyboardListeners() {
-		$(document).keydown((event) => {
-			// Only react if simplefog layer is active
-			if (ui.controls.activeControl !== this.layername) return;
-			// Don't react if game body isn't target
-			if (!event.target.tagName === "BODY") return;
-			if (event.which === 219 && this.activeTool === "brush") {
-				const s = this.getUserSetting("brushSize");
-				this.setBrushSize(s * 0.8);
-			}
-			if (event.which === 221 && this.activeTool === "brush") {
-				const s = this.getUserSetting("brushSize");
-				this.setBrushSize(s * 1.25);
-			}
-			// React to ctrl+z
-			if (event.which === 90 && event.ctrlKey) {
-				event.stopPropagation();
-				this.undo();
-			}
-		});
 	}
 
 	/**

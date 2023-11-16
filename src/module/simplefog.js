@@ -51,8 +51,28 @@ Hooks.once("init", async () => {
 		restricted: true,
 		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
 	});
+	game.keybindings.register("simplefog", "undo", {
+		name: "Undo Change",
+		hint: "",
+		uneditable: [],
+		editable: [
+			{
+				key: "Z",
+				modifiers: ["Control"]
+			}
+		],
+		onDown: (context) => {
+			if (isActiveControl()) {
+				context.event.preventDefault();
+				canvas.simplefog.undo();
+			}
+		},
+		onUp: () => {},
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
+	});
 	game.keybindings.register("simplefog", "opacity", {
-		name: "Toggle Simple Fog's Opacity",
+		name: "Toggle Opacity",
 		hint: "Toggles the Brush Opacity's bar between Reveal/Hide. Only works while editing Simple Fog's layer.",
 		uneditable: [],
 		editable: [
@@ -69,6 +89,52 @@ Hooks.once("init", async () => {
 			}
 		},
 		onUp: () => {},
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+	});
+	game.keybindings.register("simplefog", "brushReduce", {
+		name: "Reduce Brush Size",
+		hint: "Only works while the Brush is selected.",
+		uneditable: [],
+		editable: [
+			{
+				key: "BracketLeft"
+			}
+		],
+		onDown: () => {
+			if (isActiveControl() && canvas.simplefog.activeTool === "brush") {
+				const s = canvas.simplefog.getUserSetting("brushSize");
+				canvas.simplefog.setBrushSize(Math.max(s * 0.8, 10));
+				let $slider = $("input[name=brushSize]");
+				let brushSize = $slider.val();
+				$slider.val(brushSize * 0.8);
+			}
+		},
+		onUp: () => {},
+		repeat: true,
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+	});
+	game.keybindings.register("simplefog", "brushIncrease", {
+		name: "Increase Brush Size",
+		hint: "Only works while the Brush is selected.",
+		uneditable: [],
+		editable: [
+			{
+				key: "BracketRight"
+			}
+		],
+		onDown: () => {
+			if (isActiveControl() && canvas.simplefog.activeTool === "brush") {
+				const s = canvas.simplefog.getUserSetting("brushSize");
+				canvas.simplefog.setBrushSize(Math.min(s * 1.25, 500));
+				let $slider = $("input[name=brushSize]");
+				let brushSize = $slider.val();
+				$slider.val(brushSize * 1.25);
+			}
+		},
+		onUp: () => {},
+		repeat: true,
 		restricted: true,
 		precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
 	});
