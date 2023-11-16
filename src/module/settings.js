@@ -24,14 +24,6 @@ export const registerSettings = function () {
 		default: true,
 		type: Boolean,
 	});
-	game.settings.register("simplefog", "enableHotKeys", {
-		name: "Enable Simplefog Hotkeys",
-		hint: "When enabled, you will be able to quickly swap to the Simplefog control by using Ctrl+S and toggle the opacity using the hotkey 'T'",
-		scope: "world",
-		config: true,
-		default: false,
-		type: Boolean,
-	});
 	game.settings.register("simplefog", "toolHotKeys", {
 		name: "Hotkey Tool",
 		hint: "When Hotkeys is enabled, define which tool will be selected by using Ctrl+S",

@@ -98,38 +98,6 @@ export function readPixel(target, x = 0, y = 0) {
 	return pixel;
 }
 
-/**
- * @returns bool
- */
-function areHotkeysEnabled() {
-	return game.settings.get("simplefog", "enableHotKeys");
-}
-
-/**
- * @param {Event} event
- * @returns bool
- */
-function toggleControls(event) {
-	return event.key === "s" && event.ctrlKey;
-}
-
-/**
- * @param {Event} event
- * @returns bool
- */
-function isOnCanvas(event) {
-	let $path = $(event.path[0]);
-	let allowedClasses = ["vtt", "game"];
-
-	for (let allowedClass of allowedClasses) {
-		if (!$path.hasClass(allowedClass)) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
 export function dmToGM(message) {
 	let whisper_to_dm = ChatMessage.create({
 		whisper: [game.user.id],

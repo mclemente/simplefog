@@ -29,7 +29,7 @@ Hooks.once("init", async () => {
 	};
 	game.keybindings.register("simplefog", "swap", {
 		name: "Swap to Simple Fog's Controls",
-		hint: "Toggles between the Token and Simple Fog layers.",
+		hint: "Toggles between the Token and Simple Fog layers. Check the module's settings to define which tool will be selected by default.",
 		uneditable: [],
 		editable: [
 			{
@@ -37,7 +37,8 @@ Hooks.once("init", async () => {
 				modifiers: ["Control"]
 			}
 		],
-		onDown: () => {
+		onDown: (context) => {
+			context.event.preventDefault();
 			let controlName = isActiveControl() ? "token" : "simplefog";
 			let toolName = game.settings.get("simplefog", "toolHotKeys");
 
@@ -51,7 +52,7 @@ Hooks.once("init", async () => {
 		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
 	});
 	game.keybindings.register("simplefog", "opacity", {
-		name: "Toggle Simplefog's Opacity",
+		name: "Toggle Simple Fog's Opacity",
 		hint: "Toggles the Brush Opacity's bar between Reveal/Hide. Only works while editing Simple Fog's layer.",
 		uneditable: [],
 		editable: [
