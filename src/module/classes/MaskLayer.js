@@ -152,7 +152,7 @@ export default class MaskLayer extends InteractionLayer {
 			let f = (fps * speed) / 1000;
 			while (f > 0) {
 				// Delay 1 frame before updating again
-				// eslint-disable-next-line no-await-in-loop
+				// eslint-disable-next-line no-promise-executor-return
 				await new Promise((resolve) => setTimeout(resolve, frame));
 				this.fogColorLayer.alpha -= rate;
 				f -= 1;
@@ -233,7 +233,7 @@ export default class MaskLayer extends InteractionLayer {
 			let f = (fps * speed) / 1000;
 			while (f > 0) {
 				// Delay 1 frame before updating again
-				// eslint-disable-next-line no-await-in-loop
+				// eslint-disable-next-line no-promise-executor-return
 				await new Promise((resolve) => setTimeout(resolve, frame));
 				this.fogImageOverlayLayer.alpha -= rate;
 				f -= 1;

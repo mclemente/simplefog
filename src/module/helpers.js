@@ -99,7 +99,7 @@ export function readPixel(target, x = 0, y = 0) {
 }
 
 export function dmToGM(message) {
-	let whisper_to_dm = ChatMessage.create({
+	ChatMessage.create({
 		whisper: [game.user.id],
 		blind: true,
 		content: message,
@@ -114,7 +114,7 @@ export function dmToAllGM(message) {
 		}
 	}
 
-	let whisper_to_dm = ChatMessage.create({
+	ChatMessage.create({
 		whisper: dm_ids,
 		blind: true,
 		content: message,

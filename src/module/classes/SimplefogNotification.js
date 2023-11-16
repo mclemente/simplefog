@@ -4,8 +4,6 @@
 import { dmToGM } from "../helpers.js";
 
 export default class SimplefogNotification {
-	constructor() {}
-
 	static checkVersion() {
     let packageVersion;
 

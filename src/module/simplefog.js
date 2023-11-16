@@ -202,7 +202,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 Hooks.on("renderSceneControls", (controls) => {
 	// Switching to layer
 	if (canvas.simplefog != null) {
-		if (controls.activeControl == "simplefog" && controls.activeTool != undefined) {
+		if (controls.activeControl === "simplefog" && controls.activeTool !== undefined) {
 			// Open brush tools if not already open
 			if (!$("#simplefog-brush-controls").length) new BrushControls().render(true);
 			// Set active tool
