@@ -3,21 +3,21 @@
 
 [![ko-fi](https://img.shields.io/badge/ko--fi-Support%20Me-red?style=flat-square&logo=ko-fi)](https://ko-fi.com/mclemente)
 
-# Simplefog
+# Simple Fog
 A module for [FoundryVTT](https://foundryvtt.com) that lets you draw fog of war manually.
 
 ## Feature overview video
 
 [![Feature Overview](https://img.youtube.com/vi/gTt6FDQ7iQA/hqdefault.jpg)](https://www.youtube.com/watch?v=gTt6FDQ7iQA)
 
-Encounter Library did a review of Simplefog which explains how it works much better than I can, please check it out if you would like an idea how this module works.
+Encounter Library did a review of Simple Fog which explains how it works much better than I can, please check it out if you would like an idea how this module works.
 
 ## Features
 
-- Simplefog implements a manual fog of war layer above the core vision layer
-  - Enable and disable the simplefog layer at any time, per scene
-  - This allows you to use both Simplefog AND the core vision for line of sight, or alternatively use only one or the other, on a scene by scene basis
-- Tokens can be automatically hidden and revealed when underneath Simplefog with a configurable opacity threshold
+- Simple Fog implements a manual fog of war layer above the core vision layer
+  - Enable and disable the Simple Fog layer at any time, per scene
+  - This allows you to use both Simple Fog AND the core vision for line of sight, or alternatively use only one or the other, on a scene by scene basis
+- Tokens can be automatically hidden and revealed when underneath Simple Fog with a configurable opacity threshold
 - Implements a history system so you can easily undo your actions
 - Various drawing tools for drawing and erasing fog of war manually
   - Brush tool
@@ -28,7 +28,7 @@ Encounter Library did a review of Simplefog which explains how it works much bet
     - Click the orange handle to finish your drawing, or right click to cancel
   - Grid tool
     - Reveals any grid square you drag across, works for both Hex and Square grids
-- Add an image to the Simplefog layer which overlays the selected tint for both GMs and Players.
+- Add an image to the Simple Fog layer which overlays the selected tint for both GMs and Players.
 
 ![Tools Palette](docs/simplefog-tools.jpg?raw=true "Tools Palette")
 
