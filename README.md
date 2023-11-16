@@ -6,11 +6,10 @@
 # Simple Fog
 A module for [FoundryVTT](https://foundryvtt.com) that lets you draw fog of war manually.
 
-## Feature overview video
+## Feature Overview Video
+Encounter Library did a review of Simple Fog which explains how it works much better than I can, please check it out if you would like an idea how this module works.
 
 [![Feature Overview](https://img.youtube.com/vi/gTt6FDQ7iQA/hqdefault.jpg)](https://www.youtube.com/watch?v=gTt6FDQ7iQA)
-
-Encounter Library did a review of Simple Fog which explains how it works much better than I can, please check it out if you would like an idea how this module works.
 
 ## Features
 
