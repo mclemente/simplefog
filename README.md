@@ -6,18 +6,6 @@
 # Simplefog
 A module for [FoundryVTT](https://foundryvtt.com) that lets you draw fog of war manually.
 
-## Installation
-
-It's always easiest to install modules from the in game add-on browser.
-
-To install this module manually:
-1.  Inside the Foundry "Configuration and Setup" screen, click "Add-on Modules"
-2.  Click "Install Module"
-3.  In the "Manifest URL" field, paste the following url:
-`https://raw.githubusercontent.com/League-of-Foundry-Developers/simplefog/master/src/module.json`
-4.  Click 'Install' and wait for installation to complete
-5.  Don't forget to enable the module in game using the "Manage Module" button
-
 ## Feature overview video
 
 [![Feature Overview](https://img.youtube.com/vi/gTt6FDQ7iQA/hqdefault.jpg)](https://www.youtube.com/watch?v=gTt6FDQ7iQA)
