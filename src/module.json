@@ -1,7 +1,7 @@
 {
 	"id": "simplefog",
-	"title": "Simplefog - Manual Fog of War",
-	"description": "Simplefog allows you to draw fog of war manually, optionally automatically hiding and revealing tokens underneath based on opacity. It provides a number of tools to quickly draw and erase fog in various shapes - brush, rectangles, ellipses, polygons or to reveal tiles you click/drag on the grid.",
+	"title": "Simple Fog - Manual Fog of War",
+	"description": "Simple Fog allows you to draw fog of war manually, optionally automatically hiding and revealing tokens underneath based on opacity. It provides a number of tools to quickly draw and erase fog in various shapes - brush, rectangles, ellipses, polygons or to reveal tiles you click/drag on the grid.",
 	"version": "This is auto replaced",
 	"authors": [
 		{

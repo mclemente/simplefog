@@ -12,7 +12,7 @@ export default class SimplefogConfig extends FormApplication {
 			width: 500,
 			template: "modules/simplefog/templates/scene-config.html",
 			id: "simplefog-scene-config",
-			title: game.i18n.localize("Simplefog Options"),
+			title: game.i18n.localize("Simple Fog Options"),
 		});
 	}
 

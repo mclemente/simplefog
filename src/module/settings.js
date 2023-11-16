@@ -1,7 +1,7 @@
 import SimplefogLayer from "./classes/SimplefogLayer.js";
 export const registerSettings = function () {
 	game.settings.register("simplefog", "migrationVersion", {
-		name: "Simplefog Migration Version",
+		name: "Simple Fog Migration Version",
 		scope: "world",
 		config: false,
 		type: Number,
@@ -9,8 +9,8 @@ export const registerSettings = function () {
 	});
 	// Register global config settings
 	game.settings.register("simplefog", "confirmFogDisable", {
-		name: "Confirm Disabling of Scene Simplefog",
-		hint: "When enabled, a confirmation dialog will be displayed before Simplefog can be toggled off for a scene",
+		name: "Confirm Disabling of Scene Simple Fog",
+		hint: "When enabled, a confirmation dialog will be displayed before Simple Fog can be toggled off for a scene",
 		scope: "world",
 		config: true,
 		default: true,
@@ -18,7 +18,7 @@ export const registerSettings = function () {
 	});
 	game.settings.register("simplefog", "autoEnableSceneFog", {
 		name: "Auto Enable Scene Fog",
-		hint: "When enabled, Simplefog will automatically be enabled for a scene when it is first created.",
+		hint: "When enabled, Simple Fog will automatically be enabled for a scene when it is first created.",
 		scope: "world",
 		config: true,
 		default: true,
@@ -26,7 +26,7 @@ export const registerSettings = function () {
 	});
 	game.settings.register("simplefog", "toolHotKeys", {
 		name: "Hotkey Tool",
-		hint: "When Hotkeys is enabled, define which tool will be selected by using Ctrl+S",
+		hint: "Define which tool will be selected when using the keybinding.",
 		scope: "world",
 		config: true,
 		default: "brush",
