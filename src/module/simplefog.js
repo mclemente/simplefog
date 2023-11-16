@@ -4,10 +4,6 @@ import SimplefogHUDControlLayer from "./classes/SimplefogHUDControlLayer.js";
 import SimplefogLayer from "./classes/SimplefogLayer.js";
 import SimplefogMigrations from "./classes/SimplefogMigrations.js";
 import SimplefogNotification from "./classes/SimplefogNotification.js";
-import {
-	addSimplefogControlToggleListener,
-	addSimplefogOpacityToggleListener,
-} from "./helpers.js";
 import { registerSettings } from "./settings.js";
 
 Hooks.once("init", async () => {
@@ -26,6 +22,54 @@ Hooks.once("init", async () => {
 		configurable: true,
 		writable: true,
 		enumerable: false,
+	});
+
+	const isActiveControl = () => {
+		return ui.controls.activeControl === "simplefog";
+	};
+	game.keybindings.register("simplefog", "swap", {
+		name: "Swap to Simple Fog's Controls",
+		hint: "Toggles between the Token and Simple Fog layers.",
+		uneditable: [],
+		editable: [
+			{
+				key: "S",
+				modifiers: ["Control"]
+			}
+		],
+		onDown: () => {
+			let controlName = isActiveControl() ? "token" : "simplefog";
+			let toolName = game.settings.get("simplefog", "toolHotKeys");
+
+			$(`li.scene-control[data-control=${controlName}]`)?.click();
+			setTimeout(function () {
+				$(`ol.sub-controls.active li.control-tool[data-tool=${toolName}]`)?.click();
+			}, 500);
+		},
+		onUp: () => {},
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
+	});
+	game.keybindings.register("simplefog", "opacity", {
+		name: "Toggle Simplefog's Opacity",
+		hint: "Toggles the Brush Opacity's bar between Reveal/Hide. Only works while editing Simple Fog's layer.",
+		uneditable: [],
+		editable: [
+			{
+				key: "T"
+			}
+		],
+		onDown: () => {
+			if (isActiveControl()) {
+				let $slider = $("input[name=brushOpacity]");
+				let brushOpacity = $slider.val();
+				$slider.val(brushOpacity === "100" ? 0 : 100);
+				$("form#simplefog-brush-controls-form").submit();
+			}
+		},
+		onUp: () => {},
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
 	});
 });
 
@@ -49,9 +93,6 @@ Hooks.once("ready", async () => {
 
 	// ToDo: Determine replacement for canvas.sight.refresh()
 	canvas.perception.refresh();
-
-	addSimplefogControlToggleListener();
-	addSimplefogOpacityToggleListener();
 });
 
 Hooks.once("canvasInit", () => {

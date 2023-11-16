@@ -98,22 +98,6 @@ export function readPixel(target, x = 0, y = 0) {
 	return pixel;
 }
 
-export function addSimplefogControlToggleListener() {
-	window.addEventListener("keydown", (event) => {
-		if (!areHotkeysEnabled() || !toggleControls(event) || !isOnCanvas(event)) {
-			return;
-		}
-
-		let controlName = getNewControlName();
-		let toolName = game.settings.get("simplefog", "toolHotKeys");
-
-		$(`li.scene-control[data-control=${controlName}]`)?.click();
-		setTimeout(function () {
-			$(`ol.sub-controls.active li.control-tool[data-tool=${toolName}]`)?.click();
-		}, 500);
-	});
-}
-
 /**
  * @returns bool
  */
@@ -144,52 +128,6 @@ function isOnCanvas(event) {
 	}
 
 	return true;
-}
-
-/**
- * @returns string
- */
-function getNewControlName() {
-	return isActiveControl() ? "token" : "simplefog";
-}
-
-/**
- * @returns bool
- */
-function isActiveControl() {
-	return getActiveControlName() === "simplefog";
-}
-
-/**
- * @returns string
- */
-function getActiveControlName() {
-	return ui.controls.activeControl;
-}
-
-export function addSimplefogOpacityToggleListener() {
-	window.addEventListener("keydown", (event) => {
-		if (!areHotkeysEnabled() || !toggleOpacity(event) || !isOnCanvas(event) || !isActiveControl()) {
-			return;
-		}
-
-		toggleSliderAndSubmitForm();
-	});
-}
-
-/**
- * @param {Event} event
- * @returns bool
- */
-function toggleOpacity(event) {
-	return event.key === "t";
-}
-
-function toggleSliderAndSubmitForm() {
-	let $slider = $("input[name=brushOpacity]");
-	let brushOpacity = $slider.val();
-	$slider.val(brushOpacity === "100" ? 0 : 100);
-	$("form#simplefog-brush-controls-form").submit();
 }
 
 export function dmToGM(message) {
