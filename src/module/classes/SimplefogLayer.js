@@ -170,8 +170,6 @@ export default class SimplefogLayer extends MaskLayer {
 		// React to Image Overylay file changes
 		if (hasProperty(data, `flags.${this.layername}.fogImageOverlayFilePath`)) {
 			canvas[this.layername].setFogImageOverlayTexture(data.flags[this.layername].fogImageOverlayFilePath);
-		} else {
-			canvas[this.layername].setFogImageOverlayTexture(undefined);
 		}
 
 		if (game.user.isGM && hasProperty(data, `flags.${this.layername}.fogImageOverlayGMAlpha`)) {
