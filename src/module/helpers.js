@@ -1,32 +1,3 @@
-import CONSTANTS from "./constants.js";
-
-// ======================================
-// LOGGER UTILITY
-// =======================================
-
-/**
- * Prints formatted console msg if string, otherwise dumps object
- * @param data {String | Object} Output to be dumped
- * @param force {Boolean}        Log output even if CONFIG.debug.simplefog = false
- */
-export function simplefogLog(data, force = false) {
-	try {
-		const isDebugging = game.modules.get("_dev-mode")?.api?.getPackageDebugValue(CONSTANTS.MODULE_NAME);
-		if (force || isDebugging) {
-			// eslint-disable-next-line no-console
-			if (typeof data === "string") console.log(`Simplefog | ${data}`);
-			// eslint-disable-next-line no-console
-			else console.log("Simplefog |", data);
-		}
-	} catch (e) {}
-}
-
-export function simplefogLogDebug(...args) {
-	if (game.settings.get(CONSTANTS.MODULE_NAME, "debug")) {
-		console.debug("Simplefog-DEBUG |", ...args);
-	}
-}
-
 // ======================================
 // PIXI UTILITY
 // =======================================
@@ -127,102 +98,8 @@ export function readPixel(target, x = 0, y = 0) {
 	return pixel;
 }
 
-export function addSimplefogControlToggleListener() {
-	window.addEventListener("keydown", (event) => {
-		if (!areHotkeysEnabled() || !toggleControls(event) || !isOnCanvas(event)) {
-			return;
-		}
-
-		let controlName = getNewControlName();
-		let toolName = game.settings.get("simplefog", "toolHotKeys");
-
-		$("li.scene-control[data-control=" + controlName + "]")?.click();
-		setTimeout(function () {
-			$("ol.sub-controls.active li.control-tool[data-tool=" + toolName + "]")?.click();
-		}, 500);
-	});
-}
-
-/**
- * @returns bool
- */
-function areHotkeysEnabled() {
-	return game.settings.get("simplefog", "enableHotKeys");
-}
-
-/**
- * @param {Event} event
- * @returns bool
- */
-function toggleControls(event) {
-	return event.key === "s" && event.ctrlKey;
-}
-
-/**
- * @param {Event} event
- * @returns bool
- */
-function isOnCanvas(event) {
-	let $path = $(event.path[0]);
-	let allowedClasses = ["vtt", "game"];
-
-	for (let allowedClass of allowedClasses) {
-		if (!$path.hasClass(allowedClass)) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-/**
- * @returns string
- */
-function getNewControlName() {
-	return isActiveControl() ? "token" : "simplefog";
-}
-
-/**
- * @returns bool
- */
-function isActiveControl() {
-	return getActiveControlName() === "simplefog";
-}
-
-/**
- * @returns string
- */
-function getActiveControlName() {
-	return ui.controls.activeControl;
-}
-
-export function addSimplefogOpacityToggleListener() {
-	window.addEventListener("keydown", (event) => {
-		if (!areHotkeysEnabled() || !toggleOpacity(event) || !isOnCanvas(event) || !isActiveControl()) {
-			return;
-		}
-
-		toggleSliderAndSubmitForm();
-	});
-}
-
-/**
- * @param {Event} event
- * @returns bool
- */
-function toggleOpacity(event) {
-	return event.key === "t";
-}
-
-function toggleSliderAndSubmitForm() {
-	let $slider = $("input[name=brushOpacity]");
-	let brushOpacity = $slider.val();
-	$slider.val(brushOpacity === "100" ? 0 : 100);
-	$("form#simplefog-brush-controls-form").submit();
-}
-
 export function dmToGM(message) {
-	let whisper_to_dm = ChatMessage.create({
+	ChatMessage.create({
 		whisper: [game.user.id],
 		blind: true,
 		content: message,
@@ -230,14 +107,14 @@ export function dmToGM(message) {
 }
 
 export function dmToAllGM(message) {
-	var dm_ids = [];
+	let dm_ids = [];
 	for (let indexA = 0; indexA < game.users.length; indexA++) {
 		if (game.users[indexA].value.isGM) {
 			dm_ids.push(game.users[indexA].key);
 		}
 	}
 
-	let whisper_to_dm = ChatMessage.create({
+	ChatMessage.create({
 		whisper: dm_ids,
 		blind: true,
 		content: message,

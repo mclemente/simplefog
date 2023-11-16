@@ -1,12 +1,111 @@
-import SimplefogConfig from "../classes/SimplefogConfig.js";
-import BrushControls from "../classes/BrushControls.js";
-import { simplefogLogDebug } from "./helpers.js";
+import BrushControls from "./classes/BrushControls.js";
+import SimplefogConfig from "./classes/SimplefogConfig.js";
+import SimplefogHUDControlLayer from "./classes/SimplefogHUDControlLayer.js";
+import SimplefogLayer from "./classes/SimplefogLayer.js";
+import SimplefogMigrations from "./classes/SimplefogMigrations.js";
+import SimplefogNotification from "./classes/SimplefogNotification.js";
+import { registerSettings } from "./settings.js";
+
+Hooks.once("init", async () => {
+	registerSettings();
+	CONFIG.Canvas.layers.simplefog = { group: "interface", layerClass: SimplefogLayer };
+	CONFIG.Canvas.layers.simplefogHUDControls = { group: "interface", layerClass: SimplefogHUDControlLayer };
+
+	Object.defineProperty(canvas, "simplefog", {
+		value: new SimplefogLayer(),
+		configurable: true,
+		writable: true,
+		enumerable: false,
+	});
+	Object.defineProperty(canvas, "simplefogHUDControls", {
+		value: new SimplefogHUDControlLayer(),
+		configurable: true,
+		writable: true,
+		enumerable: false,
+	});
+
+	const isActiveControl = () => {
+		return ui.controls.activeControl === "simplefog";
+	};
+	game.keybindings.register("simplefog", "swap", {
+		name: "Swap to Simple Fog's Controls",
+		hint: "Toggles between the Token and Simple Fog layers. Check the module's settings to define which tool will be selected by default.",
+		uneditable: [],
+		editable: [
+			{
+				key: "S",
+				modifiers: ["Control"]
+			}
+		],
+		onDown: (context) => {
+			context.event.preventDefault();
+			let controlName = isActiveControl() ? "token" : "simplefog";
+			let toolName = game.settings.get("simplefog", "toolHotKeys");
+
+			$(`li.scene-control[data-control=${controlName}]`)?.click();
+			setTimeout(function () {
+				$(`ol.sub-controls.active li.control-tool[data-tool=${toolName}]`)?.click();
+			}, 500);
+		},
+		onUp: () => {},
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
+	});
+	game.keybindings.register("simplefog", "opacity", {
+		name: "Toggle Simple Fog's Opacity",
+		hint: "Toggles the Brush Opacity's bar between Reveal/Hide. Only works while editing Simple Fog's layer.",
+		uneditable: [],
+		editable: [
+			{
+				key: "T"
+			}
+		],
+		onDown: () => {
+			if (isActiveControl()) {
+				let $slider = $("input[name=brushOpacity]");
+				let brushOpacity = $slider.val();
+				$slider.val(brushOpacity === "100" ? 0 : 100);
+				$("form#simplefog-brush-controls-form").submit();
+			}
+		},
+		onUp: () => {},
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+	});
+});
+
+Hooks.once("ready", async () => {
+	// Check if any migrations need to be performed
+	SimplefogMigrations.check();
+
+	// Fix simplefog zIndex
+
+	canvas.simplefog.refreshZIndex();
+	// ToDo: why is this set below???
+	// canvas.simplefogHUDControls.zIndex = canvas.simplefog.getSetting('layerZindex') - 1;
+
+	// Move object hud to tokens layer
+	game.canvas.controls.hud.setParent(game.canvas.simplefogHUDControls);
+
+	// Check if new version; if so send DM to GM
+	SimplefogNotification.checkVersion();
+
+	// Hooks.on('sightRefresh', sightLayerUpdate);
+
+	// ToDo: Determine replacement for canvas.sight.refresh()
+	canvas.perception.refresh();
+});
+
+Hooks.once("canvasInit", () => {
+	canvas.simplefog.canvasInit();
+});
+
+// from controls.js
 
 /**
  * Add control buttons
  */
 Hooks.on("getSceneControlButtons", (controls) => {
-	simplefogLogDebug("controls.getSceneControlButtons");
 	if (!game.user.isGM) return;
 	controls.push({
 		name: "simplefog",
@@ -101,10 +200,9 @@ Hooks.on("getSceneControlButtons", (controls) => {
  * and switching active brush flag
  */
 Hooks.on("renderSceneControls", (controls) => {
-	simplefogLogDebug("controls.renderSceneControls");
 	// Switching to layer
 	if (canvas.simplefog != null) {
-		if (controls.activeControl == "simplefog" && controls.activeTool != undefined) {
+		if (controls.activeControl === "simplefog" && controls.activeTool !== undefined) {
 			// Open brush tools if not already open
 			if (!$("#simplefog-brush-controls").length) new BrushControls().render(true);
 			// Set active tool
@@ -138,7 +236,6 @@ function setBrushControlPos() {
  * Toggle Simple Fog
  */
 function toggleSimpleFog() {
-	simplefogLogDebug("controls.toggleSimpleFog");
 	if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
 		let dg = Dialog.confirm({
 			title: game.i18n.localize("SIMPLEFOG.disableFog"),
@@ -157,7 +254,7 @@ function toggleSimpleFog() {
 function toggleOffSimpleFog() {
 	canvas.simplefog.toggle();
 
-	//ToDo: Determine replacement for canvas.sight.refresh()
+	// ToDo: Determine replacement for canvas.sight.refresh()
 	canvas.perception.refresh();
 }
 
@@ -169,7 +266,3 @@ function cancelToggleSimpleFog(result = undefined) {
 // Reset position when brush controls are rendered or sceneNavigation changes
 Hooks.on("renderBrushControls", setBrushControlPos);
 Hooks.on("renderSceneNavigation", setBrushControlPos);
-
-// Moved to simplefog.ready
-// addSimplefogControlToggleListener();
-// addSimplefogOpacityToggleListener();

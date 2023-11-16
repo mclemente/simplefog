@@ -21,7 +21,7 @@ function _getCanvasCoords(placeable) {
 			x: Math.round(grid / 2 + p.x),
 			y: Math.round(grid / 2 + p.y),
 		};
-	} catch (error) {
+	} catch(error) {
 		return {
 			x: Math.round(grid / 2),
 			y: Math.round(grid / 2),

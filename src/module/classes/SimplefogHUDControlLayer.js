@@ -9,7 +9,7 @@ export default class SimplefogHUDControlLayer extends InteractionLayer {
 	}
 
 	static get layerOptions() {
-		//@ts-ignore
+		// @ts-ignore
 		return super.layerOptions;
 	}
 }

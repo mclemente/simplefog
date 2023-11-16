@@ -1,4 +1,4 @@
-import { hexToPercent, percentToHex } from "../js/helpers.js";
+import { hexToPercent, percentToHex } from "../helpers.js";
 
 export default class BrushControls extends FormApplication {
 	static get defaultOptions() {
@@ -11,7 +11,7 @@ export default class BrushControls extends FormApplication {
 			editable: game.user.isGM,
 			template: "modules/simplefog/templates/brush-controls.html",
 			id: "filter-config",
-			title: game.i18n.localize("Simplefog Options"),
+			title: game.i18n.localize("Simple Fog Options"),
 		});
 	}
 

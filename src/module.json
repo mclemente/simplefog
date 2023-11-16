@@ -1,153 +1,40 @@
 {
 	"id": "simplefog",
-	"title": "Simplefog - Manual Fog of War",
-	"description": "Simplefog allows you to draw fog of war manually, optionally automatically hiding and revealing tokens underneath based on opacity. It provides a number of tools to quickly draw and erase fog in various shapes - brush, rectangles, ellipses, polygons or to reveal tiles you click/drag on the grid.",
-	"version": "0.3.4",
+	"title": "Simple Fog - Manual Fog of War",
+	"description": "Simple Fog allows you to draw fog of war manually, optionally automatically hiding and revealing tokens underneath based on opacity. It provides a number of tools to quickly draw and erase fog in various shapes - brush, rectangles, ellipses, polygons or to reveal tiles you click/drag on the grid.",
+	"version": "This is auto replaced",
 	"authors": [
 		{
-			"name": "Vance Cole",
-			"url": "",
-			"discord": "",
-			"twitter": "",
-			"patreon": "",
-			"github": "",
-			"ko-fi": "",
-			"reddit": "",
-			"email": ""
-		},
-		{
-			"name": "Chris Hampton",
-			"url": "",
-			"discord": "",
-			"twitter": "",
-			"patreon": "",
-			"github": "",
-			"ko-fi": "",
-			"reddit": "",
-			"email": ""
-		},
-		{
-			"name": "Jeremy",
-			"url": "https://github.com/UranusBytes",
-			"discord": "",
-			"twitter": "",
-			"patreon": "",
-			"github": "UranusBytes",
-			"ko-fi": "",
-			"reddit": "",
-			"email": ""
-		},
-		{
-			"name": "p4535992",
-			"url": "https://github.com/p4535992",
-			"discord": "",
-			"twitter": "",
-			"patreon": "",
-			"github": "p4535992",
-			"ko-fi": "",
-			"reddit": "",
-			"email": ""
-		},
-		{
-			"name": "cirrahn",
-			"url": "https://github.com/cirrahn",
-			"discord": "",
-			"twitter": "",
-			"patreon": "cirrahn",
-			"github": "cirrahn",
-			"ko-fi": "",
-			"reddit": "",
-			"email": ""
-		},
-		{
-			"name": "macskay",
-			"url": "https://github.com/macskay",
-			"discord": "",
-			"twitter": "",
-			"patreon": "",
-			"github": "macskay",
-			"ko-fi": "",
-			"reddit": "",
-			"email": ""
-		},
-		{
-			"name": "mattd",
-			"url": "https://github.com/mattd",
-			"discord": "",
-			"twitter": "",
-			"patreon": "",
-			"github": "mattd",
-			"ko-fi": "",
-			"reddit": "",
-			"email": ""
+			"name": "Matheus Clemente",
+			"discord": "mclemente#5524"
 		}
 	],
-	"type": "module",
 	"socket": true,
-	"includes": [
-		"./assets/**",
-		"./lang/**",
-		"./languages/**",
-		"./scripts/**",
-		"./styles/**",
-		"./templates/**",
-		"./module.json",
-		"./README.md",
-		"./icons/**",
-		"./packs/**"
-	],
-	"media": [
-		{
-			"type": "icon",
-			"location": ""
-		},
-		{
-			"type": "cover",
-			"location": ""
-		},
-		{
-			"type": "screenshot",
-			"location": ""
-		}
-	],
 	"languages": [
 		{
 			"lang": "en",
 			"name": "English",
-			"path": "languages/en.json"
+			"path": "lang/en.json"
 		},
 		{
 			"lang": "es",
 			"name": "Español",
-			"path": "languages/es.json"
+			"path": "lang/es.json"
 		},
 		{
 			"lang": "ja",
 			"name": "日本語 (Japanese)",
-			"path": "languages/ja.json"
+			"path": "lang/ja.json"
 		}
 	],
-	"packs": [],
-	"systems": [],
-	"scripts": [],
-	"esmodules": ["main.js", "js/controls.js"],
-	"styles": ["css/brush-controls.css"],
+	"esmodules": ["module/simplefog.js"],
+	"styles": ["styles/simplefog.css"],
 	"compatibility": {
-		"minimum": 10,
-		"verified": 11.306,
+		"minimum": 11,
+		"verified": 11,
 		"maximum": 11
 	},
-	"manifestPlusVersion": "1.2.1",
-	"url": "https://github.com/League-of-Foundry-Developers/simplefog",
-	"manifest": "https://github.com/League-of-Foundry-Developers/simplefog/releases/latest/download/module.json",
-	"download": "https://github.com/League-of-Foundry-Developers/simplefog/releases/latest/download/module.zip",
-	"readme": "https://github.com/League-of-Foundry-Developers/simplefog/blob/v0.3.4/README.md",
-	"changelog": "https://github.com/League-of-Foundry-Developers/simplefog/blob/v0.3.4/CHANGELOG.md",
-	"bugs": "https://github.com/League-of-Foundry-Developers/simplefog/issues",
-	"allowBugReporter": true,
-	"relationships": {
-		"systems": [],
-		"requires": [],
-		"conflicts": []
-	}
+	"url": "This is auto replaced",
+	"manifest": "This is auto replaced",
+	"download": "This is auto replaced"
 }

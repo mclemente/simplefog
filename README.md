@@ -1,23 +1,10 @@
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/League-of-Foundry-Developers/simplefog) ![GitHub Releases](https://img.shields.io/github/downloads/League-of-Foundry-Developers/simplefog/latest/total) ![GitHub Releases](https://img.shields.io/github/downloads/League-of-Foundry-Developers/simplefog/total) ![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fsimplefog&colorB=4aa94a) ![Foundry Version](https://img.shields.io/endpoint?url=https://foundryshields.com/version?url=https%3A%2F%2Fgithub.com%2FLeague-of-Foundry-Developers%2Fsimplefog%2Freleases%2Flatest%2Fdownload%2Fmodule.json)
+![GitHub release](https://img.shields.io/github/release-date/mclemente/simplefog)
+![GitHub release (latest by SemVer and asset)](https://img.shields.io/github/downloads/mclemente/simplefog/latest/module.zip)
 
-![Latest Release Download Count](https://img.shields.io/github/downloads/League-of-Foundry-Developers/simplefog/latest/module.zip?color=2b82fc&label=DOWNLOADS&style=for-the-badge) [![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fsimplefog&colorB=006400&style=for-the-badge)](https://forge-vtt.com/bazaar#package=simplefog) ![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2FLeague-of-Foundry-Developers%2Fsimplefog%2Fmaster%2Fsrc%2Fmodule.json&label=Foundry%20Version&query=$.compatibility.verified&colorB=orange&style=for-the-badge) ![Latest Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2FLeague-of-Foundry-Developers%2Fsimplefog%2Fmaster%2Fsrc%2Fmodule.json&label=Latest%20Release&prefix=v&query=$.version&colorB=red&style=for-the-badge) [![Foundry Hub Endorsements](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fsimplefog%2Fshield%2Fendorsements&style=for-the-badge)](https://www.foundryvtt-hub.com/package/simplefog/) ![GitHub all releases](https://img.shields.io/github/downloads/League-of-Foundry-Developers/simplefog/total?style=for-the-badge)
-
-[![Translation status](https://weblate.foundryvtt-hub.com/widgets/simplefog/-/287x66-black.png)](https://weblate.foundryvtt-hub.com/engage/simplefog/)
+[![ko-fi](https://img.shields.io/badge/ko--fi-Support%20Me-red?style=flat-square&logo=ko-fi)](https://ko-fi.com/mclemente)
 
 # Simplefog
 A module for [FoundryVTT](https://foundryvtt.com) that lets you draw fog of war manually.
-
-## Installation
-
-It's always easiest to install modules from the in game add-on browser.
-
-To install this module manually:
-1.  Inside the Foundry "Configuration and Setup" screen, click "Add-on Modules"
-2.  Click "Install Module"
-3.  In the "Manifest URL" field, paste the following url:
-`https://raw.githubusercontent.com/League-of-Foundry-Developers/simplefog/master/src/module.json`
-4.  Click 'Install' and wait for installation to complete
-5.  Don't forget to enable the module in game using the "Manage Module" button
 
 ## Feature overview video
 
@@ -66,8 +53,6 @@ Allows you to set various options which affect the entire layer for the current 
 - Sepia / monochrome filters
 - Add indicator icon of player controlled icons hidden under fog
 - Currently incompatible with the module "GM Scene Background" when a GM layer is active
-
-## Api
 
 # Build
 
@@ -140,6 +125,6 @@ Any issues, bugs, or feature requests are always welcome to be reported directly
 ## License
 
 This package is under an [MIT license](LICENSE) and the [Foundry Virtual Tabletop Limited License Agreement for module development](https://foundryvtt.com/article/license/).
-## Credit
 
-- This is a continuation of SimpleFog, created by Vance. This is now being maintained under this fork with his permission. This was under the MIT license and continues to be so.
+## Credit
+- This is a fork of SimpleFog, created by Vance.

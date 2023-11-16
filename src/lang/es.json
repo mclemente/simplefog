@@ -1,0 +1,78 @@
+{
+	"I18N.LANGUAGE": "Español",
+	"I18N.MAINTAINERS": "@Viriato139ac#0342",
+
+	"SIMPLEFOG": {
+		"brushOpacity": "Opacidad del pincel",
+		"brushSize": "Tamaño del pincel",
+		"hide": "Ocultar",
+		"reveal": "Mostrar",
+
+		"gmFogSettings": "Ajustes de niebla del GM",
+		"gmColorTint": "Color",
+		"gmColorAlpha": "Opacidad",
+
+		"playerFogSettings": "Ajustes de niebla del jugador",
+		"playerColorTint": "Color",
+		"playerColorAlpha": "Color Opacidad",
+
+		"fogImageOverlaySettings": "Imagen de superposición de niebla",
+		"fogImageOverlay": "Imagen",
+		"fogImageOverlayNotes": "La imagen seleccionada se mostrará arriba/abajo del color del tinte. Esta imagen debe tener la misma altura y anchura que la imagen de fondo de la escena.",
+		"fogImageOverlayGMAlpha": "Opacidad de imagen GM",
+		"fogImageOverlayPlayerAlpha": "Opacidad de la imagen del jugador",
+		"fogImageOverlayZIndex": "Orden de clasificación de máscaras",
+
+		"filterSettings": "Ajustes del filtro",
+		"blurEnable": "Habilitar Revelar desenfoque",
+		"blurRadius": "Radio del difuminado",
+		"blurQuality": "Calidad del difuminado",
+		"blurQualityDesc": "Cuanto mayor sea la calidad mejor será la apariencia del efecto de difuminado, sin embargo, puede causar en que baje el rendimiento",
+		"transitionSettings": "Ajustes de transición",
+		"enableTransitions": "Habilitar transiciones",
+		"transitionSpeed": "Velocidad de la transición",
+		"visibilitySettings": "Ajustes de visibilidad",
+		"enableAutovis": "Habilitar visibilidad automática",
+		"enableForGM": "Habilitar para el GM",
+		"enableAutoFog": "Habilitar la niebla automáticamente para las nuevas escenas",
+		"visThreshold": "Umbral de visibilidad",
+		"saveAsDef": "Guardar como por defecto los ajustes actuales",
+		"ok": "OK",
+		"sf": "Simple Fog",
+		"onoff": "Habilitar/deshabilitar Simple Fog",
+
+		"brushTool": "Herramienta pincel",
+		"gridTool": "Herramienta rejilla",
+		"polygonTool": "Herramienta polígono",
+		"boxTool": "Herramienta rectángulo",
+		"ellipseTool": "Herramienta elipse",
+		"sceneConfig": "Configuración de la escena",
+		"reset": "Reiniciar niebla",
+		"confirmReset": "¿Está seguro? Se reiniciará la niebla de guerra",
+		"autoFogSettings": "Ajustes de niebla automática",
+		"autoFogNotes": "Cuando se activa y se guarda por defecto, la niebla se generará automáticamente cuando cree la escena. Por favor, active esta opción y pulse 'Guardar como por defecto los ajustes actuales' para habilitarlo. Realice el mismo proceso, pero al contrario, para deshabilitarlo",
+
+		"advancedSettings": "Ajustes avanzados",
+		"configurableZindex": "Índice Z de niebla simple",
+		"configurableZindexNotes": "El índice z determina el orden en el que se representan varias capas dentro del lienzo de Foundry. Se representará un número más alto sobre las capas con números más bajos (y los objetos en esa capa). Esto permite el ajuste del índice z para permitir que Simple Fog se represente por encima o por debajo de otras capas; particularmente los agregados por otros módulos. Ir por debajo de 200 se entremezclará con las capas de Foundry, como la imagen de primer plano (200), tokens (100), etc. (Predeterminado: 220)",
+
+		"confirmDisablingFogSettings": "Confirmar la desactivación de la niebla simple",
+		"confirmDisablingFog": "Habilite la confirmación para deshabilitar la niebla simple.",
+		"confirmDisablingFogNotes": "Al deshabilitar niebla para una escena, presente un cuadro de diálogo para confirmar la desactivación antes de hacerlo.",
+		"confirmDisableFog": "¿Estás seguro de que quieres desactivar Simple Fog para esta escena?",
+		"disableFog": "Desactivar niebla",
+
+		"hotkeySettings": "Configuración de teclas de acceso rápido",
+		"enableHotkeys": "Habilitar teclas de acceso rápido",
+		"hotkeyNotes": "Cuando esté habilitado, podrá cambiar rápidamente al control de niebla simple usando Ctrl + S y alternar la opacidad usando la tecla de acceso directo 'T'",
+		"hotKeyToolDesc": "Herramienta de teclas de acceso directo",
+		"hotKeyToolNotes": "Determine qué herramienta se seleccionará cuando se active la tecla de acceso directo.",
+
+		"autoVisNotes": "Cuando se activa, la visibilidad automática mostrará/ocultará los iconos en base al nivel de opacidad de la niebla en su localización y el umbral que se especifique. El color del pincel cambia a verde/rojo para indicar si el token es visible",
+
+		"versionNotification": "<b>Simple Fog 0.3.4</b><p>Esta versión incluye:</p><ul><li>Arreglos para v11 de macskay <a href='https://github.com/League-of-Foundry-Developers/simplefog/pull/110'>#110</a></li><li>Arreglos para v11 por mattd <a href='https://github.com/League-of-Foundry-Developers/simplefog/pull/111'>#111</a></li></ul></p>",
+
+		"migration2Notification": "<b>Migración de datos de Simple Fog</b><p>Los datos de Simple Fog se han migrado a un formato compatible con v3. Se recomienda <b>MUY</b> revisar todas las escenas y la visibilidad de la niebla, tanto desde la vista del DJ como del jugador, antes de mostrar la escena a los jugadores."
+
+	}
+}

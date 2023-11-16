@@ -3,13 +3,12 @@
  * Implements tools for manipulating the MaskLayer
  */
 
+import { Layout } from "../../libs/hexagons.js";
+import { hexObjsToArr, hexToPercent } from "../helpers.js";
 import MaskLayer from "./MaskLayer.js";
-import { Layout } from "../libs/hexagons.js";
-import { hexObjsToArr, hexToPercent, simplefogLog, simplefogLogDebug } from "../js/helpers.js";
 
 export default class SimplefogLayer extends MaskLayer {
 	constructor() {
-		simplefogLogDebug("SimplefogLayer.constructor");
 		super("simplefog");
 
 		// Register event listerenrs
@@ -47,7 +46,6 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	initSimplefog() {
-		simplefogLogDebug("SimplefogLayer.init");
 		// Preview brush objects
 		this.boxPreview = this.brush({
 			shape: this.BRUSH_TYPES.BOX,
@@ -95,7 +93,6 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	canvasInit() {
-		simplefogLogDebug("SimplefogLayer.canvasInit");
 		// Set default flags if they dont exist already
 		Object.keys(this.DEFAULTS).forEach((key) => {
 			if (!game.user.isGM) return;
@@ -108,7 +105,7 @@ export default class SimplefogLayer extends MaskLayer {
 			// Otherwise fall back to module default
 			else this.setSetting(key, this.DEFAULTS[key]);
 		});
-		//this.setColorAlpha(this.getColorAlpha(), true);
+		// this.setColorAlpha(this.getColorAlpha(), true);
 	}
 
 	/* -------------------------------------------- */
@@ -146,15 +143,15 @@ export default class SimplefogLayer extends MaskLayer {
 		if (hasProperty(data, `flags.${this.layername}.history`)) {
 			canvas[this.layername].renderStack(data.flags[this.layername].history);
 
-			//ToDo: Determine replacement for canvas.sight.refresh()
+			// ToDo: Determine replacement for canvas.sight.refresh()
 			canvas.perception.refresh();
 		}
 		// React to autoVisibility setting changes
 		if (
-			hasProperty(data, `flags.${this.layername}.autoVisibility`) ||
-			hasProperty(data, `flags.${this.layername}.vThreshold`)
+			hasProperty(data, `flags.${this.layername}.autoVisibility`)
+			|| hasProperty(data, `flags.${this.layername}.vThreshold`)
 		) {
-			//ToDo: Determine replacement for canvas.sight.refresh()
+			// ToDo: Determine replacement for canvas.sight.refresh()
 			canvas.perception.refresh();
 		}
 		// React to alpha/tint changes
@@ -184,8 +181,7 @@ export default class SimplefogLayer extends MaskLayer {
 		if (!game.user.isGM && hasProperty(data, `flags.${this.layername}.fogImageOverlayPlayerAlpha`)) {
 			canvas[this.layername].setFogImageOverlayAlpha(data.flags[this.layername].fogImageOverlayPlayerAlpha);
 		}
-		if (hasProperty(data, `flags.${this.layername}.fogImageOverlayZIndex`))
-			canvas[this.layername].setFogImageOverlayZIndex(data.flags[this.layername].fogImageOverlayZIndex);
+		if (hasProperty(data, `flags.${this.layername}.fogImageOverlayZIndex`)) canvas[this.layername].setFogImageOverlayZIndex(data.flags[this.layername].fogImageOverlayZIndex);
 	}
 
 	/**
@@ -228,7 +224,6 @@ export default class SimplefogLayer extends MaskLayer {
 	 * Sets the active tool & shows preview for brush & grid tools
 	 */
 	setActiveTool(tool) {
-		simplefogLogDebug("SimplefogLayer.setActiveTool");
 		this.clearActiveTool();
 		this.activeTool = tool;
 		this.setPreviewTint();
@@ -280,26 +275,26 @@ export default class SimplefogLayer extends MaskLayer {
 		try {
 			// Box preview
 			this.boxPreview.visible = false;
-		} catch (err) {}
+		} catch(err) {}
 		try {
 			// Ellipse Preview
 			this.ellipsePreview.visible = false;
-		} catch (err) {}
+		} catch(err) {}
 		try {
 			// Shape preview
 			this.polygonPreview.clear();
 			this.polygonPreview.visible = false;
 			this.polygonHandle.visible = false;
 			this.polygon = [];
-		} catch (err) {}
+		} catch(err) {}
 		try {
 			// Cancel op flag
 			this.op = false;
-		} catch (err) {}
+		} catch(err) {}
 		try {
 			// Clear history buffer
 			this.historyBuffer = [];
-		} catch (err) {}
+		} catch(err) {}
 	}
 
 	/**
@@ -718,7 +713,6 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	async draw() {
-		simplefogLogDebug("SimplefogLayer.draw");
 		super.draw();
 		this.initSimplefog();
 
