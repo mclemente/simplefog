@@ -163,7 +163,24 @@ Hooks.once("ready", async () => {
 });
 
 Hooks.once("canvasInit", () => {
-	canvas.simplefog.canvasInit();
+	if (!game.user.isGM) return;
+	Object.keys(canvas.simplefog.DEFAULTS).forEach((key) => {
+		// Check for existing scene specific setting
+		if (canvas.simplefog.getSetting(key) !== undefined) return;
+		// Check for custom default
+		const def = canvas.simplefog.getUserSetting(key);
+		// If user has custom default, set it for scene
+		if (def !== undefined) canvas.simplefog.setSetting(key, def);
+		// Otherwise fall back to module default
+		else canvas.simplefog.setSetting(key, canvas.simplefog.DEFAULTS[key]);
+	});
+});
+
+Hooks.on("canvasInit", () => {
+	const overlayFile = canvas.simplefog.getSetting("fogImageOverlayFilePath");
+	if (overlayFile) {
+		canvas.loadTexturesOptions.additionalSources.push(overlayFile);
+	}
 });
 
 // from controls.js

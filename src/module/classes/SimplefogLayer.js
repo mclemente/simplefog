@@ -91,22 +91,6 @@ export default class SimplefogLayer extends MaskLayer {
 		});
 	}
 
-	canvasInit() {
-		// Set default flags if they dont exist already
-		Object.keys(this.DEFAULTS).forEach((key) => {
-			if (!game.user.isGM) return;
-			// Check for existing scene specific setting
-			if (this.getSetting(key) !== undefined) return;
-			// Check for custom default
-			const def = this.getUserSetting(key);
-			// If user has custom default, set it for scene
-			if (def !== undefined) this.setSetting(key, def);
-			// Otherwise fall back to module default
-			else this.setSetting(key, this.DEFAULTS[key]);
-		});
-		// this.setColorAlpha(this.getColorAlpha(), true);
-	}
-
 	/* -------------------------------------------- */
 	/*  Event Listeners and Handlers                */
 	/* -------------------------------------------- */

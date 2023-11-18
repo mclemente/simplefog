@@ -63,7 +63,7 @@ export default class MaskLayer extends InteractionLayer {
 	 * maskTexture - renderable texture that holds the actual mask data
 	 * fogImageOverlayLayer   - PIXI Sprite that holds the image applied over the fog color
 	 */
-	async initMask() {
+	initMask() {
 		// Check if masklayer is flagged visible
 		let v = this.getSetting("visible");
 		if (v === undefined) v = false;
@@ -104,7 +104,7 @@ export default class MaskLayer extends InteractionLayer {
 
 		// apply image overlay to fog layer after we renderStack to prevent revealing the map
 		const fogImageOverlayFilePath = this.getSetting("fogImageOverlayFilePath");
-		const texture = await this.getFogImageOverlayTexture(fogImageOverlayFilePath);
+		const texture = this.getFogImageOverlayTexture(fogImageOverlayFilePath);
 		this.fogImageOverlayLayer = new PIXI.Sprite(texture);
 		this.fogImageOverlayLayer.position.set(canvas.dimensions.sceneRect.x, canvas.dimensions.sceneRect.y);
 		this.fogImageOverlayLayer.width = canvas.dimensions.sceneRect.width;
@@ -196,15 +196,15 @@ export default class MaskLayer extends InteractionLayer {
 	/* -------------------------------------------- */
 	/*  Player Fog Image Overlay                    */
 	/* -------------------------------------------- */
-	async getFogImageOverlayTexture(fogImageOverlayFilePath) {
+	getFogImageOverlayTexture(fogImageOverlayFilePath) {
 		if (fogImageOverlayFilePath) {
-			return await loadTexture(fogImageOverlayFilePath);
+			return getTexture(fogImageOverlayFilePath);
 		}
 	}
 
-	async setFogImageOverlayTexture(fogImageOverlayFilePath) {
+	setFogImageOverlayTexture(fogImageOverlayFilePath) {
 		if (fogImageOverlayFilePath) {
-			const texture = await loadTexture(fogImageOverlayFilePath);
+			const texture = getTexture(fogImageOverlayFilePath);
 			this.fogImageOverlayLayer.texture = texture;
 		} else {
 			this.fogImageOverlayLayer.texture = undefined;
@@ -549,7 +549,7 @@ export default class MaskLayer extends InteractionLayer {
 
 	async draw() {
 		super.draw();
-		await this.initMask();
+		this.initMask();
 		this.addChild(canvas.simplefog.fogImageOverlayLayer);
 		this.addChild(this.fogColorLayer);
 		this.addChild(this.fogColorLayer.mask);
