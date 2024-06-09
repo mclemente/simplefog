@@ -1,12 +1,4 @@
-import SimplefogLayer from "./classes/SimplefogLayer.js";
 export const registerSettings = function () {
-	game.settings.register("simplefog", "migrationVersion", {
-		name: "Simple Fog Migration Version",
-		scope: "world",
-		config: false,
-		type: Number,
-		default: 0,
-	});
 	// Register global config settings
 	game.settings.register("simplefog", "confirmFogDisable", {
 		name: "Confirm Disabling of Scene Simple Fog",
@@ -46,6 +38,6 @@ export const registerSettings = function () {
 		config: true,
 		default: 220,
 		type: Number,
-		onChange: SimplefogLayer.refreshZIndex,
+		onChange: () => canvas.simplefog.refreshZIndex,
 	});
 };

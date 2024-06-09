@@ -41,7 +41,7 @@ export default class MaskLayer extends InteractionLayer {
 
 	static get layerOptions() {
 		// @ts-ignore
-		return mergeObject(super.layerOptions, {
+		return foundry.utils.mergeObject(super.layerOptions, {
 			// ToDo: is ugly hack still needed?
 			// Ugly hack - render at very high zindex and then re-render at layer init with layerZindex value
 			zIndex: game.settings.get("simplefog", "zIndex"),
@@ -319,8 +319,11 @@ export default class MaskLayer extends InteractionLayer {
 		// Prevent calling update when no lights loaded
 		if (!canvas.sight?.light?.los?.geometry) return;
 		// Update sight layer
-		// ToDo: Determine replacement for canvas.sight.refresh()
-		canvas.perception.refresh();
+		canvas.perception.update({
+			refreshLighting: true,
+			refreshVision: true,
+			refreshOcclusion: true
+		});
 	}
 
 	/**
@@ -527,7 +530,6 @@ export default class MaskLayer extends InteractionLayer {
 
 		if (history === undefined) {
 			this.setSetting("autoFog", !v);
-
 		}
 	}
 
@@ -550,12 +552,12 @@ export default class MaskLayer extends InteractionLayer {
 	async draw() {
 		super.draw();
 		this.initMask();
-		this.addChild(canvas.simplefog.fogImageOverlayLayer);
+		this.addChild(this.fogImageOverlayLayer);
 		this.addChild(this.fogColorLayer);
 		this.addChild(this.fogColorLayer.mask);
 	}
 
 	refreshZIndex() {
-		canvas.simplefog.zIndex = game.settings.get("simplefog", "zIndex");
+		this.zIndex = game.settings.get("simplefog", "zIndex");
 	}
 }

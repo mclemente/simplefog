@@ -2,7 +2,7 @@ import { hexToWeb, webToHex } from "../helpers.js";
 
 export default class SimplefogConfig extends FormApplication {
 	static get defaultOptions() {
-		return mergeObject(super.defaultOptions, {
+		return foundry.utils.mergeObject(super.defaultOptions, {
 			classes: ["form"],
 			closeOnSubmit: false,
 			submitOnChange: true,
@@ -87,6 +87,10 @@ export default class SimplefogConfig extends FormApplication {
 		}
 
 		// Update sight layer
-		canvas.perception.refresh();
+		canvas.perception.update({
+			refreshLighting: true,
+			refreshVision: true,
+			refreshOcclusion: true
+		});
 	}
 }

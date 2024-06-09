@@ -97,26 +97,3 @@ export function readPixel(target, x = 0, y = 0) {
 	}
 	return pixel;
 }
-
-export function dmToGM(message) {
-	ChatMessage.create({
-		whisper: [game.user.id],
-		blind: true,
-		content: message,
-	});
-}
-
-export function dmToAllGM(message) {
-	let dm_ids = [];
-	for (let indexA = 0; indexA < game.users.length; indexA++) {
-		if (game.users[indexA].value.isGM) {
-			dm_ids.push(game.users[indexA].key);
-		}
-	}
-
-	ChatMessage.create({
-		whisper: dm_ids,
-		blind: true,
-		content: message,
-	});
-}

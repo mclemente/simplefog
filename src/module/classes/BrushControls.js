@@ -2,8 +2,7 @@ import { hexToPercent, percentToHex } from "../helpers.js";
 
 export default class BrushControls extends FormApplication {
 	static get defaultOptions() {
-		return mergeObject(super.defaultOptions, {
-			classes: ["form"],
+		return foundry.utils.mergeObject(super.defaultOptions, {
 			closeOnSubmit: false,
 			submitOnChange: true,
 			submitOnClose: true,
@@ -32,11 +31,6 @@ export default class BrushControls extends FormApplication {
 	/* -------------------------------------------- */
 	/*  Event Listeners and Handlers                */
 	/* -------------------------------------------- */
-
-	/** @override */
-	activateListeners(html) {
-		super.activateListeners(html);
-	}
 
 	/**
 	 * This method is called upon form submission after form data is validated

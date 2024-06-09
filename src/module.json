@@ -30,9 +30,9 @@
 	"esmodules": ["module/simplefog.js"],
 	"styles": ["styles/simplefog.css"],
 	"compatibility": {
-		"minimum": 11,
-		"verified": 11,
-		"maximum": 11
+		"minimum": 12,
+		"verified": 12,
+		"maximum": 12
 	},
 	"url": "This is auto replaced",
 	"manifest": "This is auto replaced",

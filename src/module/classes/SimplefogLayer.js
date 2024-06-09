@@ -102,11 +102,11 @@ export default class SimplefogLayer extends MaskLayer {
 		// Check if update applies to current viewed scene
 		if (!scene._view) return;
 		// React to visibility change
-		if (hasProperty(data, `flags.${this.layername}.visible`)) {
+		if (foundry.utils.hasProperty(data, `flags.${this.layername}.visible`)) {
 			canvas[this.layername].visible = data.flags[this.layername].visible;
 		}
 		// React to composite history change
-		if (hasProperty(data, `flags.${this.layername}.blurEnable`)) {
+		if (foundry.utils.hasProperty(data, `flags.${this.layername}.blurEnable`)) {
 			if (this.fogColorLayer !== undefined) {
 				if (this.getSetting("blurEnable")) {
 					this.fogColorLayer.filters = [this.blur];
@@ -115,54 +115,60 @@ export default class SimplefogLayer extends MaskLayer {
 				}
 			}
 		}
-		if (hasProperty(data, `flags.${this.layername}.blurRadius`)) {
+		if (foundry.utils.hasProperty(data, `flags.${this.layername}.blurRadius`)) {
 			canvas[this.layername].blur.blur = this.getSetting("blurRadius");
 		}
 		// React to composite history change
-		if (hasProperty(data, `flags.${this.layername}.blurQuality`)) {
+		if (foundry.utils.hasProperty(data, `flags.${this.layername}.blurQuality`)) {
 			canvas[this.layername].blur.quality = this.getSetting("blurQuality");
 		}
 		// React to composite history change
-		if (hasProperty(data, `flags.${this.layername}.history`)) {
+		if (foundry.utils.hasProperty(data, `flags.${this.layername}.history`)) {
 			canvas[this.layername].renderStack(data.flags[this.layername].history);
 
-			// ToDo: Determine replacement for canvas.sight.refresh()
-			canvas.perception.refresh();
+			canvas.perception.update({
+				refreshLighting: true,
+				refreshVision: true,
+				refreshOcclusion: true
+			});
 		}
 		// React to autoVisibility setting changes
 		if (
-			hasProperty(data, `flags.${this.layername}.autoVisibility`)
-			|| hasProperty(data, `flags.${this.layername}.vThreshold`)
+			foundry.utils.hasProperty(data, `flags.${this.layername}.autoVisibility`)
+			|| foundry.utils.hasProperty(data, `flags.${this.layername}.vThreshold`)
 		) {
-			// ToDo: Determine replacement for canvas.sight.refresh()
-			canvas.perception.refresh();
+			canvas.perception.update({
+				refreshLighting: true,
+				refreshVision: true,
+				refreshOcclusion: true
+			});
 		}
 		// React to alpha/tint changes
-		if (!game.user.isGM && hasProperty(data, `flags.${this.layername}.playerColorAlpha`)) {
+		if (!game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.playerColorAlpha`)) {
 			canvas[this.layername].setColorAlpha(data.flags[this.layername].playerColorAlpha);
 		}
-		if (game.user.isGM && hasProperty(data, `flags.${this.layername}.gmColorAlpha`)) {
+		if (game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.gmColorAlpha`)) {
 			canvas[this.layername].setColorAlpha(data.flags[this.layername].gmColorAlpha);
 		}
-		if (!game.user.isGM && hasProperty(data, `flags.${this.layername}.playerColorTint`)) {
+		if (!game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.playerColorTint`)) {
 			canvas[this.layername].setColorTint(data.flags[this.layername].playerColorTint);
 		}
-		if (game.user.isGM && hasProperty(data, `flags.${this.layername}.gmColorTint`)) {
+		if (game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.gmColorTint`)) {
 			canvas[this.layername].setColorTint(data.flags[this.layername].gmColorTint);
 		}
 
 		// React to Image Overylay file changes
-		if (hasProperty(data, `flags.${this.layername}.fogImageOverlayFilePath`)) {
+		if (foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayFilePath`)) {
 			canvas[this.layername].setFogImageOverlayTexture(data.flags[this.layername].fogImageOverlayFilePath);
 		}
 
-		if (game.user.isGM && hasProperty(data, `flags.${this.layername}.fogImageOverlayGMAlpha`)) {
+		if (game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayGMAlpha`)) {
 			canvas[this.layername].setFogImageOverlayAlpha(data.flags[this.layername].fogImageOverlayGMAlpha);
 		}
-		if (!game.user.isGM && hasProperty(data, `flags.${this.layername}.fogImageOverlayPlayerAlpha`)) {
+		if (!game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayPlayerAlpha`)) {
 			canvas[this.layername].setFogImageOverlayAlpha(data.flags[this.layername].fogImageOverlayPlayerAlpha);
 		}
-		if (hasProperty(data, `flags.${this.layername}.fogImageOverlayZIndex`)) canvas[this.layername].setFogImageOverlayZIndex(data.flags[this.layername].fogImageOverlayZIndex);
+		if (foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayZIndex`)) canvas[this.layername].setFogImageOverlayZIndex(data.flags[this.layername].fogImageOverlayZIndex);
 	}
 
 	/**

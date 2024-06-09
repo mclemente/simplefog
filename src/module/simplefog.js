@@ -2,27 +2,12 @@ import BrushControls from "./classes/BrushControls.js";
 import SimplefogConfig from "./classes/SimplefogConfig.js";
 import SimplefogHUDControlLayer from "./classes/SimplefogHUDControlLayer.js";
 import SimplefogLayer from "./classes/SimplefogLayer.js";
-import SimplefogMigrations from "./classes/SimplefogMigrations.js";
-import SimplefogNotification from "./classes/SimplefogNotification.js";
 import { registerSettings } from "./settings.js";
 
 Hooks.once("init", async () => {
 	registerSettings();
 	CONFIG.Canvas.layers.simplefog = { group: "interface", layerClass: SimplefogLayer };
 	CONFIG.Canvas.layers.simplefogHUDControls = { group: "interface", layerClass: SimplefogHUDControlLayer };
-
-	Object.defineProperty(canvas, "simplefog", {
-		value: new SimplefogLayer(),
-		configurable: true,
-		writable: true,
-		enumerable: false,
-	});
-	Object.defineProperty(canvas, "simplefogHUDControls", {
-		value: new SimplefogHUDControlLayer(),
-		configurable: true,
-		writable: true,
-		enumerable: false,
-	});
 
 	const isActiveControl = () => {
 		return ui.controls.activeControl === "simplefog";
@@ -141,25 +126,14 @@ Hooks.once("init", async () => {
 });
 
 Hooks.once("ready", async () => {
-	// Check if any migrations need to be performed
-	SimplefogMigrations.check();
-
-	// Fix simplefog zIndex
-
 	canvas.simplefog.refreshZIndex();
-	// ToDo: why is this set below???
-	// canvas.simplefogHUDControls.zIndex = canvas.simplefog.getSetting('layerZindex') - 1;
-
-	// Move object hud to tokens layer
-	game.canvas.controls.hud.setParent(game.canvas.simplefogHUDControls);
-
-	// Check if new version; if so send DM to GM
-	SimplefogNotification.checkVersion();
 
 	// Hooks.on('sightRefresh', sightLayerUpdate);
-
-	// ToDo: Determine replacement for canvas.sight.refresh()
-	canvas.perception.refresh();
+	canvas.perception.update({
+		refreshLighting: true,
+		refreshVision: true,
+		refreshOcclusion: true
+	});
 });
 
 Hooks.once("canvasInit", () => {
@@ -336,9 +310,11 @@ function toggleSimpleFog() {
 
 function toggleOffSimpleFog() {
 	canvas.simplefog.toggle();
-
-	// ToDo: Determine replacement for canvas.sight.refresh()
-	canvas.perception.refresh();
+	canvas.perception.update({
+		refreshLighting: true,
+		refreshVision: true,
+		refreshOcclusion: true
+	});
 }
 
 function cancelToggleSimpleFog(result = undefined) {
