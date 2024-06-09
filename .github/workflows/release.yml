@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4.0.0
         with:
           node-version: ${{ env.node_version }}
 
@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4.0.0
         with:
           node-version: ${{ env.node_version }}
 
@@ -70,7 +70,7 @@ jobs:
         id: sub_manifest_link_version
         uses: microsoft/variable-substitution@v1
         with:
-          files: 'src/${{ env.package_type }}.json'
+          files: "src/${{ env.package_type }}.json"
         env:
           version: ${{ steps.get_version.outputs.version-without-v }}
           url: https://github.com/${{ github.repository }}
@@ -81,7 +81,7 @@ jobs:
         run: npm run build
 
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: dist
           path: dist
@@ -96,7 +96,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download production artifacts for publication
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: dist
           path: dist
@@ -112,6 +112,40 @@ jobs:
           allowUpdates: true
           name: ${{ github.event.release.name }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: './dist/${{ env.package_type }}.json, ./${{ env.package_type }}.zip'
+          artifacts: "./dist/${{ env.package_type }}.json, ./${{ env.package_type }}.zip"
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
+
+      - name: Get Module ID
+        id: moduleID
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: "./dist/${{ env.package_type }}.json"
+          prop_path: "id"
+
+      - name: Get mininum
+        id: minimum
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: "./dist/${{ env.package_type }}.json"
+          prop_path: "compatibility.minimum"
+
+      - name: Get verified
+        id: verified
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: "./dist/${{ env.package_type }}.json"
+          prop_path: "compatibility.verified"
+
+      - name: Extract tag version number
+        id: get_version
+        uses: battila7/get-version-action@v2
+
+      - name: Foundry Release API
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: "https://api.foundryvtt.com/_api/packages/release_version"
+          method: "POST"
+          customHeaders: '{"Content-Type": "application/json", "Authorization" : "${{ secrets.FOUNDRY_KEY }}"}'
+          data: '{"id": "${{ steps.moduleID.outputs.prop }}", "release": {"version": "${{ steps.get_version.outputs.version-without-v }}", "manifest": "https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/${{ env.package_type }}.json", "notes": "https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}/", "compatibility" : {"minimum": "${{ steps.minimum.outputs.prop }}", "verified": "${{ steps.verified.outputs.prop }}"}}}'
+          preventFailureOnNoResponse: true
