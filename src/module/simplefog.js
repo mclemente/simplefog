@@ -126,9 +126,8 @@ Hooks.once("init", async () => {
 });
 
 Hooks.once("ready", async () => {
-	canvas.simplefog.refreshZIndex();
+	canvas.simplefog.zIndex = game.settings.get("simplefog", "zIndex");
 
-	// Hooks.on('sightRefresh', sightLayerUpdate);
 	canvas.perception.update({
 		refreshLighting: true,
 		refreshVision: true,

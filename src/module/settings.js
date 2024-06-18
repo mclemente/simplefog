@@ -38,6 +38,6 @@ export const registerSettings = function () {
 		config: true,
 		default: 220,
 		type: Number,
-		onChange: () => canvas.simplefog.refreshZIndex()
+		onChange: (value) => canvas.simplefog.zIndex = value
 	});
 };

@@ -556,8 +556,4 @@ export default class MaskLayer extends InteractionLayer {
 		this.addChild(this.fogColorLayer);
 		this.addChild(this.fogColorLayer.mask);
 	}
-
-	refreshZIndex() {
-		this.zIndex = game.settings.get("simplefog", "zIndex");
-	}
 }
