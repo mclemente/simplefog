@@ -40,78 +40,9 @@ export default class MaskLayer extends InteractionLayer {
 	}
 
 	static get layerOptions() {
-		// @ts-ignore
 		return foundry.utils.mergeObject(super.layerOptions, {
-			// ToDo: is ugly hack still needed?
-			// Ugly hack - render at very high zindex and then re-render at layer init with layerZindex value
 			zIndex: game.settings.get("simplefog", "zIndex"),
 		});
-	}
-
-	/* -------------------------------------------- */
-	/*  Init                                        */
-	/* -------------------------------------------- */
-
-	/**
-	 * Called on canvas init, creates the canvas layers and various objects and registers listeners
-	 *
-	 * Important objects:
-	 *
-	 * layer       - PIXI Sprite which holds all the mask elements
-	 * filters     - Holds filters such as blur applied to the layer
-	 * fogColorLayer  - PIXI Sprite wrapping the renderable mask
-	 * maskTexture - renderable texture that holds the actual mask data
-	 * fogImageOverlayLayer   - PIXI Sprite that holds the image applied over the fog color
-	 */
-	initMask() {
-		// Check if masklayer is flagged visible
-		let v = this.getSetting("visible");
-		if (v === undefined) v = false;
-		this.visible = v;
-
-		// The layer is the primary sprite to be displayed
-		this.fogColorLayer = MaskLayer.getCanvasSprite();
-		this.setColorTint(this.getTint());
-		this.setColorAlpha(this.getColorAlpha(), true);
-
-		this.blur = new PIXI.filters.BlurFilter();
-		this.blur.padding = 0;
-		this.blur.repeatEdgePixels = true;
-		this.blur.blur = this.getSetting("blurRadius");
-		this.blur.quality = this.getSetting("blurQuality");
-
-		// Filters
-		if (this.getSetting("blurEnable")) {
-			this.fogColorLayer.filters = [this.blur];
-		} else {
-			this.fogColorLayer.filters = [];
-		}
-
-		// So you can hit escape on the keyboard and it will bring up the menu
-		this._controlled = {};
-
-		this.maskTexture = MaskLayer.getMaskTexture();
-		this.maskSprite = new PIXI.Sprite(this.maskTexture);
-
-		this.fogColorLayer.mask = this.maskSprite;
-		this.setFill();
-
-		// Allow zIndex prop to function for items on this layer
-		this.sortableChildren = true;
-
-		// Render entire history stack
-		this.renderStack(undefined, 0, undefined, true);
-
-		// apply image overlay to fog layer after we renderStack to prevent revealing the map
-		const fogImageOverlayFilePath = this.getSetting("fogImageOverlayFilePath");
-		const texture = this.getFogImageOverlayTexture(fogImageOverlayFilePath);
-		this.fogImageOverlayLayer = new PIXI.Sprite(texture);
-		this.fogImageOverlayLayer.position.set(canvas.dimensions.sceneRect.x, canvas.dimensions.sceneRect.y);
-		this.fogImageOverlayLayer.width = canvas.dimensions.sceneRect.width;
-		this.fogImageOverlayLayer.height = canvas.dimensions.sceneRect.height;
-		this.fogImageOverlayLayer.mask = this.maskSprite;
-		this.setFogImageOverlayZIndex(this.getSetting("fogImageOverlayZIndex"));
-		this.setFogImageOverlayAlpha(this.getFogImageOverlayAlpha(), true);
 	}
 
 	/* -------------------------------------------- */
@@ -533,25 +464,56 @@ export default class MaskLayer extends InteractionLayer {
 		}
 	}
 
-	/**
-	 * Actions upon layer becoming active
-	 */
-	activate() {
-		super.activate();
-		this.eventMode = "static";
-	}
+	async _draw() {
+		// Check if masklayer is flagged visible
+		let v = this.getSetting("visible");
+		if (v === undefined) v = false;
+		this.visible = v;
 
-	/**
-	 * Actions upon layer becoming inactive
-	 */
-	deactivate() {
-		super.deactivate();
-		this.eventMode = "passive";
-	}
+		// The layer is the primary sprite to be displayed
+		this.fogColorLayer = MaskLayer.getCanvasSprite();
+		this.setColorTint(this.getTint());
+		this.setColorAlpha(this.getColorAlpha(), true);
 
-	async draw() {
-		super.draw();
-		this.initMask();
+		this.blur = new PIXI.filters.BlurFilter();
+		this.blur.padding = 0;
+		this.blur.repeatEdgePixels = true;
+		this.blur.blur = this.getSetting("blurRadius");
+		this.blur.quality = this.getSetting("blurQuality");
+
+		// Filters
+		if (this.getSetting("blurEnable")) {
+			this.fogColorLayer.filters = [this.blur];
+		} else {
+			this.fogColorLayer.filters = [];
+		}
+
+		// So you can hit escape on the keyboard and it will bring up the menu
+		this._controlled = {};
+
+		this.maskTexture = MaskLayer.getMaskTexture();
+		this.maskSprite = new PIXI.Sprite(this.maskTexture);
+
+		this.fogColorLayer.mask = this.maskSprite;
+		this.setFill();
+
+		// Allow zIndex prop to function for items on this layer
+		this.sortableChildren = true;
+
+		// Render entire history stack
+		this.renderStack(undefined, 0, undefined, true);
+
+		// apply image overlay to fog layer after we renderStack to prevent revealing the map
+		const fogImageOverlayFilePath = this.getSetting("fogImageOverlayFilePath");
+		const texture = this.getFogImageOverlayTexture(fogImageOverlayFilePath);
+		this.fogImageOverlayLayer = new PIXI.Sprite(texture);
+		this.fogImageOverlayLayer.position.set(canvas.dimensions.sceneRect.x, canvas.dimensions.sceneRect.y);
+		this.fogImageOverlayLayer.width = canvas.dimensions.sceneRect.width;
+		this.fogImageOverlayLayer.height = canvas.dimensions.sceneRect.height;
+		this.fogImageOverlayLayer.mask = this.maskSprite;
+		this.setFogImageOverlayZIndex(this.getSetting("fogImageOverlayZIndex"));
+		this.setFogImageOverlayAlpha(this.getFogImageOverlayAlpha(), true);
+
 		this.addChild(this.fogImageOverlayLayer);
 		this.addChild(this.fogColorLayer);
 		this.addChild(this.fogColorLayer.mask);

@@ -1,58 +1,45 @@
 import BrushControls from "./classes/BrushControls.js";
 import SimplefogConfig from "./classes/SimplefogConfig.js";
-import SimplefogHUDControlLayer from "./classes/SimplefogHUDControlLayer.js";
 import SimplefogLayer from "./classes/SimplefogLayer.js";
 import { registerSettings } from "./settings.js";
 
 Hooks.once("init", async () => {
 	registerSettings();
 	CONFIG.Canvas.layers.simplefog = { group: "interface", layerClass: SimplefogLayer };
-	CONFIG.Canvas.layers.simplefogHUDControls = { group: "interface", layerClass: SimplefogHUDControlLayer };
 
-	const isActiveControl = () => {
-		return ui.controls.activeControl === "simplefog";
-	};
+	const isActiveControl = () => ui.controls.activeControl === "simplefog";
 	game.keybindings.register("simplefog", "swap", {
 		name: "Swap to Simple Fog's Controls",
 		hint: "Toggles between the Token and Simple Fog layers. Check the module's settings to define which tool will be selected by default.",
-		uneditable: [],
 		editable: [
 			{
 				key: "S",
 				modifiers: ["Control"]
 			}
 		],
-		onDown: (context) => {
-			context.event.preventDefault();
-			let controlName = isActiveControl() ? "token" : "simplefog";
-			let toolName = game.settings.get("simplefog", "toolHotKeys");
-
-			$(`li.scene-control[data-control=${controlName}]`)?.click();
-			setTimeout(function () {
-				$(`ol.sub-controls.active li.control-tool[data-tool=${toolName}]`)?.click();
-			}, 500);
+		onDown: () => {
+			const layer = isActiveControl() ? "tokens" : "simplefog";
+			ui.controls.initialize({ layer });
+			return true;
 		},
-		onUp: () => {},
 		restricted: true,
 		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
 	});
 	game.keybindings.register("simplefog", "undo", {
 		name: "Undo Change",
 		hint: "",
-		uneditable: [],
 		editable: [
 			{
 				key: "Z",
 				modifiers: ["Control"]
 			}
 		],
-		onDown: (context) => {
+		onDown: () => {
 			if (isActiveControl()) {
-				context.event.preventDefault();
 				canvas.simplefog.undo();
+				return true;
 			}
 		},
-		onUp: () => {},
 		restricted: true,
 		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
 	});
@@ -71,16 +58,14 @@ Hooks.once("init", async () => {
 				let brushOpacity = $slider.val();
 				$slider.val(brushOpacity === "100" ? 0 : 100);
 				$("form#simplefog-brush-controls-form").submit();
+				return true;
 			}
 		},
-		onUp: () => {},
 		restricted: true,
-		precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
 	});
 	game.keybindings.register("simplefog", "brushReduce", {
 		name: "Reduce Brush Size",
 		hint: "Only works while the Brush is selected.",
-		uneditable: [],
 		editable: [
 			{
 				key: "BracketLeft"
@@ -93,17 +78,16 @@ Hooks.once("init", async () => {
 				let $slider = $("input[name=brushSize]");
 				let brushSize = $slider.val();
 				$slider.val(brushSize * 0.8);
+				return true;
 			}
 		},
 		onUp: () => {},
 		repeat: true,
 		restricted: true,
-		precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
 	});
 	game.keybindings.register("simplefog", "brushIncrease", {
 		name: "Increase Brush Size",
 		hint: "Only works while the Brush is selected.",
-		uneditable: [],
 		editable: [
 			{
 				key: "BracketRight"
@@ -116,12 +100,11 @@ Hooks.once("init", async () => {
 				let $slider = $("input[name=brushSize]");
 				let brushSize = $slider.val();
 				$slider.val(brushSize * 1.25);
+				return true;
 			}
 		},
-		onUp: () => {},
 		repeat: true,
 		restricted: true,
-		precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
 	});
 });
 
@@ -247,7 +230,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				button: true,
 			},
 		],
-		activeTool: "brush",
+		activeTool: game.settings.get("simplefog", "toolHotKeys"),
 	});
 });
 

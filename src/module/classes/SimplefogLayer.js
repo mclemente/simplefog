@@ -31,63 +31,13 @@ export default class SimplefogLayer extends MaskLayer {
 			hotKeyTool: "Brush",
 		});
 
-		/*    // React to canvas zoom
-    Hooks.on('canvasPan', (canvas, dimensions) => {
-    // Scale blur filter radius to account for zooming
-      //this.blur.blur = this.getSetting('blurRadius') * dimensions.scale;
-    });*/
-
 		// React to changes to current scene
 		Hooks.on("updateScene", (scene, data) => this._updateScene(scene, data));
-
-		// Canvas expects the options.name property to be set
-		this.options = this.constructor.layerOptions;
 	}
 
-	initSimplefog() {
-		// Preview brush objects
-		this.boxPreview = this.brush({
-			shape: this.BRUSH_TYPES.BOX,
-			x: 0,
-			y: 0,
-			fill: 0xffffff,
-			alpha: this.DEFAULTS.previewAlpha,
-			width: 100,
-			height: 100,
-			visible: false,
-			zIndex: 10,
-		});
-		this.ellipsePreview = this.brush({
-			shape: this.BRUSH_TYPES.ELLIPSE,
-			x: 0,
-			y: 0,
-			fill: 0xffffff,
-			alpha: this.DEFAULTS.previewAlpha,
-			width: 100,
-			height: 100,
-			visible: false,
-			zIndex: 10,
-		});
-		this.polygonPreview = this.brush({
-			shape: this.BRUSH_TYPES.POLYGON,
-			x: 0,
-			y: 0,
-			vertices: [],
-			fill: 0xffffff,
-			alpha: this.DEFAULTS.previewAlpha,
-			visible: false,
-			zIndex: 10,
-		});
-		this.polygonHandle = this.brush({
-			shape: this.BRUSH_TYPES.BOX,
-			x: 0,
-			y: 0,
-			fill: this.DEFAULTS.handlefill,
-			width: this.DEFAULTS.handlesize * 2,
-			height: this.DEFAULTS.handlesize * 2,
-			alpha: this.DEFAULTS.previewAlpha,
-			visible: false,
-			zIndex: 15,
+	static get layerOptions() {
+		return foundry.utils.mergeObject(super.layerOptions, {
+			name: "simplefog"
 		});
 	}
 
@@ -175,11 +125,8 @@ export default class SimplefogLayer extends MaskLayer {
 	 * Adds the mouse listeners to the layer
 	 */
 	_registerMouseListeners() {
-		this.addListener("pointerdown", this._pointerDown);
 		this.addListener("pointerup", this._pointerUp);
 		this.addListener("pointermove", this._pointerMove);
-		this.dragging = false;
-		this.brushing = false;
 	}
 
 	/**
@@ -259,15 +206,10 @@ export default class SimplefogLayer extends MaskLayer {
 		} catch(err) {}
 	}
 
-	/**
-	 * Mouse handlers for canvas layer interactions
-	 */
-	_pointerDown(e) {
+	_onClickLeft(e) {
 		// Don't allow new action if history push still in progress
 		if (this.historyBuffer.length > 0) return;
-		// On left mouse button
-		if (e.data.button === 0) {
-			const p = e.data.getLocalPosition(canvas.app.stage);
+		const p = canvas.mousePosition;
 			// Round positions to nearest pixel
 			p.x = Math.round(p.x);
 			p.y = Math.round(p.y);
@@ -294,19 +236,19 @@ export default class SimplefogLayer extends MaskLayer {
 			}
 			// Call _pointermove so single click will still draw brush if mouse does not move
 			this._pointerMove(e);
-		}
-		// On right button, cancel action
-		else if (e.data.button === 2) {
-			// Todo: Not sure why this doesnt trigger when drawing ellipse & box
-			if (["polygon", "box", "ellipse"].includes(this.activeTool)) {
-				this.clearActiveTool();
-			}
+	}
+
+	_onClickRight(e) {
+		if (this.historyBuffer.length > 0) return;
+		// Todo: Not sure why this doesnt trigger when drawing ellipse & box
+		if (["polygon", "box", "ellipse"].includes(this.activeTool)) {
+			this.clearActiveTool();
 		}
 	}
 
 	_pointerMove(e) {
 		// Get mouse position translated to canvas coords
-		const p = e.data.getLocalPosition(canvas.app.stage);
+		const p = canvas.mousePosition;
 		// Round positions to nearest pixel
 		p.x = Math.round(p.x);
 		p.y = Math.round(p.y);
@@ -332,7 +274,7 @@ export default class SimplefogLayer extends MaskLayer {
 		// Only react to left mouse button
 		if (e.data.button === 0) {
 			// Translate click to canvas position
-			const p = e.data.getLocalPosition(canvas.app.stage);
+			const p = canvas.mousePosition;
 			// Round positions to nearest pixel
 			p.x = Math.round(p.x);
 			p.y = Math.round(p.y);
@@ -513,19 +455,16 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerMoveGrid(p) {
-		const gridSize = canvas.scene.grid.size;
-		const gridType = canvas.scene.grid.type;
+		const { size, type } = canvas.scene.grid;
 		// Square grid
-		if (gridType === 1) {
-			const gridx = Math.floor(p.x / gridSize);
-			const gridy = Math.floor(p.y / gridSize);
-			const x = gridx * gridSize;
-			const y = gridy * gridSize;
+		if (type === 1) {
+			const x = Math.floor(p.x / size) * size;
+			const y = Math.floor(p.y / size) * size;
 			const coord = `${x},${y}`;
 			this.boxPreview.x = x;
 			this.boxPreview.y = y;
-			this.boxPreview.width = gridSize;
-			this.boxPreview.height = gridSize;
+			this.boxPreview.width = size;
+			this.boxPreview.height = size;
 			if (this.op) {
 				if (!this.dupes.includes(coord)) {
 					// Flag cell as drawn in dupes
@@ -534,15 +473,15 @@ export default class SimplefogLayer extends MaskLayer {
 						shape: this.BRUSH_TYPES.BOX,
 						x,
 						y,
-						width: gridSize,
-						height: gridSize,
+						width: size,
+						height: size,
 						fill: this.getUserSetting("brushOpacity"),
 					});
 				}
 			}
 		}
 		// Hex Grid
-		else if ([2, 3, 4, 5].includes(gridType)) {
+		else if ([2, 3, 4, 5].includes(type)) {
 			// Convert pixel coord to hex coord
 			const qr = this.gridLayout.pixelToHex(p).round();
 			// Get current grid coord verts
@@ -595,88 +534,96 @@ export default class SimplefogLayer extends MaskLayer {
 	_initGrid() {
 		const gridSize = canvas.scene.grid.size;
 		this.dupes = [];
-		if (canvas.scene.flags.core?.legacyHex) {
-			switch (canvas.scene.grid.type) {
-				// Square grid
-				// Pointy Hex Odd
-				case 2:
-					this.gridLayout = new Layout(
-						Layout.pointy,
-						{ x: gridSize / 2, y: gridSize / 2 },
-						{ x: 0, y: gridSize / 2 }
-					);
-					break;
-				// Pointy Hex Even
-				case 3:
-					this.gridLayout = new Layout(
-						Layout.pointy,
-						{ x: gridSize / 2, y: gridSize / 2 },
-						{ x: (Math.sqrt(3) * gridSize) / 4, y: gridSize / 2 }
-					);
-					break;
-				// Flat Hex Odd
-				case 4:
-					this.gridLayout = new Layout(
-						Layout.flat,
-						{ x: gridSize / 2, y: gridSize / 2 },
-						{ x: gridSize / 2, y: 0 }
-					);
-					break;
-				// Flat Hex Even
-				case 5:
-					this.gridLayout = new Layout(
-						Layout.flat,
-						{ x: gridSize / 2, y: gridSize / 2 },
-						{ x: gridSize / 2, y: (Math.sqrt(3) * gridSize) / 4 }
-					);
-					break;
-				default:
-					break;
+		const legacyHex = !!canvas.scene.flags.core?.legacyHex;
+		const divisor = legacyHex ? 2 : Math.sqrt(3);
+		switch (canvas.scene.grid.type) {
+			// Square grid
+			// Pointy Hex Odd
+			case 2:
+				this.gridLayout = new Layout(
+					Layout.pointy,
+					{ x: gridSize / divisor, y: gridSize / divisor },
+					{ x: 0, y: gridSize / divisor }
+				);
+				break;
+			// Pointy Hex Even
+			case 3: {
+				const x = legacyHex ? (Math.sqrt(3) * gridSize) / 4 : gridSize / 2;
+				this.gridLayout = new Layout(
+					Layout.pointy,
+					{ x: gridSize / divisor, y: gridSize / divisor },
+					{ x, y: gridSize / divisor }
+				);
+				break;
 			}
-		} else {
-			switch (canvas.scene.grid.type) {
-				// Square grid
-				// Pointy Hex Odd
-				case 2:
-					this.gridLayout = new Layout(
-						Layout.pointy,
-						{ x: gridSize / Math.sqrt(3), y: gridSize / Math.sqrt(3) },
-						{ x: 0, y: gridSize / Math.sqrt(3) }
-					);
-					break;
-				// Pointy Hex Even
-				case 3:
-					this.gridLayout = new Layout(
-						Layout.pointy,
-						{ x: gridSize / Math.sqrt(3), y: gridSize / Math.sqrt(3) },
-						{ x: gridSize / 2, y: gridSize / Math.sqrt(3) }
-					);
-					break;
-				// Flat Hex Odd
-				case 4:
-					this.gridLayout = new Layout(
-						Layout.flat,
-						{ x: gridSize / Math.sqrt(3), y: gridSize / Math.sqrt(3) },
-						{ x: gridSize / Math.sqrt(3), y: 0 }
-					);
-					break;
-				// Flat Hex Even
-				case 5:
-					this.gridLayout = new Layout(
-						Layout.flat,
-						{ x: gridSize / Math.sqrt(3), y: gridSize / Math.sqrt(3) },
-						{ x: gridSize / Math.sqrt(3), y: gridSize / 2 }
-					);
-					break;
-				default:
-					break;
+			// Flat Hex Odd
+			case 4:
+				this.gridLayout = new Layout(
+					Layout.flat,
+					{ x: gridSize / divisor, y: gridSize / divisor },
+					{ x: gridSize / divisor, y: 0 }
+				);
+				break;
+			// Flat Hex Even
+			case 5: {
+				const y = legacyHex ? (Math.sqrt(3) * gridSize) / 4 : gridSize / 2;
+				this.gridLayout = new Layout(
+					Layout.flat,
+					{ x: gridSize / divisor, y: gridSize / divisor },
+					{ x: gridSize / divisor, y }
+				);
+				break;
 			}
+			default:
+				break;
 		}
 	}
 
-	async draw() {
-		super.draw();
-		this.initSimplefog();
+	async _draw() {
+		super._draw();
+		this.boxPreview = this.brush({
+			shape: this.BRUSH_TYPES.BOX,
+			x: 0,
+			y: 0,
+			fill: 0xffffff,
+			alpha: this.DEFAULTS.previewAlpha,
+			width: 100,
+			height: 100,
+			visible: false,
+			zIndex: 10,
+		});
+		this.ellipsePreview = this.brush({
+			shape: this.BRUSH_TYPES.ELLIPSE,
+			x: 0,
+			y: 0,
+			fill: 0xffffff,
+			alpha: this.DEFAULTS.previewAlpha,
+			width: 100,
+			height: 100,
+			visible: false,
+			zIndex: 10,
+		});
+		this.polygonPreview = this.brush({
+			shape: this.BRUSH_TYPES.POLYGON,
+			x: 0,
+			y: 0,
+			vertices: [],
+			fill: 0xffffff,
+			alpha: this.DEFAULTS.previewAlpha,
+			visible: false,
+			zIndex: 10,
+		});
+		this.polygonHandle = this.brush({
+			shape: this.BRUSH_TYPES.BOX,
+			x: 0,
+			y: 0,
+			fill: this.DEFAULTS.handlefill,
+			width: this.DEFAULTS.handlesize * 2,
+			height: this.DEFAULTS.handlesize * 2,
+			alpha: this.DEFAULTS.previewAlpha,
+			visible: false,
+			zIndex: 15,
+		});
 
 		this.addChild(this.boxPreview);
 		this.addChild(this.ellipsePreview);
