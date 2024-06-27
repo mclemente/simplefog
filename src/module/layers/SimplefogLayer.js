@@ -38,7 +38,8 @@ export default class SimplefogLayer extends MaskLayer {
 
 	static get layerOptions() {
 		return foundry.utils.mergeObject(super.layerOptions, {
-			name: "simplefog"
+			name: "simplefog",
+			baseClass: SimplefogLayer,
 		});
 	}
 
