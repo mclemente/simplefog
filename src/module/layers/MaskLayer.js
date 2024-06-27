@@ -41,6 +41,7 @@ export default class MaskLayer extends InteractionLayer {
 
 	static get layerOptions() {
 		return foundry.utils.mergeObject(super.layerOptions, {
+			baseClass: MaskLayer,
 			zIndex: game.settings.get("simplefog", "zIndex"),
 		});
 	}
