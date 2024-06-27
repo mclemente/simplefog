@@ -159,15 +159,9 @@ export default class SimplefogLayer extends MaskLayer {
 		this.clearActiveTool();
 		this.activeTool = tool;
 		this.setPreviewTint();
-		if (this.brushControls.rendered) {
-			if (tool === "brush") {
-				this.ellipsePreview.visible = true;
-				// $("#simplefog-brush-controls #brush-size-container").show();
-			} else {
-				// $("#simplefog-brush-controls #brush-size-container").hide();
-			}
-		}
-		if (tool === "grid") {
+		if (this.brushControls.rendered && tool === "brush") {
+			this.ellipsePreview.visible = true;
+		} else if (tool === "grid") {
 			if (canvas.scene.grid.type === 1) {
 				this.boxPreview.width = canvas.scene.grid.size;
 				this.boxPreview.height = canvas.scene.grid.size;
