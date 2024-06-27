@@ -2,50 +2,38 @@
     <h3 class="form-header"><i class="fas fa-crown"></i> {{localize 'SIMPLEFOG.gmFogSettings'}}</h3>
     <div class="form-group">
         <label for="gmColorTint">{{localize 'SIMPLEFOG.gmColorTint'}}</label>
-        <input class="color" type="text" name="gmColorTint" value="{{ gmColorTint }}" data-dtype="String" />
-        <input type="color" value="{{ gmColorTint }}" data-edit="gmColorTint" />
+        <color-picker name="gmColorTint" value="{{ gmColorTint }}"></color-picker>
     </div>
     <div class="form-group">
         <label for="gmColorAlpha">{{localize 'SIMPLEFOG.gmColorAlpha'}}</label>
-        <input type="range" name="gmColorAlpha" value="{{ gmColorAlpha }}" min="0" max="100" step="1" data-dtype="Number" />
-        <span class="range-value">{{ gmColorAlpha }}</span>
+        {{rangePicker name="gmColorAlpha" value=gmColorAlpha min=0 max=100 step=1}}
     </div>
 
     <h3 class="form-header"><i class="fas fa-users"></i> {{localize 'SIMPLEFOG.playerFogSettings'}}</h3>
     <div class="form-group">
         <label for="playerColorTint">{{localize 'SIMPLEFOG.playerColorTint'}}</label>
-        <input class="color" type="text" name="playerColorTint" value="{{ playerColorTint }}" data-dtype="String" />
-        <input type="color" value="{{ playerColorTint }}" data-edit="playerColorTint" />
+        <color-picker name="playerColorTint" value="{{ playerColorTint }}"></color-picker>
     </div>
     <div class="form-group">
         <label for="playerColorAlpha">{{localize 'SIMPLEFOG.playerColorAlpha'}}</label>
-        <input type="range" name="playerColorAlpha" value="{{ playerColorAlpha }}" min="0" max="100" step="1"
-            data-dtype="Number" />
-        <span class="range-value">{{ playerColorAlpha }}</span>
+        {{rangePicker name="playerColorAlpha" value=playerColorAlpha min=0 max=100 step=1}}
     </div>
 
     <h3 class="form-header"><i class="fas fa-image"></i> {{localize 'SIMPLEFOG.fogImageOverlaySettings'}}</h3>
     <div class="form-group">
         <label for="fogImageOverlayFilePath">{{localize 'SIMPLEFOG.fogImageOverlay'}}</label>
-        <button type="button" class="file-picker" data-type="imagevideo" data-target="fogImageOverlayFilePath" title="Browse Files" tabindex="-1">
-            <i class="fas fa-file-import fa-fw"></i>
-        </button>
-        <input class="image" type="text" name="fogImageOverlayFilePath" value="{{ fogImageOverlayFilePath }}" placeholder="{{localize 'SIMPLEFOG.fogImageOverlay'}}" data-dtype="String" />
+        <file-picker name="fogImageOverlayFilePath" type="imagevideo" value="{{ fogImageOverlayFilePath }}"></file-picker>
     </div>
     <p class="notes">
         {{ localize 'SIMPLEFOG.fogImageOverlayNotes' }}
     </p>
     <div class="form-group">
         <label for="fogImageOverlayGMAlpha">{{localize 'SIMPLEFOG.fogImageOverlayGMAlpha'}}</label>
-        <input type="range" name="fogImageOverlayGMAlpha" value="{{ fogImageOverlayGMAlpha }}" min="0" max="100" step="1"
-            data-dtype="Number" />
-        <span class="range-value">{{ fogImageOverlayGMAlpha }}</span>
+        {{rangePicker name="fogImageOverlayGMAlpha" value=fogImageOverlayGMAlpha min=0 max=100 step=1}}
     </div>
     <div class="form-group">
         <label for="fogImageOverlayPlayerAlpha">{{localize 'SIMPLEFOG.fogImageOverlayPlayerAlpha'}}</label>
-        <input type="range" name="fogImageOverlayPlayerAlpha" value="{{ fogImageOverlayPlayerAlpha }}" min="0" max="100" step="1"
-            data-dtype="Number" />
-        <span class="range-value">{{ fogImageOverlayPlayerAlpha }}</span>
+        {{rangePicker name="fogImageOverlayPlayerAlpha" value=fogImageOverlayPlayerAlpha min=0 max=100 step=1}}
     </div>
     <div class="form-group">
         <label for="fogImageOverlayZIndex">{{localize 'SIMPLEFOG.fogImageOverlayZIndex'}}</label>
@@ -57,46 +45,41 @@
     <h3 class="form-header"><i class="fas fa-filter"></i> {{localize 'SIMPLEFOG.filterSettings'}}</h3>
     <div class="form-group">
         <label for="blurEnable">{{localize 'SIMPLEFOG.blurEnable'}}</label>
-        <input type='checkbox' {{#if blurEnable}}checked{{/if}} name='blurEnable' />
+        <input type='checkbox' {{checked blurEnable}} name='blurEnable' />
     </div>
     <div class="form-group">
         <label for="blurRadius">{{localize 'SIMPLEFOG.blurRadius'}}</label>
-        <input type="range" name="blurRadius" value="{{ blurRadius }}" min="0" max="50" step="1" data-dtype="Number" />
-        <span class="range-value">{{ blurRadius }}</span>
+        {{rangePicker name="blurRadius" value=blurRadius min=0 max=50 step=1}}
     </div>
     <div class="form-group">
         <label for="blurQuality">{{localize 'SIMPLEFOG.blurQuality'}}</label>
-        <input type="range" name="blurQuality" value="{{ blurQuality }}" min="1" max="8" step="1" data-dtype="Number" />
-        <span class="range-value">{{ blurQuality }}</span>
+        {{rangePicker name="blurQuality" value=blurQuality min=1 max=8 step=1}}
         <p class="notes">{{localize 'SIMPLEFOG.blurQualityDesc'}}</p>
     </div>
 
     <h3 class="form-header"><i class="fas fa-adjust"></i> {{localize 'SIMPLEFOG.transitionSettings'}}</h3>
     <div class="form-group">
         <label for="transition">{{localize 'SIMPLEFOG.enableTransitions'}}</label>
-        <input type='checkbox' {{#if transition}}checked{{/if}} name='transition' />
+        <input type='checkbox' {{checked transition}} name='transition' />
     </div>
     <div class="form-group">
         <label for="transitionSpeed">{{localize 'SIMPLEFOG.transitionSpeed'}}</label>
-        <input type="range" name="transitionSpeed" value="{{ transitionSpeed }}" min="100" max="5000" step="100"
-            data-dtype="Number" />
-        <span class="range-value">{{ transitionSpeed }}</span>
+        {{rangePicker name="transitionSpeed" value=transitionSpeed min=100 max=5000 step=100}}
     </div>
     <h3 class="form-header"><i class="fas fa-low-vision"></i> {{localize 'SIMPLEFOG.visibilitySettings'}}</h3>
     <p class="notes">{{ localize 'SIMPLEFOG.autoVisNotes' }}</p>
     <div class="form-group">
         <label for="autoVisibility">{{localize 'SIMPLEFOG.enableAutovis'}}</label>
-        <input type='checkbox' {{#if autoVisibility}}checked{{/if}} name='autoVisibility' />
+        <input type='checkbox' {{checked autoVisibility}} name='autoVisibility' />
     </div>
 
     <div class="form-group">
         <label for="autoVisGM">{{localize 'SIMPLEFOG.enableForGM'}}</label>
-        <input type='checkbox' {{#if autoVisGM}}checked{{/if}} name='autoVisGM' />
+        <input type='checkbox' {{checked autoVisGM}} name='autoVisGM' />
     </div>
     <div class="form-group">
         <label for="vThreshold">{{localize 'SIMPLEFOG.visThreshold'}}</label>
-        <input type="range" name="vThreshold" value="{{ vThreshold }}" min="0" max="100" step="1" data-dtype="Number" />
-        <span class="range-value">{{ vThreshold }}</span>
+        {{rangePicker name="vThreshold" value=vThreshold min=0 max=100 step=1}}
     </div>
 
     <hr>
