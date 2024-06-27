@@ -189,26 +189,21 @@ export default class MaskLayer extends InteractionLayer {
 	 */
 
 	getSetting(name) {
-		let setting = canvas.scene.getFlag(this.layername, name);
-		if (setting === undefined) setting = this.getUserSetting(name);
-		if (setting === undefined) setting = this.DEFAULTS[name];
-		return setting;
+		return canvas.scene.getFlag(this.layername, name)
+			?? this.getUserSetting(name)
+			?? this.DEFAULTS[name];
 	}
 
 	async setSetting(name, value) {
-		const v = await canvas.scene.setFlag(this.layername, name, value);
-		return v;
+		return await canvas.scene.setFlag(this.layername, name, value);
 	}
 
 	getUserSetting(name) {
-		let setting = game.user.getFlag(this.layername, name);
-		if (setting === undefined) setting = this.DEFAULTS[name];
-		return setting;
+		return game.user.getFlag(this.layername, name) ?? this.DEFAULTS[name];
 	}
 
 	async setUserSetting(name, value) {
-		const v = await game.user.setFlag(this.layername, name, value);
-		return v;
+		return await game.user.setFlag(this.layername, name, value);
 	}
 
 	/**

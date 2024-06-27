@@ -1,18 +1,26 @@
 <div id="simplefog-brush-controls">
-    <form id="simplefog-brush-controls-form">
+    <div id="simplefog-brush-controls-form">
+        {{#if displayContainer}}
         <div id="brush-size-container">
-            <h3 class="form-header">{{localize 'SIMPLEFOG.brushSize'}}</h3>
-            <div class="form-group">
-                <input type="range" name="brushSize" value="{{ brushSize }}" min="10" max="500" step="10" data-dtype="Number"/>
+            <label>{{localize 'SIMPLEFOG.brushSize'}}</label>
+            <div class="flexrow">
+                <input type="range" name="brushSize" value="{{ brushSize }}" min="10" max="500" step="10" data-action="brushSize">
+                <span class="range-value">{{ brushSize }}px</span>
             </div>
         </div>
+        {{/if}}
         <div id="brush-opacity-container">
-            <h3 class="form-header">{{localize 'SIMPLEFOG.brushOpacity'}}</h3>
-            <div class="form-group brush-opacity">
-                <input type="range" name="brushOpacity" value="{{ brushOpacity }}" min="0" max="100" step="1" data-dtype="Number"/>
-                <div class="label left-label">{{localize 'SIMPLEFOG.reveal'}}</div>
-                <div class="label right-label">{{localize 'SIMPLEFOG.hide'}}</div>
+            <label>{{localize 'SIMPLEFOG.brushOpacity'}}</label>
+            <div class="brush-opacity">
+                <div class="flexrow">
+                    <input type="range" name="brushOpacity" value="{{ brushOpacity }}" min="0" max="100" step="1" data-action="brushOpacity">
+                    <span class="range-value">{{ brushOpacity }}%</span>
+                </div>
+                <div class="flexrow">
+                    <label>{{localize 'SIMPLEFOG.reveal'}}</label>
+                    <label>{{localize 'SIMPLEFOG.hide'}}</label>
+                </div>
             </div>
         </div>
-    </form>
+    </div>
 </div>

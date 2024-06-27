@@ -4,6 +4,7 @@
  */
 
 import { Layout } from "../../libs/hexagons.js";
+import { BrushControls } from "../apps/BrushControls.js";
 import { hexObjsToArr, hexToPercent } from "../helpers.js";
 import MaskLayer from "./MaskLayer.js";
 
@@ -39,6 +40,28 @@ export default class SimplefogLayer extends MaskLayer {
 		return foundry.utils.mergeObject(super.layerOptions, {
 			name: "simplefog"
 		});
+	}
+
+	get brushControls() {
+		return this.#brushControls ??= new BrushControls();
+	}
+
+	#brushControls;
+
+	/** @inheritDoc */
+	_activate() {
+		super._activate();
+		this.setActiveTool(ui.controls.activeTool);
+		this.brushControls.render({force: true});
+	}
+
+		/* -------------------------------------------- */
+
+		/** @inheritDoc */
+	_deactivate() {
+		super._deactivate();
+		this.brushControls.close({animate: false});
+		this.clearActiveTool();
 	}
 
 	/* -------------------------------------------- */
@@ -136,13 +159,12 @@ export default class SimplefogLayer extends MaskLayer {
 		this.clearActiveTool();
 		this.activeTool = tool;
 		this.setPreviewTint();
-		const currentTool = $("#simplefog-brush-controls #brush-size-container");
-		if (currentTool.length) {
+		if (this.brushControls.rendered) {
 			if (tool === "brush") {
 				this.ellipsePreview.visible = true;
-				$("#simplefog-brush-controls #brush-size-container").show();
+				// $("#simplefog-brush-controls #brush-size-container").show();
 			} else {
-				$("#simplefog-brush-controls #brush-size-container").hide();
+				// $("#simplefog-brush-controls #brush-size-container").hide();
 			}
 		}
 		if (tool === "grid") {

@@ -1,6 +1,5 @@
-import BrushControls from "./classes/BrushControls.js";
-import SimplefogConfig from "./classes/SimplefogConfig.js";
-import SimplefogLayer from "./classes/SimplefogLayer.js";
+import SimplefogConfig from "./apps/SimplefogConfig.js";
+import SimplefogLayer from "./layers/SimplefogLayer.js";
 import { registerSettings } from "./settings.js";
 
 Hooks.once("init", async () => {
@@ -54,10 +53,11 @@ Hooks.once("init", async () => {
 		],
 		onDown: () => {
 			if (isActiveControl()) {
-				let $slider = $("input[name=brushOpacity]");
-				let brushOpacity = $slider.val();
-				$slider.val(brushOpacity === "100" ? 0 : 100);
-				$("form#simplefog-brush-controls-form").submit();
+				const bc = canvas.simplefog.brushControls;
+				const handler = bc.options.actions.brushOpacity;
+				const slider = bc.element.querySelector("input[name=brushOpacity]");
+				const value = slider.value = slider.value === "100" ? 0 : 100;
+				handler.call(bc, null, null, value);
 				return true;
 			}
 		},
@@ -73,11 +73,12 @@ Hooks.once("init", async () => {
 		],
 		onDown: () => {
 			if (isActiveControl() && canvas.simplefog.activeTool === "brush") {
-				const s = canvas.simplefog.getUserSetting("brushSize");
-				canvas.simplefog.setBrushSize(Math.max(s * 0.8, 10));
-				let $slider = $("input[name=brushSize]");
-				let brushSize = $slider.val();
-				$slider.val(brushSize * 0.8);
+				const bc = canvas.simplefog.brushControls;
+				const handler = bc.options.actions.brushSize;
+				const slider = bc.element.querySelector("input[name=brushSize]");
+				slider.value = Math.max(Number(slider.value) * 0.8, 10).toNearest(10, "floor");
+				handler.call(bc);
+				canvas.simplefog.setBrushSize(slider.value);
 				return true;
 			}
 		},
@@ -95,11 +96,12 @@ Hooks.once("init", async () => {
 		],
 		onDown: () => {
 			if (isActiveControl() && canvas.simplefog.activeTool === "brush") {
-				const s = canvas.simplefog.getUserSetting("brushSize");
-				canvas.simplefog.setBrushSize(Math.min(s * 1.25, 500));
-				let $slider = $("input[name=brushSize]");
-				let brushSize = $slider.val();
-				$slider.val(brushSize * 1.25);
+				const bc = canvas.simplefog.brushControls;
+				const handler = bc.options.actions.brushSize;
+				const slider = bc.element.querySelector("input[name=brushSize]");
+				slider.value = Math.min(Number(slider.value) * 1.25, 500).toNearest(10, "ceil");
+				handler.call(bc);
+				canvas.simplefog.setBrushSize(slider.value);
 				return true;
 			}
 		},
@@ -235,43 +237,6 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 /**
- * Handles adding the custom brush controls pallet
- * and switching active brush flag
- */
-Hooks.on("renderSceneControls", (controls) => {
-	// Switching to layer
-	if (canvas.simplefog != null) {
-		if (controls.activeControl === "simplefog" && controls.activeTool !== undefined) {
-			// Open brush tools if not already open
-			if (!$("#simplefog-brush-controls").length) new BrushControls().render(true);
-			// Set active tool
-			canvas.simplefog.setActiveTool(controls.activeTool);
-		}
-		// Switching away from layer
-		else {
-			// Clear active tool
-			canvas.simplefog.clearActiveTool();
-			// Remove brush tools if open
-			const bc = $("#simplefog-brush-controls")[0];
-			if (bc) bc.remove();
-		}
-	}
-});
-
-/**
- * Sets Y position of the brush controls to account for scene navigation buttons
- */
-function setBrushControlPos() {
-	const brushControl = $("#simplefog-brush-controls");
-	const navigation = $("#navigation");
-	if (brushControl.length && navigation.length) {
-		const h = navigation.height();
-		brushControl.css({ top: `${h + 30}px` });
-		canvas.simplefog.setActiveTool(canvas.simplefog.activeTool);
-	}
-}
-
-/**
  * Toggle Simple Fog
  */
 function toggleSimpleFog() {
@@ -303,7 +268,3 @@ function cancelToggleSimpleFog(result = undefined) {
 	ui.controls.controls.find(({ name }) => name === "simplefog").tools[0].active = true;
 	ui.controls.render();
 }
-
-// Reset position when brush controls are rendered or sceneNavigation changes
-Hooks.on("renderBrushControls", setBrushControlPos);
-Hooks.on("renderSceneNavigation", setBrushControlPos);
