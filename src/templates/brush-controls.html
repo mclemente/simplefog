@@ -1,25 +1,23 @@
-<div id="simplefog-brush-controls">
-    <div id="simplefog-brush-controls-form">
-        {{#if displayContainer}}
-        <div id="brush-size-container">
-            <label>{{localize 'SIMPLEFOG.brushSize'}}</label>
-            <div class="flexrow">
-                <input type="range" name="brushSize" value="{{ brushSize }}" min="10" max="500" step="10" data-action="brushSize">
-                <span class="range-value">{{ brushSize }}px</span>
-            </div>
+<div>
+    {{#if displayContainer}}
+    <div>
+        <label>{{localize 'SIMPLEFOG.brushSize'}}</label>
+        <div class="flexrow">
+            <input type="range" name="brushSize" value="{{ brushSize }}" min="10" max="500" step="10" data-action="brushSize">
+            <span class="range-value">{{ brushSize }}px</span>
         </div>
-        {{/if}}
-        <div id="brush-opacity-container">
-            <label>{{localize 'SIMPLEFOG.brushOpacity'}}</label>
-            <div class="brush-opacity">
-                <div class="flexrow">
-                    <input type="range" name="brushOpacity" value="{{ brushOpacity }}" min="0" max="100" step="1" data-action="brushOpacity">
-                    <span class="range-value">{{ brushOpacity }}%</span>
-                </div>
-                <div class="flexrow">
-                    <label>{{localize 'SIMPLEFOG.reveal'}}</label>
-                    <label>{{localize 'SIMPLEFOG.hide'}}</label>
-                </div>
+    </div>
+    {{/if}}
+    <div>
+        <label>{{localize 'SIMPLEFOG.brushOpacity'}}</label>
+        <div class="brush-opacity">
+            <div class="flexrow">
+                <input type="range" name="brushOpacity" value="{{ brushOpacity }}" min="0" max="100" step="1" data-action="brushOpacity">
+                <span class="range-value">{{ brushOpacity }}%</span>
+            </div>
+            <div class="flexrow">
+                <label>{{localize 'SIMPLEFOG.reveal'}}</label>
+                <label>{{localize 'SIMPLEFOG.hide'}}</label>
             </div>
         </div>
     </div>
