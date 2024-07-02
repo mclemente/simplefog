@@ -18,7 +18,7 @@ Hooks.once("init", async () => {
 		],
 		onDown: () => {
 			const layer = isActiveControl() ? "tokens" : "simplefog";
-			ui.controls.initialize({ layer });
+			canvas[layer].activate();
 			return true;
 		},
 		restricted: true,
