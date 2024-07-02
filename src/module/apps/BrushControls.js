@@ -67,7 +67,6 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 			?.addEventListener("change", BrushControls.brushSize.bind(this));
 		this.element.querySelector("input[name='brushOpacity']")
 			.addEventListener("change", BrushControls.brushOpacity.bind(this));
-		canvas.simplefog.setActiveTool(canvas.simplefog.activeTool);
 	}
 
 	/* -------------------------------------------- */

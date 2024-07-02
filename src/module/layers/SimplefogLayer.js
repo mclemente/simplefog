@@ -43,6 +43,10 @@ export default class SimplefogLayer extends MaskLayer {
 		});
 	}
 
+	get activeTool() {
+		return ui.controls.activeTool;
+	}
+
 	get brushControls() {
 		return this.#brushControls ??= new BrushControls();
 	}
@@ -52,7 +56,20 @@ export default class SimplefogLayer extends MaskLayer {
 	/** @inheritDoc */
 	_activate() {
 		super._activate();
-		this.setActiveTool(ui.controls.activeTool);
+		this.clearActiveTool();
+		this.setPreviewTint();
+		if (this.activeTool === "brush") {
+			this.ellipsePreview.visible = true;
+		} else if (this.activeTool === "grid") {
+			if (canvas.scene.grid.type === 1) {
+				this.boxPreview.width = canvas.scene.grid.size;
+				this.boxPreview.height = canvas.scene.grid.size;
+				this.boxPreview.visible = true;
+			} else if ([2, 3, 4, 5].includes(canvas.scene.grid.type)) {
+				this._initGrid();
+				this.polygonPreview.visible = true;
+			}
+		}
 		this.brushControls.render({force: true});
 	}
 
@@ -142,7 +159,9 @@ export default class SimplefogLayer extends MaskLayer {
 		if (!game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayPlayerAlpha`)) {
 			canvas[this.layername].setFogImageOverlayAlpha(data.flags[this.layername].fogImageOverlayPlayerAlpha);
 		}
-		if (foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayZIndex`)) canvas[this.layername].setFogImageOverlayZIndex(data.flags[this.layername].fogImageOverlayZIndex);
+		if (foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayZIndex`)) {
+			canvas[this.layername].setFogImageOverlayZIndex(data.flags[this.layername].fogImageOverlayZIndex);
+		}
 	}
 
 	/**
@@ -151,27 +170,6 @@ export default class SimplefogLayer extends MaskLayer {
 	_registerMouseListeners() {
 		this.addListener("pointerup", this._pointerUp);
 		this.addListener("pointermove", this._pointerMove);
-	}
-
-	/**
-	 * Sets the active tool & shows preview for brush & grid tools
-	 */
-	setActiveTool(tool) {
-		this.clearActiveTool();
-		this.activeTool = tool;
-		this.setPreviewTint();
-		if (this.brushControls.rendered && tool === "brush") {
-			this.ellipsePreview.visible = true;
-		} else if (tool === "grid") {
-			if (canvas.scene.grid.type === 1) {
-				this.boxPreview.width = canvas.scene.grid.size;
-				this.boxPreview.height = canvas.scene.grid.size;
-				this.boxPreview.visible = true;
-			} else if ([2, 3, 4, 5].includes(canvas.scene.grid.type)) {
-				this._initGrid();
-				this.polygonPreview.visible = true;
-			}
-		}
 	}
 
 	setPreviewTint() {
