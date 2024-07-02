@@ -196,29 +196,18 @@ export default class SimplefogLayer extends MaskLayer {
 	 * Aborts any active drawing tools
 	 */
 	clearActiveTool() {
-		try {
-			// Box preview
-			this.boxPreview.visible = false;
-		} catch(err) {}
-		try {
-			// Ellipse Preview
-			this.ellipsePreview.visible = false;
-		} catch(err) {}
-		try {
-			// Shape preview
-			this.polygonPreview.clear();
-			this.polygonPreview.visible = false;
-			this.polygonHandle.visible = false;
-			this.polygon = [];
-		} catch(err) {}
-		try {
-			// Cancel op flag
-			this.op = false;
-		} catch(err) {}
-		try {
-			// Clear history buffer
-			this.historyBuffer = [];
-		} catch(err) {}
+		// Box preview
+		this.boxPreview.visible = false;
+		// Ellipse Preview
+		this.ellipsePreview.visible = false;
+		this.polygonPreview.clear();
+		this.polygonPreview.visible = false;
+		this.polygonHandle.visible = false;
+		this.polygon = [];
+		// Cancel op flag
+		this.op = false;
+		// Clear history buffer
+		this.historyBuffer = [];
 	}
 
 	_onClickLeft(e) {
