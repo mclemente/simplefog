@@ -160,7 +160,7 @@ export default class SimplefogLayer extends MaskLayer {
 			canvas[this.layername].setFogImageOverlayAlpha(data.flags[this.layername].fogImageOverlayPlayerAlpha);
 		}
 		if (foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayZIndex`)) {
-			canvas[this.layername].setFogImageOverlayZIndex(data.flags[this.layername].fogImageOverlayZIndex);
+			canvas[this.layername].fogImageOverlayLayer.zIndex = data.flags[this.layername].fogImageOverlayZIndex;
 		}
 	}
 

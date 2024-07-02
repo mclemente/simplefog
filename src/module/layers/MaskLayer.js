@@ -78,7 +78,7 @@ export default class MaskLayer extends InteractionLayer {
 		else {
 			const start = this.fogColorLayer.alpha;
 			const dist = start - alpha;
-			const fps = 60;
+			const fps = game.settings.get("core", "maxFPS");
 			const speed = this.getSetting("transitionSpeed");
 			const frame = 1000 / fps;
 			const rate = dist / ((fps * speed) / 1000);
@@ -155,15 +155,10 @@ export default class MaskLayer extends InteractionLayer {
 	}
 
 	async setFogImageOverlayAlpha(alpha, skip = false) {
-		// If skip is false, do not transition and just set alpha immediately
-		if (skip || !this.getSetting("transition")) {
-			this.fogImageOverlayLayer.alpha = alpha;
-		}
-		// Loop until transition is complete
-		else {
+		if (!skip && this.getSetting("transition")) {
 			const start = this.fogImageOverlayLayer.alpha;
 			const dist = start - alpha;
-			const fps = 60;
+			const fps = game.settings.get("core", "maxFPS");
 			const speed = this.getSetting("transitionSpeed");
 			const frame = 1000 / fps;
 			const rate = dist / ((fps * speed) / 1000);
@@ -175,13 +170,8 @@ export default class MaskLayer extends InteractionLayer {
 				this.fogImageOverlayLayer.alpha -= rate;
 				f -= 1;
 			}
-			// Reset target alpha in case loop overshot a bit
-			this.fogImageOverlayLayer.alpha = alpha;
 		}
-	}
-
-	async setFogImageOverlayZIndex(zIndex) {
-		this.fogImageOverlayLayer.zIndex = zIndex;
+		this.fogImageOverlayLayer.alpha = alpha;
 	}
 
 	/**
@@ -507,7 +497,7 @@ export default class MaskLayer extends InteractionLayer {
 		this.fogImageOverlayLayer.width = canvas.dimensions.sceneRect.width;
 		this.fogImageOverlayLayer.height = canvas.dimensions.sceneRect.height;
 		this.fogImageOverlayLayer.mask = this.maskSprite;
-		this.setFogImageOverlayZIndex(this.getSetting("fogImageOverlayZIndex"));
+		this.fogImageOverlayLayer.zIndex = this.getSetting("fogImageOverlayZIndex");
 		this.setFogImageOverlayAlpha(this.getFogImageOverlayAlpha(), true);
 
 		this.addChild(this.fogImageOverlayLayer);
