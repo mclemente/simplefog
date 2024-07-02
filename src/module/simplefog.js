@@ -166,26 +166,31 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				name: "brush",
 				title: game.i18n.localize("SIMPLEFOG.brushTool"),
 				icon: "fas fa-paint-brush",
+				onClick: () => canvas.simplefog?._changeTool(),
 			},
 			{
 				name: "grid",
 				title: game.i18n.localize("SIMPLEFOG.gridTool"),
 				icon: "fas fa-border-none",
+				onClick: () => canvas.simplefog?._changeTool(),
 			},
 			{
 				name: "polygon",
 				title: game.i18n.localize("SIMPLEFOG.polygonTool"),
 				icon: "fas fa-draw-polygon",
+				onClick: () => canvas.simplefog?._changeTool(),
 			},
 			{
 				name: "box",
 				title: game.i18n.localize("SIMPLEFOG.boxTool"),
 				icon: "far fa-square",
+				onClick: () => canvas.simplefog?._changeTool(),
 			},
 			{
 				name: "ellipse",
 				title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
 				icon: "far fa-circle",
+				onClick: () => canvas.simplefog?._changeTool(),
 			},
 			// {
 			//   name: "image",

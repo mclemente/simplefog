@@ -56,20 +56,7 @@ export default class SimplefogLayer extends MaskLayer {
 	/** @inheritDoc */
 	_activate() {
 		super._activate();
-		this.clearActiveTool();
-		this.setPreviewTint();
-		if (this.activeTool === "brush") {
-			this.ellipsePreview.visible = true;
-		} else if (this.activeTool === "grid") {
-			if (canvas.scene.grid.type === 1) {
-				this.boxPreview.width = canvas.scene.grid.size;
-				this.boxPreview.height = canvas.scene.grid.size;
-				this.boxPreview.visible = true;
-			} else if ([2, 3, 4, 5].includes(canvas.scene.grid.type)) {
-				this._initGrid();
-				this.polygonPreview.visible = true;
-			}
-		}
+		this._changeTool();
 		this.brushControls.render({force: true});
 	}
 
@@ -80,6 +67,25 @@ export default class SimplefogLayer extends MaskLayer {
 		super._deactivate();
 		this.brushControls.close({animate: false});
 		this.clearActiveTool();
+	}
+
+	_changeTool() {
+		this.clearActiveTool();
+		this.setPreviewTint();
+		if (this.activeTool === "brush") {
+			this.ellipsePreview.visible = true;
+			this._pointerMoveBrush(canvas.mousePosition);
+		} else if (this.activeTool === "grid") {
+			if (canvas.scene.grid.type === 1) {
+				this.boxPreview.width = canvas.scene.grid.size;
+				this.boxPreview.height = canvas.scene.grid.size;
+				this.boxPreview.visible = true;
+			} else if ([2, 3, 4, 5].includes(canvas.scene.grid.type)) {
+				this._initGrid();
+				this.polygonPreview.visible = true;
+			}
+			this._pointerMoveGrid(canvas.mousePosition);
+		}
 	}
 
 	/* -------------------------------------------- */
@@ -214,6 +220,7 @@ export default class SimplefogLayer extends MaskLayer {
 		// Don't allow new action if history push still in progress
 		if (this.historyBuffer.length > 0) return;
 		const p = canvas.mousePosition;
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
 			// Round positions to nearest pixel
 			p.x = Math.round(p.x);
 			p.y = Math.round(p.y);
@@ -258,13 +265,13 @@ export default class SimplefogLayer extends MaskLayer {
 		p.y = Math.round(p.y);
 		switch (this.activeTool) {
 			case "brush":
-				this._pointerMoveBrush(p, e);
+				this._pointerMoveBrush(p);
 				break;
 			case "box":
 				this._pointerMoveBox(p, e);
 				break;
 			case "grid":
-				this._pointerMoveGrid(p, e);
+				this._pointerMoveGrid(p);
 				break;
 			case "ellipse":
 				this._pointerMoveEllipse(p, e);
