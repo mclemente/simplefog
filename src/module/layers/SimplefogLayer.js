@@ -228,19 +228,19 @@ export default class SimplefogLayer extends MaskLayer {
 		// Check active tool
 		switch (this.activeTool) {
 			case "brush":
-				this._pointerDownBrush(p, e);
+				this._pointerDownBrush();
 				break;
 			case "grid":
-				this._pointerDownGrid(p, e);
+				this._pointerDownGrid();
 				break;
 			case "box":
-				this._pointerDownBox(p, e);
+				this._pointerDownBox(p);
 				break;
 			case "ellipse":
-				this._pointerDownEllipse(p, e);
+				this._pointerDownEllipse(p);
 				break;
 			case "polygon":
-				this._pointerDownPolygon(p, e);
+				this._pointerDownPolygon(p);
 				break;
 			default: // Do nothing
 				break;
