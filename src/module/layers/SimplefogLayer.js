@@ -57,7 +57,6 @@ export default class SimplefogLayer extends MaskLayer {
 	_activate() {
 		super._activate();
 		this._changeTool();
-		this.brushControls.render({force: true});
 	}
 
 		/* -------------------------------------------- */
@@ -86,6 +85,7 @@ export default class SimplefogLayer extends MaskLayer {
 			}
 			this._pointerMoveGrid(canvas.mousePosition);
 		}
+		this.brushControls.render({ force: true });
 	}
 
 	/* -------------------------------------------- */
