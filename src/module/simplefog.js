@@ -148,96 +148,95 @@ Hooks.on("canvasInit", () => {
  */
 Hooks.on("getSceneControlButtons", (controls) => {
 	if (!game.user.isGM) return;
+	const tools = [
+		{
+			name: "simplefogtoggle",
+			title: game.i18n.localize("SIMPLEFOG.onoff"),
+			icon: "fas fa-eye",
+			onClick: () => toggleSimpleFog(),
+			active: canvas.simplefog?.visible,
+			toggle: true,
+		},
+		{
+			name: "brush",
+			title: game.i18n.localize("SIMPLEFOG.brushTool"),
+			icon: "fas fa-paint-brush",
+			onClick: () => canvas.simplefog?._changeTool(),
+		},
+		{
+			name: "polygon",
+			title: game.i18n.localize("SIMPLEFOG.polygonTool"),
+			icon: "fas fa-draw-polygon",
+			onClick: () => canvas.simplefog?._changeTool(),
+		},
+		{
+			name: "box",
+			title: game.i18n.localize("SIMPLEFOG.boxTool"),
+			icon: "far fa-square",
+			onClick: () => canvas.simplefog?._changeTool(),
+		},
+		{
+			name: "ellipse",
+			title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
+			icon: "far fa-circle",
+			onClick: () => canvas.simplefog?._changeTool(),
+		},
+		{
+			name: "sceneConfig",
+			title: game.i18n.localize("SIMPLEFOG.sceneConfig"),
+			icon: "fas fa-cog",
+			onClick: () => {
+				new SimplefogConfig().render(true);
+			},
+			button: true,
+		},
+		{
+			name: "clearfog",
+			title: game.i18n.localize("SIMPLEFOG.reset"),
+			icon: "fas fa-trash",
+			onClick: () => {
+				const dg = new Dialog({
+					title: game.i18n.localize("SIMPLEFOG.reset"),
+					content: game.i18n.localize("SIMPLEFOG.confirmReset"),
+					buttons: {
+						reset: {
+							icon: '<i class="fas fa-trash"></i>',
+							label: "Reset",
+							callback: () => canvas.simplefog.resetMask(),
+						},
+						blank: {
+							icon: '<i class="fas fa-eye"></i>',
+							label: "Blank",
+							callback: () => canvas.simplefog.blankMask(),
+						},
+						cancel: {
+							icon: '<i class="fas fa-times"></i>',
+							label: "Cancel",
+						},
+					},
+					default: "reset",
+				});
+				dg.render(true);
+			},
+			button: true,
+		},
+	];
+	let activeTool = game.settings.get("simplefog", "toolHotKeys");
+	if (canvas.grid.type) {
+		tools.splice(2, 0, {
+			name: "grid",
+			title: game.i18n.localize("SIMPLEFOG.gridTool"),
+			icon: "fas fa-border-none",
+			onClick: () => canvas.simplefog?._changeTool(),
+		});
+	} else if (activeTool === "grid") activeTool = "brush";
 	controls.push({
 		name: "simplefog",
 		title: game.i18n.localize("SIMPLEFOG.sf"),
 		icon: "fas fa-cloud",
 		layer: "simplefog",
-		tools: [
-			{
-				name: "simplefogtoggle",
-				title: game.i18n.localize("SIMPLEFOG.onoff"),
-				icon: "fas fa-eye",
-				onClick: () => toggleSimpleFog(),
-				active: canvas.simplefog?.visible,
-				toggle: true,
-			},
-			{
-				name: "brush",
-				title: game.i18n.localize("SIMPLEFOG.brushTool"),
-				icon: "fas fa-paint-brush",
-				onClick: () => canvas.simplefog?._changeTool(),
-			},
-			{
-				name: "grid",
-				title: game.i18n.localize("SIMPLEFOG.gridTool"),
-				icon: "fas fa-border-none",
-				onClick: () => canvas.simplefog?._changeTool(),
-			},
-			{
-				name: "polygon",
-				title: game.i18n.localize("SIMPLEFOG.polygonTool"),
-				icon: "fas fa-draw-polygon",
-				onClick: () => canvas.simplefog?._changeTool(),
-			},
-			{
-				name: "box",
-				title: game.i18n.localize("SIMPLEFOG.boxTool"),
-				icon: "far fa-square",
-				onClick: () => canvas.simplefog?._changeTool(),
-			},
-			{
-				name: "ellipse",
-				title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
-				icon: "far fa-circle",
-				onClick: () => canvas.simplefog?._changeTool(),
-			},
-			// {
-			//   name: "image",
-			//   title: "Image Tool",
-			//   icon: "far fa-image",
-			// },
-			{
-				name: "sceneConfig",
-				title: game.i18n.localize("SIMPLEFOG.sceneConfig"),
-				icon: "fas fa-cog",
-				onClick: () => {
-					new SimplefogConfig().render(true);
-				},
-				button: true,
-			},
-			{
-				name: "clearfog",
-				title: game.i18n.localize("SIMPLEFOG.reset"),
-				icon: "fas fa-trash",
-				onClick: () => {
-					const dg = new Dialog({
-						title: game.i18n.localize("SIMPLEFOG.reset"),
-						content: game.i18n.localize("SIMPLEFOG.confirmReset"),
-						buttons: {
-							reset: {
-								icon: '<i class="fas fa-trash"></i>',
-								label: "Reset",
-								callback: () => canvas.simplefog.resetMask(),
-							},
-							blank: {
-								icon: '<i class="fas fa-eye"></i>',
-								label: "Blank",
-								callback: () => canvas.simplefog.blankMask(),
-							},
-							cancel: {
-								icon: '<i class="fas fa-times"></i>',
-								label: "Cancel",
-							},
-						},
-						default: "reset",
-					});
-					dg.render(true);
-				},
-				button: true,
-			},
-		],
-		activeTool: game.settings.get("simplefog", "toolHotKeys"),
+		tools,
+		activeTool,
 	});
 });
 
