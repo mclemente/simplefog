@@ -249,6 +249,27 @@ export default class SimplefogLayer extends MaskLayer {
 		this._pointerMove(e);
 	}
 
+	_onClickLeft2(e) {
+		// Don't allow new action if history push still in progress
+		if (this.historyBuffer.length > 0) return;
+		const p = canvas.mousePosition;
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
+		// Round positions to nearest pixel
+		p.x = Math.round(p.x);
+		p.y = Math.round(p.y);
+		this.op = true;
+		// Check active tool
+		switch (this.activeTool) {
+			case "polygon":
+				this._pointerDown2Polygon(p);
+				break;
+			default: // Do nothing
+				break;
+		}
+		// Call _pointermove so single click will still draw brush if mouse does not move
+		this._pointerMove(e);
+	}
+
 	_onClickRight(e) {
 		if (this.historyBuffer.length > 0) return;
 		// Todo: Not sure why this doesnt trigger when drawing ellipse & box
@@ -427,20 +448,7 @@ export default class SimplefogLayer extends MaskLayer {
 			const xo = Math.abs(this.polygon[0].x - x);
 			const yo = Math.abs(this.polygon[0].y - y);
 			if (xo < this.DEFAULTS.handlesize && yo < this.DEFAULTS.handlesize) {
-				const verts = hexObjsToArr(this.polygon);
-				// render the new shape to history
-				this.renderBrush({
-					shape: this.BRUSH_TYPES.POLYGON,
-					x: 0,
-					y: 0,
-					vertices: verts,
-					fill: this.getUserSetting("brushOpacity"),
-				});
-				// Reset the preview shape
-				this.polygonPreview.clear();
-				this.polygonPreview.visible = false;
-				this.polygonHandle.visible = false;
-				this.polygon = [];
+				this._pointerClosePolygon();
 				return;
 			}
 		}
@@ -451,6 +459,33 @@ export default class SimplefogLayer extends MaskLayer {
 			this.polygonHandle.y = y - this.DEFAULTS.handlesize;
 			this.polygonHandle.visible = true;
 		}
+		this._pointerUpdatePolygon(x, y);
+	}
+
+	_pointerDown2Polygon() {
+		if (!this.polygon || this.polygon.length < 3) return;
+		this._pointerClosePolygon();
+	}
+
+	_pointerClosePolygon() {
+		const verts = hexObjsToArr(this.polygon);
+		// render the new shape to history
+		this.renderBrush({
+			shape: this.BRUSH_TYPES.POLYGON,
+			x: 0,
+			y: 0,
+			vertices: verts,
+			fill: this.getUserSetting("brushOpacity"),
+		});
+		// Reset the preview shape
+		this.polygonPreview.clear();
+		this.polygonPreview.visible = false;
+		this.polygonHandle.visible = false;
+		this.polygon = [];
+		return true;
+	}
+
+	_pointerUpdatePolygon(x, y) {
 		// If intermediate vertex, add it to array and redraw the preview
 		this.polygon.push({ x, y });
 		this.polygonPreview.clear();
