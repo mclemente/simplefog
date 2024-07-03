@@ -221,32 +221,32 @@ export default class SimplefogLayer extends MaskLayer {
 		if (this.historyBuffer.length > 0) return;
 		const p = canvas.mousePosition;
 		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
-			// Round positions to nearest pixel
-			p.x = Math.round(p.x);
-			p.y = Math.round(p.y);
-			this.op = true;
-			// Check active tool
-			switch (this.activeTool) {
-				case "brush":
-					this._pointerDownBrush(p, e);
-					break;
-				case "grid":
-					this._pointerDownGrid(p, e);
-					break;
-				case "box":
-					this._pointerDownBox(p, e);
-					break;
-				case "ellipse":
-					this._pointerDownEllipse(p, e);
-					break;
-				case "polygon":
-					this._pointerDownPolygon(p, e);
-					break;
-				default: // Do nothing
-					break;
-			}
-			// Call _pointermove so single click will still draw brush if mouse does not move
-			this._pointerMove(e);
+		// Round positions to nearest pixel
+		p.x = Math.round(p.x);
+		p.y = Math.round(p.y);
+		this.op = true;
+		// Check active tool
+		switch (this.activeTool) {
+			case "brush":
+				this._pointerDownBrush(p, e);
+				break;
+			case "grid":
+				this._pointerDownGrid(p, e);
+				break;
+			case "box":
+				this._pointerDownBox(p, e);
+				break;
+			case "ellipse":
+				this._pointerDownEllipse(p, e);
+				break;
+			case "polygon":
+				this._pointerDownPolygon(p, e);
+				break;
+			default: // Do nothing
+				break;
+		}
+		// Call _pointermove so single click will still draw brush if mouse does not move
+		this._pointerMove(e);
 	}
 
 	_onClickRight(e) {
