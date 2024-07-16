@@ -175,7 +175,9 @@ module.exports = {
 
   globals: {
     PIXI: false,
+	ClockwiseSweepPolygon: false,
 	InteractionLayer: false,
+	PointSourcePolygon: false
   },
 
   overrides: [

@@ -5,6 +5,7 @@
 
 import { Layout } from "../../libs/hexagons.js";
 import { BrushControls } from "../apps/BrushControls.js";
+import { CWSPNoDoors } from "../clockwise-sweep.js";
 import { hexObjsToArr, hexToPercent } from "../helpers.js";
 import MaskLayer from "./MaskLayer.js";
 
@@ -44,8 +45,14 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	get activeTool() {
-		return ui.controls.activeTool;
+		return this.#activeTool;
 	}
+
+	set activeTool(tool) {
+		this.#activeTool = tool;
+	}
+
+	#activeTool;
 
 	get brushControls() {
 		return this.#brushControls ??= new BrushControls();
@@ -69,6 +76,9 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_changeTool() {
+		const wasActive = this.activeTool;
+		this.activeTool = ui.controls.activeTool;
+
 		this.clearActiveTool();
 		this.setPreviewTint();
 		if (this.activeTool === "brush") {
@@ -84,6 +94,13 @@ export default class SimplefogLayer extends MaskLayer {
 				this.polygonPreview.visible = true;
 			}
 			this._pointerMoveGrid(canvas.mousePosition);
+		} else if (this.activeTool === "room") {
+			this._pointerMoveRoom(canvas.mousePosition);
+		}
+
+		if (wasActive === "room" || this.activeTool === "room") {
+			canvas.walls.objects.visible = !(wasActive === "room");
+			canvas.walls.placeables.forEach((l) => l.renderFlags.set({refreshState: true}));
 		}
 		this.brushControls.render({ force: true });
 	}
@@ -242,6 +259,9 @@ export default class SimplefogLayer extends MaskLayer {
 			case "polygon":
 				this._pointerDownPolygon(p);
 				break;
+			case "room":
+				this._pointerDownRoom(p);
+				break;
 			default: // Do nothing
 				break;
 		}
@@ -296,6 +316,9 @@ export default class SimplefogLayer extends MaskLayer {
 				break;
 			case "ellipse":
 				this._pointerMoveEllipse(p, e);
+				break;
+			case "room":
+				this._pointerMoveRoom(p);
 				break;
 			default:
 				break;
@@ -493,6 +516,71 @@ export default class SimplefogLayer extends MaskLayer {
 		this.polygonPreview.drawPolygon(hexObjsToArr(this.polygon));
 		this.polygonPreview.endFill();
 		this.polygonPreview.visible = true;
+	}
+
+	_pointerDownRoom(p) {
+		const vertices = this._getRoomVertices(p);
+		if (!vertices) return false;
+
+		this.renderBrush({
+			shape: this.BRUSH_TYPES.POLYGON,
+			x: 0,
+			y: 0,
+			vertices,
+			fill: this.getUserSetting("brushOpacity"),
+		});
+		return true;
+	}
+
+	_pointerMoveRoom(p) {
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
+			this.polygonPreview.visible = false;
+			return;
+		} else this.polygonPreview.visible = true;
+		this.polygonPreview.clear();
+		this.polygonPreview.beginFill(0xffffff);
+		this.polygonPreview.drawPolygon(this._getRoomVertices(p));
+		this.polygonPreview.endFill();
+	}
+
+	_getRoomVertices(p) {
+		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", useInnerBounds: true });
+		const walls = sweep.edges.filter((e) => e.type === "wall").map((e) => e.object);
+		const verts = canvas.walls.identifyInteriorArea(walls);
+		let vertices = [];
+		if (verts.length) {
+			let closest;
+			const target = { x: p.x, y: p.y };
+			verts.forEach((v) => {
+				const points = v.points;
+				let maxX; let maxY;
+				let minX = maxX = points[0];
+				let minY = maxY = points[1];
+				for ( let i = 1; i < points.length; i += 2 ) {
+					const x = points[i-1];
+					const y = points[i];
+					if ( x < minX ) minX = x;
+					else if ( x > maxX ) maxX = x;
+					if ( y < minY ) minY = y;
+					else if ( y > maxY ) maxY = y;
+				}
+				const withinBounds = (minX <= target.x && maxX >= target.x && minY <= target.y && maxY >= target.y);
+				const betterFit = (
+					closest
+					&& (
+						minX <= closest.minX
+						&& maxX >= closest.maxX
+						&& minY <= closest.minY
+						&& maxY >= closest.maxY
+					)
+				);
+				if (withinBounds || betterFit) {
+					closest = { minX, minY, maxX, maxY };
+					vertices = points;
+				}
+			});
+		}
+		return vertices;
 	}
 
 	/**

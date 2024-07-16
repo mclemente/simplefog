@@ -176,6 +176,12 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			onClick: () => canvas.simplefog?._changeTool(),
 		},
 		{
+			name: "room",
+			title: game.i18n.localize("SIMPLEFOG.roomTool"),
+			icon: "fas fa-block-brick",
+			onClick: () => canvas.simplefog?._changeTool(),
+		},
+		{
 			name: "polygon",
 			title: game.i18n.localize("SIMPLEFOG.polygonTool"),
 			icon: "fas fa-draw-polygon",

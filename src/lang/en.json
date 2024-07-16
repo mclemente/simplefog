@@ -40,6 +40,7 @@
 
 		"brushTool": "Brush Tool",
 		"gridTool": "Grid Tool",
+		"roomTool": "Room Tool",
 		"polygonTool": "Polygon Tool",
 		"boxTool": "Box Tool",
 		"ellipseTool": "Ellipse Tool",
