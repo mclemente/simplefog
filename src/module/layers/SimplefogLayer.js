@@ -76,10 +76,8 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_changeTool() {
-		const wasActive = this.activeTool;
-		this.activeTool = ui.controls.activeTool;
-
 		this.clearActiveTool();
+		this.activeTool = ui.controls.activeTool;
 		this.setPreviewTint();
 		if (this.activeTool === "brush") {
 			this.ellipsePreview.visible = true;
@@ -96,10 +94,7 @@ export default class SimplefogLayer extends MaskLayer {
 			this._pointerMoveGrid(canvas.mousePosition);
 		} else if (this.activeTool === "room") {
 			this._pointerMoveRoom(canvas.mousePosition);
-		}
-
-		if (wasActive === "room" || this.activeTool === "room") {
-			canvas.walls.objects.visible = !(wasActive === "room");
+			canvas.walls.objects.visible = true;
 			canvas.walls.placeables.forEach((l) => l.renderFlags.set({refreshState: true}));
 		}
 		this.brushControls.render({ force: true });
@@ -231,6 +226,10 @@ export default class SimplefogLayer extends MaskLayer {
 		this.op = false;
 		// Clear history buffer
 		this.historyBuffer = [];
+		if (this.activeTool === "room") {
+			canvas.walls.objects.visible = false;
+			canvas.walls.placeables.forEach((l) => l.renderFlags.set({refreshState: true}));
+		}
 	}
 
 	_onClickLeft(e) {
