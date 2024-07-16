@@ -351,23 +351,22 @@ export default class MaskLayer extends InteractionLayer {
 	 */
 	brush(data) {
 		// Get new graphic & begin filling
-		const alpha = typeof data.alpha === "undefined" ? 1 : data.alpha;
-		const visible = typeof data.visible === "undefined" ? true : data.visible;
+		const { alpha = 1, fill, height, shape, vertices, visible = true, width, x, y, zIndex } = data;
 		const brush = new PIXI.Graphics();
-		brush.beginFill(data.fill);
+		brush.beginFill(fill);
 		// Draw the shape depending on type of brush
-		switch (data.shape) {
+		switch (shape) {
 			case this.BRUSH_TYPES.ELLIPSE:
-				brush.drawEllipse(0, 0, data.width, data.height);
+				brush.drawEllipse(0, 0, width, height);
 				break;
 			case this.BRUSH_TYPES.BOX:
-				brush.drawRect(0, 0, data.width, data.height);
+				brush.drawRect(0, 0, width, height);
 				break;
 			case this.BRUSH_TYPES.ROUNDED_RECT:
-				brush.drawRoundedRect(0, 0, data.width, data.height, 10);
+				brush.drawRoundedRect(0, 0, width, height, 10);
 				break;
 			case this.BRUSH_TYPES.POLYGON:
-				brush.drawPolygon(data.vertices);
+				brush.drawPolygon(vertices);
 				break;
 			default:
 				break;
@@ -376,9 +375,9 @@ export default class MaskLayer extends InteractionLayer {
 		brush.endFill();
 		brush.alpha = alpha;
 		brush.visible = visible;
-		brush.x = data.x;
-		brush.y = data.y;
-		brush.zIndex = data.zIndex;
+		brush.x = x;
+		brush.y = y;
+		brush.zIndex = zIndex;
 		return brush;
 	}
 
