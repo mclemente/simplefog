@@ -56,8 +56,8 @@ Hooks.once("init", async () => {
 				const bc = canvas.simplefog.brushControls;
 				const handler = bc.options.actions.brushOpacity;
 				const slider = bc.element.querySelector("input[name=brushOpacity]");
-				const value = slider.value = slider.value === "100" ? 0 : 100;
-				handler.call(bc, null, null, value);
+				slider.value = slider.value === "100" ? 0 : 100;
+				handler.call(bc);
 				return true;
 			}
 		},
