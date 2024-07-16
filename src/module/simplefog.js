@@ -222,7 +222,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 		},
 	];
 	let activeTool = game.settings.get("simplefog", "toolHotKeys");
-	if (canvas.grid.type) {
+	if (canvas.grid?.type) {
 		tools.splice(2, 0, {
 			name: "grid",
 			title: game.i18n.localize("SIMPLEFOG.gridTool"),
