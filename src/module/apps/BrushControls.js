@@ -18,6 +18,7 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 		actions: {
 			brushSize: BrushControls.brushSize,
 			brushOpacity: BrushControls.brushOpacity,
+			brushOpacityToggle: BrushControls.brushOpacityToggle
 		},
 	};
 
@@ -107,5 +108,13 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 		await canvas.simplefog.setUserSetting("brushOpacity", percentToHex(value));
 		target.parentNode.querySelector(".range-value").innerText = `${value}%`;
 		canvas.simplefog.setPreviewTint();
+	}
+
+	static async brushOpacityToggle(event, target) {
+		event?.preventDefault();
+		const bc = canvas.simplefog.brushControls;
+		const slider = bc.element.querySelector("input[name=brushOpacity]");
+		slider.value = Number(event.target.dataset.value);
+		BrushControls.brushOpacity.call(bc);
 	}
 }

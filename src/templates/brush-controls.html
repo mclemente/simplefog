@@ -15,9 +15,10 @@
                 <input type="range" name="brushOpacity" value="{{ brushOpacity }}" min="0" max="100" step="1" data-action="brushOpacity">
                 <span class="range-value">{{ brushOpacity }}%</span>
             </div>
-            <div class="flexrow">
-                <label>{{localize 'SIMPLEFOG.reveal'}}</label>
-                <label>{{localize 'SIMPLEFOG.hide'}}</label>
+            <div class="visibility-labels flexrow">
+                <a data-action="brushOpacityToggle" data-value="0">{{localize 'SIMPLEFOG.reveal'}}</a>
+                <a data-action="brushOpacityToggle" data-value="100">{{localize 'SIMPLEFOG.hide'}}</a>
+                <div class="spacer"></div>
             </div>
         </div>
     </div>

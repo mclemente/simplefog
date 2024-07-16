@@ -1,3 +1,7 @@
-#simplefog-filter-config .brush-opacity label:nth-child(2) {
+#simplefog-filter-config .brush-opacity .visibility-labels a:nth-child(2) {
 	text-align: right;
+}
+
+#simplefog-filter-config .brush-opacity .visibility-labels .spacer {
+	flex: 0 1 48px;
 }
