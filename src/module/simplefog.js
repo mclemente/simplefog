@@ -108,6 +108,18 @@ Hooks.once("init", async () => {
 		repeat: true,
 		restricted: true,
 	});
+	game.keybindings.register("simplefog", "forceShape", {
+		name: "Force Drag Shape (Hold)",
+		hint: "Forces the width and height of Rectangle and Ellipse tools to be the same.",
+		uneditable: [
+			{
+				key: "Shift"
+			}
+		],
+		repeat: true,
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.DEFERRED
+	});
 });
 
 Hooks.once("ready", async () => {
