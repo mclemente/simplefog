@@ -544,42 +544,7 @@ export default class SimplefogLayer extends MaskLayer {
 
 	_getRoomVertices(p) {
 		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", useInnerBounds: true });
-		const walls = sweep.edges.filter((e) => e.type === "wall").map((e) => e.object);
-		const verts = canvas.walls.identifyInteriorArea(walls);
-		let vertices = [];
-		if (verts.length) {
-			let closest;
-			const target = { x: p.x, y: p.y };
-			verts.forEach((v) => {
-				const points = v.points;
-				let maxX; let maxY;
-				let minX = maxX = points[0];
-				let minY = maxY = points[1];
-				for ( let i = 1; i < points.length; i += 2 ) {
-					const x = points[i-1];
-					const y = points[i];
-					if ( x < minX ) minX = x;
-					else if ( x > maxX ) maxX = x;
-					if ( y < minY ) minY = y;
-					else if ( y > maxY ) maxY = y;
-				}
-				const withinBounds = (minX <= target.x && maxX >= target.x && minY <= target.y && maxY >= target.y);
-				const betterFit = (
-					closest
-					&& (
-						minX <= closest.minX
-						&& maxX >= closest.maxX
-						&& minY <= closest.minY
-						&& maxY >= closest.maxY
-					)
-				);
-				if (withinBounds || betterFit) {
-					closest = { minX, minY, maxX, maxY };
-					vertices = points;
-				}
-			});
-		}
-		return vertices;
+		return Array.from(sweep.points);
 	}
 
 	/**
