@@ -543,6 +543,8 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_getRoomVertices(p) {
+		const sceneRect = canvas.dimensions.sceneRect;
+		if (p.x < sceneRect.left || p.x > sceneRect.right || p.y < sceneRect.top || p.y > sceneRect.bottom) return [];
 		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", useInnerBounds: true });
 		return Array.from(sweep.points);
 	}
