@@ -60,7 +60,8 @@ export default class SimplefogLayer extends MaskLayer {
 
 	#brushControls;
 
-	/** @inheritDoc */
+	#rightclick;
+
 	_activate() {
 		super._activate();
 		this._changeTool();
@@ -292,9 +293,9 @@ export default class SimplefogLayer extends MaskLayer {
 	_onClickRight(e) {
 		if (this.historyBuffer.length > 0) return;
 		// Todo: Not sure why this doesnt trigger when drawing ellipse & box
-		if (["polygon", "box", "ellipse"].includes(this.activeTool)) {
+		if (["box", "ellipse"].includes(this.activeTool)) {
 			this.clearActiveTool();
-		}
+		} else if (this.activeTool === "polygon") this.#rightclick = true;
 	}
 
 	_pointerMove(e) {
@@ -316,6 +317,9 @@ export default class SimplefogLayer extends MaskLayer {
 			case "ellipse":
 				this._pointerMoveEllipse(p, e);
 				break;
+			case "polygon":
+				this.#rightclick = false;
+				break;
 			case "room":
 				this._pointerMoveRoom(p);
 				break;
@@ -325,7 +329,6 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerUp(e) {
-		// Only react to left mouse button
 		if (e.data.button === 0) {
 			// Translate click to canvas position
 			const p = canvas.mousePosition;
@@ -346,6 +349,10 @@ export default class SimplefogLayer extends MaskLayer {
 			this.op = false;
 			// Push the history buffer
 			this.commitHistory();
+		} else if (e.data.button === 2) {
+			if (this.activeTool === "polygon" && this.#rightclick) {
+				this.clearActiveTool();
+			}
 		}
 	}
 
