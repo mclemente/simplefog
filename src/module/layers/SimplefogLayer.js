@@ -60,6 +60,12 @@ export default class SimplefogLayer extends MaskLayer {
 
 	#brushControls;
 
+	#gridType;
+
+	#lastPosition;
+
+	#previewTint = 0xff0000;
+
 	#rightclick;
 
 	_activate() {
@@ -84,14 +90,7 @@ export default class SimplefogLayer extends MaskLayer {
 			this.ellipsePreview.visible = true;
 			this._pointerMoveBrush(canvas.mousePosition);
 		} else if (this.activeTool === "grid") {
-			if (canvas.scene.grid.type === 1) {
-				this.boxPreview.width = canvas.scene.grid.size;
-				this.boxPreview.height = canvas.scene.grid.size;
-				this.boxPreview.visible = true;
-			} else if ([2, 3, 4, 5].includes(canvas.scene.grid.type)) {
-				this._initGrid();
-				this.polygonPreview.visible = true;
-			}
+			this._initGrid();
 			this._pointerMoveGrid(canvas.mousePosition);
 		} else if (this.activeTool === "room") {
 			this._pointerMoveRoom(canvas.mousePosition);
@@ -191,14 +190,23 @@ export default class SimplefogLayer extends MaskLayer {
 		this.addListener("pointermove", this._pointerMove);
 	}
 
+	highlightConfig(x, y) {
+		return { x, y, color: this.#previewTint, alpha: this.DEFAULTS.previewAlpha };
+	}
+
 	setPreviewTint() {
 		const vt = this.getSetting("vThreshold");
 		const bo = hexToPercent(this.getUserSetting("brushOpacity")) / 100;
-		let tint = 0xff0000;
-		if (bo < vt) tint = 0x00ff00;
-		this.ellipsePreview.tint = tint;
-		this.boxPreview.tint = tint;
-		this.polygonPreview.tint = tint;
+		this.#previewTint = 0xff0000;
+		if (bo < vt) this.#previewTint = 0x00ff00;
+		this.ellipsePreview.tint = this.#previewTint;
+		this.boxPreview.tint = this.#previewTint;
+		this.polygonPreview.tint = this.#previewTint;
+		if (this.activeTool === "grid" && this.#lastPosition) {
+			const { x, y } = this.#lastPosition;
+			canvas.interface.grid.clearHighlightLayer(this.layername);
+			canvas.interface.grid.highlightPosition(this.layername, this.highlightConfig(x, y));
+		}
 	}
 
 	/**
@@ -215,6 +223,7 @@ export default class SimplefogLayer extends MaskLayer {
 	 * Aborts any active drawing tools
 	 */
 	clearActiveTool() {
+		canvas.interface.grid.clearHighlightLayer(this.layername);
 		// Box preview
 		this.boxPreview.visible = false;
 		// Ellipse Preview
@@ -566,21 +575,16 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerMoveGrid(p) {
-		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
-			this.boxPreview.visible = false;
-			return;
-		} else this.boxPreview.visible = true;
+		canvas.interface.grid.clearHighlightLayer(this.layername);
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
 		const { size, type } = canvas.scene.grid;
 		// Square grid
 		if (type === 1) {
-			const x = Math.floor(p.x / size) * size;
-			const y = Math.floor(p.y / size) * size;
-			const coord = `${x},${y}`;
-			this.boxPreview.x = x;
-			this.boxPreview.y = y;
-			this.boxPreview.width = size;
-			this.boxPreview.height = size;
+			const { x, y } = canvas.grid.getTopLeftPoint({x: p.x, y: p.y });
+			canvas.interface.grid.highlightPosition(this.layername, this.highlightConfig(x, y));
+			this.#lastPosition = { x, y };
 			if (this.op) {
+				const coord = `${x},${y}`;
 				if (!this.dupes.includes(coord)) {
 					// Flag cell as drawn in dupes
 					this.dupes.push(coord);
@@ -597,22 +601,23 @@ export default class SimplefogLayer extends MaskLayer {
 		}
 		// Hex Grid
 		else if ([2, 3, 4, 5].includes(type)) {
-			// Convert pixel coord to hex coord
-			const qr = this.gridLayout.pixelToHex(p).round();
-			// Get current grid coord verts
-			const vertices = this.gridLayout.polygonCorners({ q: qr.q, r: qr.r });
-			// Convert to array of individual verts
-			const vertexArray = hexObjsToArr(vertices);
-			// Update the preview shape
-			this.polygonPreview.clear();
-			this.polygonPreview.beginFill(0xffffff);
-			this.polygonPreview.drawPolygon(vertexArray);
-			this.polygonPreview.endFill();
+			const coords = canvas.grid.getCenterPoint({ x: p.x, y: p.y });
+			const cube = canvas.grid.getCube(coords);
+			const offset = canvas.grid.getOffset(cube);
+			const { x, y } = canvas.grid.getTopLeftPoint(offset);
+			canvas.interface.grid.highlightPosition(this.layername, this.highlightConfig(x, y));
+			this.#lastPosition = { x, y };
 			// If drag operation has started
 			if (this.op) {
+				// Convert pixel coord to hex coord
+				const qr = this.gridLayout.pixelToHex(p).round();
 				const coord = `${qr.q},${qr.r}`;
 				// Check if this grid cell was already drawn
 				if (!this.dupes.includes(coord)) {
+					// Get current grid coord verts
+					const vertices = this.gridLayout.polygonCorners({ q: qr.q, r: qr.r });
+					// Convert to array of individual verts
+					const vertexArray = hexObjsToArr(vertices);
 					// Get the vert coords for the hex
 					this.renderBrush({
 						shape: this.BRUSH_TYPES.POLYGON,
@@ -622,7 +627,7 @@ export default class SimplefogLayer extends MaskLayer {
 						fill: this.getUserSetting("brushOpacity"),
 					});
 					// Flag cell as drawn in dupes
-					this.dupes.push(`${qr.q},${qr.r}`);
+					this.dupes.push(coord);
 				}
 			}
 		}
@@ -647,27 +652,28 @@ export default class SimplefogLayer extends MaskLayer {
 	 * Checks grid type, creates a dupe detection matrix & if hex grid init a layout
 	 */
 	_initGrid() {
-		const gridSize = canvas.scene.grid.size;
+		const { size, type } = canvas.scene.grid;
 		this.dupes = [];
+		if (this.#gridType === type) return;
 		const legacyHex = !!canvas.scene.flags.core?.legacyHex;
 		const divisor = legacyHex ? 2 : Math.sqrt(3);
-		switch (canvas.scene.grid.type) {
+		switch (type) {
 			// Square grid
 			// Pointy Hex Odd
 			case 2:
 				this.gridLayout = new Layout(
 					Layout.pointy,
-					{ x: gridSize / divisor, y: gridSize / divisor },
-					{ x: 0, y: gridSize / divisor }
+					{ x: size / divisor, y: size / divisor },
+					{ x: 0, y: size / divisor }
 				);
 				break;
 			// Pointy Hex Even
 			case 3: {
-				const x = legacyHex ? (Math.sqrt(3) * gridSize) / 4 : gridSize / 2;
+				const x = legacyHex ? (Math.sqrt(3) * size) / 4 : size / 2;
 				this.gridLayout = new Layout(
 					Layout.pointy,
-					{ x: gridSize / divisor, y: gridSize / divisor },
-					{ x, y: gridSize / divisor }
+					{ x: size / divisor, y: size / divisor },
+					{ x, y: size / divisor }
 				);
 				break;
 			}
@@ -675,23 +681,24 @@ export default class SimplefogLayer extends MaskLayer {
 			case 4:
 				this.gridLayout = new Layout(
 					Layout.flat,
-					{ x: gridSize / divisor, y: gridSize / divisor },
-					{ x: gridSize / divisor, y: 0 }
+					{ x: size / divisor, y: size / divisor },
+					{ x: size / divisor, y: 0 }
 				);
 				break;
 			// Flat Hex Even
 			case 5: {
-				const y = legacyHex ? (Math.sqrt(3) * gridSize) / 4 : gridSize / 2;
+				const y = legacyHex ? (Math.sqrt(3) * size) / 4 : size / 2;
 				this.gridLayout = new Layout(
 					Layout.flat,
-					{ x: gridSize / divisor, y: gridSize / divisor },
-					{ x: gridSize / divisor, y }
+					{ x: size / divisor, y: size / divisor },
+					{ x: size / divisor, y }
 				);
 				break;
 			}
 			default:
 				break;
 		}
+		this.#gridType = type;
 	}
 
 	async _draw() {
@@ -744,5 +751,6 @@ export default class SimplefogLayer extends MaskLayer {
 		this.addChild(this.ellipsePreview);
 		this.addChild(this.polygonPreview);
 		this.addChild(this.polygonHandle);
+		canvas.interface.grid.addHighlightLayer(this.layername);
 	}
 }
