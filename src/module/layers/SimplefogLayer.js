@@ -52,11 +52,11 @@ export default class SimplefogLayer extends MaskLayer {
 		this.#activeTool = tool;
 	}
 
-	#activeTool;
-
 	get brushControls() {
 		return this.#brushControls ??= new BrushControls();
 	}
+
+	#activeTool;
 
 	#brushControls;
 
