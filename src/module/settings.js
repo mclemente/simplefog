@@ -33,7 +33,7 @@ export const registerSettings = function () {
 	});
 	game.settings.register("simplefog", "zIndex", {
 		name: "Simplefog Z-Index",
-		hint: "The z-index determines the order in which various layers are rendered within the Foundry canvas.  A higher number will be rendered on top of lower numbered layers (and the objects on that layer).  This allows for the adjustment of the z-index to allow for Simple Fog to be rendered above/below other layers; particularly ones added by other modules. Going below 200 will intermingle with Foundry layers such as the foreground image (200), tokens (100), etc...  (Default: 220)",
+		hint: "The z-index determines the order in which various layers are rendered within the Foundry canvas. A higher number will be rendered on top of lower numbered layers (and the objects on that layer). This allows for the adjustment of the z-index to allow for Simple Fog to be rendered above/below other layers; particularly ones added by other modules. Going below 200 will intermingle with Foundry layers such as the foreground image (200), tokens (100), etc... (Default: 220)",
 		scope: "world",
 		config: true,
 		default: 220,
