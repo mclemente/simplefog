@@ -6,10 +6,9 @@
  */
 
 export default class MaskLayer extends InteractionLayer {
-	constructor(layername) {
+	constructor() {
 		super();
 		this.lock = false;
-		this.layername = layername;
 		this.historyBuffer = [];
 		this.pointer = 0;
 		this.gridLayout = {};
@@ -180,21 +179,21 @@ export default class MaskLayer extends InteractionLayer {
 	 */
 
 	getSetting(name) {
-		return canvas.scene.getFlag(this.layername, name)
+		return canvas.scene.getFlag("simplefog", name)
 			?? this.getUserSetting(name)
 			?? this.DEFAULTS[name];
 	}
 
 	async setSetting(name, value) {
-		return await canvas.scene.setFlag(this.layername, name, value);
+		return await canvas.scene.setFlag("simplefog", name, value);
 	}
 
 	getUserSetting(name) {
-		return game.user.getFlag(this.layername, name) ?? this.DEFAULTS[name];
+		return game.user.getFlag("simplefog", name) ?? this.DEFAULTS[name];
 	}
 
 	async setUserSetting(name, value) {
-		return await game.user.setFlag(this.layername, name, value);
+		return await game.user.setFlag("simplefog", name, value);
 	}
 
 	/**
@@ -204,9 +203,9 @@ export default class MaskLayer extends InteractionLayer {
 	 * @param start {Number}        The position in the history stack to stop rendering
 	 */
 	renderStack(
-		history = canvas.scene.getFlag(this.layername, "history"),
+		history = canvas.scene.getFlag("simplefog", "history"),
 		start = this.pointer,
-		stop = canvas.scene.getFlag(this.layername, "history.pointer"),
+		stop = canvas.scene.getFlag("simplefog", "history.pointer"),
 		isInit = false
 	) {
 		history = history || { events: [], pointer: 0 };
@@ -251,7 +250,7 @@ export default class MaskLayer extends InteractionLayer {
 		if (this.historyBuffer.length === 0) return;
 		if (this.lock) return;
 		this.lock = true;
-		let history = canvas.scene.getFlag(this.layername, "history");
+		let history = canvas.scene.getFlag("simplefog", "history");
 		// If history storage doesnt exist, create it
 		if (!history) {
 			history = {
@@ -264,7 +263,7 @@ export default class MaskLayer extends InteractionLayer {
 		// Push the new history buffer to the scene
 		history.events.push(this.historyBuffer);
 		history.pointer = history.events.length;
-		await canvas.scene.unsetFlag(this.layername, "history");
+		await canvas.scene.unsetFlag("simplefog", "history");
 		await this.setSetting("history", history);
 		// Clear the history buffer
 		this.historyBuffer = [];
@@ -280,8 +279,8 @@ export default class MaskLayer extends InteractionLayer {
 		this.setFill();
 		// If save, also unset history and reset pointer
 		if (save) {
-			await canvas.scene.unsetFlag(this.layername, "history");
-			await canvas.scene.setFlag(this.layername, "history", {
+			await canvas.scene.unsetFlag("simplefog", "history");
+			await canvas.scene.setFlag("simplefog", "history", {
 				events: [],
 				pointer: 0,
 			});
@@ -313,7 +312,7 @@ export default class MaskLayer extends InteractionLayer {
 	async undo(steps = 1) {
 		// Grab existing history
 		// Todo: this could probably just grab and set the pointer for a slight performance improvement
-		let history = canvas.scene.getFlag(this.layername, "history");
+		let history = canvas.scene.getFlag("simplefog", "history");
 		if (!history) {
 			history = {
 				events: [],
@@ -324,8 +323,8 @@ export default class MaskLayer extends InteractionLayer {
 		if (newpointer < 0) newpointer = 0;
 		// Set new pointer & update history
 		history.pointer = newpointer;
-		await canvas.scene.unsetFlag(this.layername, "history");
-		await canvas.scene.setFlag(this.layername, "history", history);
+		await canvas.scene.unsetFlag("simplefog", "history");
+		await canvas.scene.setFlag("simplefog", "history", history);
 	}
 
 	/* -------------------------------------------- */
@@ -442,7 +441,7 @@ export default class MaskLayer extends InteractionLayer {
 		this.setSetting("visible", !v);
 
 		// If first time, set autofog to opposite so it doesn't reapply it.
-		let history = canvas.scene.getFlag(this.layername, "history");
+		let history = canvas.scene.getFlag("simplefog", "history");
 
 		if (history === undefined) {
 			this.setSetting("autoFog", !v);

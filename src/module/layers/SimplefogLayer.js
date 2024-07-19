@@ -11,7 +11,7 @@ import MaskLayer from "./MaskLayer.js";
 
 export default class SimplefogLayer extends MaskLayer {
 	constructor() {
-		super("simplefog");
+		super();
 
 		// Register event listerenrs
 		Hooks.on("ready", () => {
@@ -111,11 +111,11 @@ export default class SimplefogLayer extends MaskLayer {
 		// Check if update applies to current viewed scene
 		if (!scene._view) return;
 		// React to visibility change
-		if (foundry.utils.hasProperty(data, `flags.${this.layername}.visible`)) {
-			canvas[this.layername].visible = data.flags[this.layername].visible;
+		if (foundry.utils.hasProperty(data, "flags.simplefog.visible")) {
+			canvas.simplefog.visible = data.flags.simplefog.visible;
 		}
 		// React to composite history change
-		if (foundry.utils.hasProperty(data, `flags.${this.layername}.blurEnable`)) {
+		if (foundry.utils.hasProperty(data, "flags.simplefog.blurEnable")) {
 			if (this.fogColorLayer !== undefined) {
 				if (this.getSetting("blurEnable")) {
 					this.fogColorLayer.filters = [this.blur];
@@ -124,16 +124,16 @@ export default class SimplefogLayer extends MaskLayer {
 				}
 			}
 		}
-		if (foundry.utils.hasProperty(data, `flags.${this.layername}.blurRadius`)) {
-			canvas[this.layername].blur.blur = this.getSetting("blurRadius");
+		if (foundry.utils.hasProperty(data, "flags.simplefog.blurRadius")) {
+			canvas.simplefog.blur.blur = this.getSetting("blurRadius");
 		}
 		// React to composite history change
-		if (foundry.utils.hasProperty(data, `flags.${this.layername}.blurQuality`)) {
-			canvas[this.layername].blur.quality = this.getSetting("blurQuality");
+		if (foundry.utils.hasProperty(data, "flags.simplefog.blurQuality")) {
+			canvas.simplefog.blur.quality = this.getSetting("blurQuality");
 		}
 		// React to composite history change
-		if (foundry.utils.hasProperty(data, `flags.${this.layername}.history`)) {
-			canvas[this.layername].renderStack(data.flags[this.layername].history);
+		if (foundry.utils.hasProperty(data, "flags.simplefog.history")) {
+			canvas.simplefog.renderStack(data.flags.simplefog.history);
 
 			canvas.perception.update({
 				refreshLighting: true,
@@ -143,8 +143,8 @@ export default class SimplefogLayer extends MaskLayer {
 		}
 		// React to autoVisibility setting changes
 		if (
-			foundry.utils.hasProperty(data, `flags.${this.layername}.autoVisibility`)
-			|| foundry.utils.hasProperty(data, `flags.${this.layername}.vThreshold`)
+			foundry.utils.hasProperty(data, "flags.simplefog.autoVisibility")
+			|| foundry.utils.hasProperty(data, "flags.simplefog.vThreshold")
 		) {
 			canvas.perception.update({
 				refreshLighting: true,
@@ -153,32 +153,32 @@ export default class SimplefogLayer extends MaskLayer {
 			});
 		}
 		// React to alpha/tint changes
-		if (!game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.playerColorAlpha`)) {
-			canvas[this.layername].setColorAlpha(data.flags[this.layername].playerColorAlpha);
+		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorAlpha")) {
+			canvas.simplefog.setColorAlpha(data.flags.simplefog.playerColorAlpha);
 		}
-		if (game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.gmColorAlpha`)) {
-			canvas[this.layername].setColorAlpha(data.flags[this.layername].gmColorAlpha);
+		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.gmColorAlpha")) {
+			canvas.simplefog.setColorAlpha(data.flags.simplefog.gmColorAlpha);
 		}
-		if (!game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.playerColorTint`)) {
-			canvas[this.layername].setColorTint(data.flags[this.layername].playerColorTint);
+		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorTint")) {
+			canvas.simplefog.setColorTint(data.flags.simplefog.playerColorTint);
 		}
-		if (game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.gmColorTint`)) {
-			canvas[this.layername].setColorTint(data.flags[this.layername].gmColorTint);
+		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.gmColorTint")) {
+			canvas.simplefog.setColorTint(data.flags.simplefog.gmColorTint);
 		}
 
 		// React to Image Overylay file changes
-		if (foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayFilePath`)) {
-			canvas[this.layername].setFogImageOverlayTexture(data.flags[this.layername].fogImageOverlayFilePath);
+		if (foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayFilePath")) {
+			canvas.simplefog.setFogImageOverlayTexture(data.flags.simplefog.fogImageOverlayFilePath);
 		}
 
-		if (game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayGMAlpha`)) {
-			canvas[this.layername].setFogImageOverlayAlpha(data.flags[this.layername].fogImageOverlayGMAlpha);
+		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayGMAlpha")) {
+			canvas.simplefog.setFogImageOverlayAlpha(data.flags.simplefog.fogImageOverlayGMAlpha);
 		}
-		if (!game.user.isGM && foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayPlayerAlpha`)) {
-			canvas[this.layername].setFogImageOverlayAlpha(data.flags[this.layername].fogImageOverlayPlayerAlpha);
+		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayPlayerAlpha")) {
+			canvas.simplefog.setFogImageOverlayAlpha(data.flags.simplefog.fogImageOverlayPlayerAlpha);
 		}
-		if (foundry.utils.hasProperty(data, `flags.${this.layername}.fogImageOverlayZIndex`)) {
-			canvas[this.layername].fogImageOverlayLayer.zIndex = data.flags[this.layername].fogImageOverlayZIndex;
+		if (foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayZIndex")) {
+			canvas.simplefog.fogImageOverlayLayer.zIndex = data.flags.simplefog.fogImageOverlayZIndex;
 		}
 	}
 
@@ -204,8 +204,8 @@ export default class SimplefogLayer extends MaskLayer {
 		this.polygonPreview.tint = this.#previewTint;
 		if (this.activeTool === "grid" && this.#lastPosition) {
 			const { x, y } = this.#lastPosition;
-			canvas.interface.grid.clearHighlightLayer(this.layername);
-			canvas.interface.grid.highlightPosition(this.layername, this.highlightConfig(x, y));
+			canvas.interface.grid.clearHighlightLayer("simplefog");
+			canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
 		}
 	}
 
@@ -223,7 +223,7 @@ export default class SimplefogLayer extends MaskLayer {
 	 * Aborts any active drawing tools
 	 */
 	clearActiveTool() {
-		canvas.interface.grid.clearHighlightLayer(this.layername);
+		canvas.interface.grid.clearHighlightLayer("simplefog");
 		// Box preview
 		this.boxPreview.visible = false;
 		// Ellipse Preview
@@ -575,13 +575,13 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerMoveGrid(p) {
-		canvas.interface.grid.clearHighlightLayer(this.layername);
+		canvas.interface.grid.clearHighlightLayer("simplefog");
 		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
 		const { size, type } = canvas.scene.grid;
 		// Square grid
 		if (type === 1) {
 			const { x, y } = canvas.grid.getTopLeftPoint({x: p.x, y: p.y });
-			canvas.interface.grid.highlightPosition(this.layername, this.highlightConfig(x, y));
+			canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
 			this.#lastPosition = { x, y };
 			if (this.op) {
 				const coord = `${x},${y}`;
@@ -605,7 +605,7 @@ export default class SimplefogLayer extends MaskLayer {
 			const cube = canvas.grid.getCube(coords);
 			const offset = canvas.grid.getOffset(cube);
 			const { x, y } = canvas.grid.getTopLeftPoint(offset);
-			canvas.interface.grid.highlightPosition(this.layername, this.highlightConfig(x, y));
+			canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
 			this.#lastPosition = { x, y };
 			// If drag operation has started
 			if (this.op) {
@@ -751,6 +751,6 @@ export default class SimplefogLayer extends MaskLayer {
 		this.addChild(this.ellipsePreview);
 		this.addChild(this.polygonPreview);
 		this.addChild(this.polygonHandle);
-		canvas.interface.grid.addHighlightLayer(this.layername);
+		canvas.interface.grid.addHighlightLayer("simplefog");
 	}
 }
