@@ -5,7 +5,7 @@
 
 import { Layout } from "../../libs/hexagons.js";
 import { BrushControls } from "../apps/BrushControls.js";
-import { CWSPNoDoors } from "../clockwise-sweep.js";
+import { CWSPNoDoors } from "../ClockwiseSweep.js";
 import { hexObjsToArr, hexToPercent } from "../helpers.js";
 import MaskLayer from "./MaskLayer.js";
 
