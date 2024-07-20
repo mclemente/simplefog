@@ -202,13 +202,13 @@ export default class MaskLayer extends InteractionLayer {
 	 * @param start {Number}        The position in the history stack to begin rendering from
 	 * @param start {Number}        The position in the history stack to stop rendering
 	 */
-	renderStack(
+	renderStack({
 		history = canvas.scene.getFlag("simplefog", "history"),
 		start = this.pointer,
 		stop = canvas.scene.getFlag("simplefog", "history.pointer"),
 		isInit = false
-	) {
-		history = history || { events: [], pointer: 0 };
+	}) {
+		history ||= { events: [], pointer: 0 };
 		// If history is blank, do nothing
 		if (history === undefined && !isInit) {
 			this.visible = game.settings.get("simplefog", "autoEnableSceneFog");
@@ -485,7 +485,7 @@ export default class MaskLayer extends InteractionLayer {
 		this.sortableChildren = true;
 
 		// Render entire history stack
-		this.renderStack(undefined, 0, undefined, true);
+		this.renderStack({ start: 0, isInit: true });
 
 		// apply image overlay to fog layer after we renderStack to prevent revealing the map
 		const fogImageOverlayFilePath = this.getSetting("fogImageOverlayFilePath");

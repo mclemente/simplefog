@@ -133,7 +133,7 @@ export default class SimplefogLayer extends MaskLayer {
 		}
 		// React to composite history change
 		if (foundry.utils.hasProperty(data, "flags.simplefog.history")) {
-			canvas.simplefog.renderStack(data.flags.simplefog.history);
+			canvas.simplefog.renderStack({ history: data.flags.simplefog.history });
 
 			canvas.perception.update({
 				refreshLighting: true,
