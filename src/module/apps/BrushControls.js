@@ -27,7 +27,6 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 		list: {
 			id: "list",
 			template: "modules/simplefog/templates/brush-controls.html",
-			// scrollable: ["ol.region-list"]
 		}
 	};
 
