@@ -19,7 +19,7 @@ export class CWSPNoDoors extends ClockwiseSweepPolygon {
 
 		// Ignore edges which do not block this polygon type
 		const isOpenDoor = edge.type === "wall" && edge.object.isOpen;
-		if ( !isOpenDoor && edge[type] === CONST.WALL_SENSE_TYPES.NONE ) return false;
+		if ( (this.config.shiftKey || !isOpenDoor) && edge[type] === CONST.WALL_SENSE_TYPES.NONE ) return false;
 
 		// Ignore edges which are collinear with the origin
 		const side = edge.orientPoint(this.origin);

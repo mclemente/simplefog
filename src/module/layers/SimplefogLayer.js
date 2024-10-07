@@ -269,7 +269,7 @@ export default class SimplefogLayer extends MaskLayer {
 				this._pointerDownPolygon(p);
 				break;
 			case "room":
-				this._pointerDownRoom(p);
+				this._pointerDownRoom(p, e);
 				break;
 			default: // Do nothing
 				break;
@@ -330,7 +330,7 @@ export default class SimplefogLayer extends MaskLayer {
 				this.#rightclick = false;
 				break;
 			case "room":
-				this._pointerMoveRoom(p);
+				this._pointerMoveRoom(p, e);
 				break;
 			default:
 				break;
@@ -533,8 +533,8 @@ export default class SimplefogLayer extends MaskLayer {
 		this.polygonPreview.visible = true;
 	}
 
-	_pointerDownRoom(p) {
-		const vertices = this._getRoomVertices(p);
+	_pointerDownRoom(p, e) {
+		const vertices = this._getRoomVertices(p, e);
 		if (!vertices) return false;
 
 		this.renderBrush({
@@ -547,21 +547,21 @@ export default class SimplefogLayer extends MaskLayer {
 		return true;
 	}
 
-	_pointerMoveRoom(p) {
+	_pointerMoveRoom(p, e) {
 		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
 			this.polygonPreview.visible = false;
 			return;
 		} else this.polygonPreview.visible = true;
 		this.polygonPreview.clear();
 		this.polygonPreview.beginFill(0xffffff);
-		this.polygonPreview.drawPolygon(this._getRoomVertices(p));
+		this.polygonPreview.drawPolygon(this._getRoomVertices(p, e));
 		this.polygonPreview.endFill();
 	}
 
-	_getRoomVertices(p) {
+	_getRoomVertices(p, e) {
 		const sceneRect = canvas.dimensions.sceneRect;
 		if (p.x < sceneRect.left || p.x > sceneRect.right || p.y < sceneRect.top || p.y > sceneRect.bottom) return [];
-		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", useInnerBounds: true });
+		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", useInnerBounds: true, shiftKey: e?.shiftKey });
 		return Array.from(sweep.points);
 	}
 
