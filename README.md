@@ -27,6 +27,9 @@ Encounter Library did a review of Simple Fog which explains how it works much be
     - Click the orange handle to finish your drawing, or right click to cancel
   - Grid tool
     - Reveals any grid square you drag across, works for both Hex and Square grids
+  - Room tool
+    - Reveals walled rooms. Hold the SHIFT key to take doors into account.
+    - This feature doesn't detect an actual "room", it is limited by sight, so it won't reveal fog over corners.
 - Add an image to the Simple Fog layer which overlays the selected tint for both GMs and Players.
 
 ![Tools Palette](docs/simplefog-tools.jpg?raw=true "Tools Palette")
