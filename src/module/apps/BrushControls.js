@@ -52,8 +52,8 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 	/** @inheritDoc */
 	_onFirstRender(context, options) {
 		super._onFirstRender(context, options);
-		const left = ui.nav?.element[0].getBoundingClientRect().left;
-		const top = ui.controls?.element[0].getBoundingClientRect().top;
+		const left = ui.nav?.position.left;
+		const top = ui.controls?.position.top;
 		options.position = {...options.position, left, top};
 		canvas.scene.apps[this.id] = this;
 	}
