@@ -160,8 +160,8 @@ Hooks.on("canvasInit", () => {
  */
 Hooks.on("getSceneControlButtons", (controls) => {
 	if (!game.user.isGM) return;
-	const tools = [
-		{
+	const tools = {
+		"simplefogtoggle": {
 			name: "simplefogtoggle",
 			title: game.i18n.localize("SIMPLEFOG.onoff"),
 			icon: "fas fa-eye",
@@ -169,37 +169,37 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			active: canvas.simplefog?.visible,
 			toggle: true,
 		},
-		{
+		"brush": {
 			name: "brush",
 			title: game.i18n.localize("SIMPLEFOG.brushTool"),
 			icon: "fas fa-paint-brush",
 			onClick: () => canvas.simplefog?._changeTool(),
 		},
-		{
+		"room": {
 			name: "room",
 			title: game.i18n.localize("SIMPLEFOG.roomTool"),
 			icon: "fas fa-block-brick",
 			onClick: () => canvas.simplefog?._changeTool(),
 		},
-		{
+		"polygon": {
 			name: "polygon",
 			title: game.i18n.localize("SIMPLEFOG.polygonTool"),
 			icon: "fas fa-draw-polygon",
 			onClick: () => canvas.simplefog?._changeTool(),
 		},
-		{
+		"box": {
 			name: "box",
 			title: game.i18n.localize("SIMPLEFOG.boxTool"),
 			icon: "far fa-square",
 			onClick: () => canvas.simplefog?._changeTool(),
 		},
-		{
+		"ellipse": {
 			name: "ellipse",
 			title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
 			icon: "far fa-circle",
 			onClick: () => canvas.simplefog?._changeTool(),
 		},
-		{
+		"sceneConfig": {
 			name: "sceneConfig",
 			title: game.i18n.localize("SIMPLEFOG.sceneConfig"),
 			icon: "fas fa-cog",
@@ -208,7 +208,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			},
 			button: true,
 		},
-		{
+		"clearfog": {
 			name: "clearfog",
 			title: game.i18n.localize("SIMPLEFOG.reset"),
 			icon: "fas fa-trash",
@@ -238,7 +238,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			},
 			button: true,
 		},
-	];
+	};
 	let activeTool = game.settings.get("simplefog", "toolHotKeys");
 	if (canvas.grid?.type) {
 		tools.splice(2, 0, {
