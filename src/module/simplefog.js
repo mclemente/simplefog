@@ -248,14 +248,14 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			onClick: () => canvas.simplefog?._changeTool(),
 		});
 	} else if (activeTool === "grid") activeTool = "brush";
-	controls.push({
+	controls["simplefog"] = {
 		name: "simplefog",
 		title: game.i18n.localize("SIMPLEFOG.sf"),
 		icon: "fas fa-cloud",
 		layer: "simplefog",
 		tools,
 		activeTool,
-	});
+	};
 });
 
 /**
