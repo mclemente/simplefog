@@ -5,3 +5,11 @@
 #simplefog-filter-config .brush-opacity .visibility-labels .spacer {
 	flex: 0 1 48px;
 }
+
+#simplefog-filter-config-list .flexrow {
+	gap: 0.5em;
+}
+
+#simplefog-filter-config .range-value {
+	flex: 0 0 38px;
+}
