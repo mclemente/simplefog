@@ -165,6 +165,10 @@ Hooks.on("getSceneControlButtons", (controls) => {
 		name: "simplefog",
 		title: "Simple Fog",
 		icon: "fas fa-eye",
+		onChange: (event, active) => {
+			if ( active ) canvas.simplefog.activate();
+		},
+		onToolChange: (event, tool) => canvas.simplefog._changeTool(tool.name),
 		activeTool: canvas.grid?.type === 0 && activeTool === "grid" ? "brush" : activeTool,
 		tools: {
 			simplefogtoggle: {
@@ -182,72 +186,42 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				title: game.i18n.localize("SIMPLEFOG.brushTool"),
 				icon: "fas fa-paint-brush",
 				visible: true,
-				order: 1,
-				onChange: () => {
-					canvas.simplefog.activate();
-					canvas.simplefog?._changeTool("brush");
-				},
-				button: true
+				order: 1
 			},
 			grid: {
 				name: "grid",
 				title: game.i18n.localize("SIMPLEFOG.gridTool"),
 				icon: "fas fa-border-none",
-				visible: canvas.grid?.type,
-				order: 1,
-				onChange: () => {
-					canvas.simplefog.activate();
-					canvas.simplefog?._changeTool("grid");
-				},
-				button: true
+				visible: true, // TODO hide button when no grid is available once V13 fixes https://github.com/foundryvtt/foundryvtt/issues/12906
+				order: 1
 			},
 			room: {
 				name: "room",
 				title: game.i18n.localize("SIMPLEFOG.roomTool"),
 				icon: "fas fa-block-brick",
 				visible: true,
-				order: 2,
-				onChange: () => {
-					canvas.simplefog.activate();
-					canvas.simplefog?._changeTool("room");
-				},
-				button: true
+				order: 2
 			},
 			polygon: {
 				name: "polygon",
 				title: game.i18n.localize("SIMPLEFOG.polygonTool"),
 				icon: "fas fa-draw-polygon",
 				visible: true,
-				order: 2,
-				onChange: () => {
-					canvas.simplefog.activate();
-					canvas.simplefog?._changeTool("polygon");
-				},
-				button: true
+				order: 2
 			},
 			box: {
 				name: "box",
 				title: game.i18n.localize("SIMPLEFOG.boxTool"),
 				icon: "far fa-square",
 				visible: true,
-				order: 2,
-				onChange: () => {
-					canvas.simplefog.activate();
-					canvas.simplefog?._changeTool("box");
-				},
-				button: true
+				order: 2
 			},
 			ellipse: {
 				name: "ellipse",
 				title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
 				icon: "far fa-circle",
 				visible: true,
-				order: 2,
-				onChange: () => {
-					canvas.simplefog.activate();
-					canvas.simplefog?._changeTool("ellipse");
-				},
-				button: true
+				order: 2
 			},
 			sceneConfig: {
 				name: "sceneConfig",
@@ -255,10 +229,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				icon: "fas fa-cog",
 				visible: true,
 				order: 2,
-				onChange: () => {
-					canvas.simplefog.activate();
-					new SimplefogConfig().render(true);
-				},
+				onChange: () => new SimplefogConfig().render(true),
 				button: true
 			},
 			reset: {
@@ -268,7 +239,6 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				visible: true,
 				order: 2,
 				onChange: () => {
-					canvas.simplefog.activate();
 					const dg = new Dialog({
 						title: game.i18n.localize("SIMPLEFOG.reset"),
 						content: game.i18n.localize("SIMPLEFOG.confirmReset"),
