@@ -26,6 +26,7 @@ export const registerSettings = function () {
 		choices: {
 			brush: "Brush",
 			grid: "Grid",
+			room: "Room",
 			polygon: "Polygon",
 			box: "Box",
 			ellipse: "Ellipse",

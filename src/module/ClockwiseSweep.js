@@ -1,16 +1,17 @@
 // CWSP which ignores open doors
 
-export class CWSPNoDoors extends ClockwiseSweepPolygon {
-	_testEdgeInclusion(edge, edgeTypes, bounds) {
+export class CWSPNoDoors extends foundry.canvas.geometry.ClockwiseSweepPolygon {
+	_testEdgeInclusion(edge, edgeTypes) {
 		const { type, boundaryShapes, useThreshold, wallDirectionMode, externalRadius } = this.config;
 
 		// Only include edges of the appropriate type
-		const m = edgeTypes[edge.type];
+		const edgeType = edgeTypes[edge.type];
+		const m = edgeType?.mode;
 		if ( !m ) return false;
 		if ( m === 2 ) return true;
 
-		// Test for inclusion in the overall bounding box
-		//if ( !bounds.lineSegmentIntersects(edge.a, edge.b, { inside: true }) ) return false;
+		// Exclude edges with a lower priority than required for this polygon
+		if ( edge.priority < edgeType.priority ) return false;
 
 		// Specific boundary shapes may impose additional requirements
 		for ( const shape of boundaryShapes ) {
@@ -26,7 +27,7 @@ export class CWSPNoDoors extends ClockwiseSweepPolygon {
 		if ( !side ) return false;
 
 		// Ignore one-directional walls which are facing away from the origin
-		const wdm = PointSourcePolygon.WALL_DIRECTION_MODES;
+		const wdm = foundry.canvas.geometry.PointSourcePolygon.WALL_DIRECTION_MODES;
 		if ( edge.direction && (wallDirectionMode !== wdm.BOTH) ) {
 			if ( (wallDirectionMode === wdm.NORMAL) === (side === edge.direction) ) return false;
 		}

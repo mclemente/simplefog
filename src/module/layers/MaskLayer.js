@@ -5,7 +5,7 @@
  * and replaying the mask / undo etc.
  */
 
-export default class MaskLayer extends InteractionLayer {
+export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	constructor() {
 		super();
 		this.lock = false;
