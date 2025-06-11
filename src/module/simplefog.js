@@ -256,6 +256,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 							cancel: {
 								icon: '<i class="fas fa-times"></i>',
 								label: "Cancel",
+								callback: () => false
 							},
 						},
 						default: "reset",
@@ -271,17 +272,15 @@ Hooks.on("getSceneControlButtons", (controls) => {
 /**
  * Toggle Simple Fog
  */
-function toggleSimpleFog() {
+async function toggleSimpleFog() {
 	if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
-		let dg = Dialog.confirm({
+		await Dialog.confirm({
 			title: game.i18n.localize("SIMPLEFOG.disableFog"),
 			content: game.i18n.localize("SIMPLEFOG.confirmDisableFog"),
 			yes: () => toggleOffSimpleFog(),
-			no: () => cancelToggleSimpleFog(),
 			defaultYes: false,
-			rejectClose: true,
 		});
-		dg.then(undefined, cancelToggleSimpleFog);
+		ui.controls.render({ reset: true });
 	} else {
 		toggleOffSimpleFog();
 	}
@@ -294,9 +293,4 @@ function toggleOffSimpleFog() {
 		refreshVision: true,
 		refreshOcclusion: true
 	});
-}
-
-function cancelToggleSimpleFog(result = undefined) {
-	ui.controls.controls.find(({ name }) => name === "simplefog").tools[0].active = true;
-	ui.controls.render();
 }
