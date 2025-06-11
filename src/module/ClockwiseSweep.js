@@ -10,7 +10,7 @@ export class CWSPNoDoors extends ClockwiseSweepPolygon {
 		if ( m === 2 ) return true;
 
 		// Test for inclusion in the overall bounding box
-		if ( !bounds.lineSegmentIntersects(edge.a, edge.b, { inside: true }) ) return false;
+		//if ( !bounds.lineSegmentIntersects(edge.a, edge.b, { inside: true }) ) return false;
 
 		// Specific boundary shapes may impose additional requirements
 		for ( const shape of boundaryShapes ) {
