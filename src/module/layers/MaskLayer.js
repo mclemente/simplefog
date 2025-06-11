@@ -311,18 +311,9 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	 */
 	async undo(steps = 1) {
 		// Grab existing history
-		// Todo: this could probably just grab and set the pointer for a slight performance improvement
-		let history = canvas.scene.getFlag("simplefog", "history");
-		if (!history) {
-			history = {
-				events: [],
-				pointer: 0,
-			};
-		}
-		let newpointer = this.pointer - steps;
-		if (newpointer < 0) newpointer = 0;
+		const history = canvas.scene.getFlag("simplefog", "history") ?? { events: [], pointer: 0 };
 		// Set new pointer & update history
-		history.pointer = newpointer;
+		history.pointer = Math.max(0, this.pointer - steps);
 		await canvas.scene.unsetFlag("simplefog", "history");
 		await canvas.scene.setFlag("simplefog", "history", history);
 	}
