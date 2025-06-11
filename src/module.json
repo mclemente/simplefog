@@ -31,7 +31,8 @@
 	"styles": ["styles/simplefog.css"],
 	"compatibility": {
 		"minimum": 13,
-		"verified": 13
+		"verified": 13,
+		"maximum": 13
 	},
 	"url": "This is auto replaced",
 	"manifest": "This is auto replaced",
