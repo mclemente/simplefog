@@ -290,6 +290,8 @@ Hooks.on('getSceneControlButtons', controls => {
                     visible: true,
                     order: 1,
                     onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
                         canvas.simplefog?._changeTool("brush");
                     },
                     button: true
@@ -301,6 +303,8 @@ Hooks.on('getSceneControlButtons', controls => {
                     visible: true,
                     order: 2,
                     onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
                         canvas.simplefog?._changeTool("room");
                     },
                     button: true
@@ -312,6 +316,8 @@ Hooks.on('getSceneControlButtons', controls => {
                     visible: true,
                     order: 2,
                     onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
                         canvas.simplefog?._changeTool("polygon");
                     },
                     button: true
@@ -323,6 +329,8 @@ Hooks.on('getSceneControlButtons', controls => {
                     visible: true,
                     order: 2,
                     onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
                         canvas.simplefog?._changeTool("box");
                     },
                     button: true
@@ -334,6 +342,8 @@ Hooks.on('getSceneControlButtons', controls => {
                     visible: true,
                     order: 2,
                     onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
                         canvas.simplefog?._changeTool("ellipse");
                     },
                     button: true
@@ -345,6 +355,8 @@ Hooks.on('getSceneControlButtons', controls => {
                     visible: true,
                     order: 2,
                     onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
                         new SimplefogConfig().render(true);
                     },
                     button: true
@@ -356,6 +368,8 @@ Hooks.on('getSceneControlButtons', controls => {
                     visible: true,
                     order: 2,
                     onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
 						const dg = new Dialog({
 							title: game.i18n.localize("SIMPLEFOG.reset"),
 							content: game.i18n.localize("SIMPLEFOG.confirmReset"),
