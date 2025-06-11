@@ -82,9 +82,9 @@ export default class SimplefogLayer extends MaskLayer {
 		this.clearActiveTool();
 	}
 
-	_changeTool() {
+	_changeTool(tool = "") {
 		this.clearActiveTool();
-		this.activeTool = ui.controls.activeTool;
+		this.activeTool = tool;
 		this.setPreviewTint();
 		if (this.activeTool === "brush") {
 			this.ellipsePreview.visible = true;
