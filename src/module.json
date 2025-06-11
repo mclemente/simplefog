@@ -7,6 +7,10 @@
 		{
 			"name": "Matheus Clemente",
 			"discord": "mclemente#5524"
+		},
+		{
+			"name": "Oxy949",
+			"discord": "oxy949"
 		}
 	],
 	"socket": true,
@@ -30,9 +34,8 @@
 	"esmodules": ["module/simplefog.js"],
 	"styles": ["styles/simplefog.css"],
 	"compatibility": {
-		"minimum": 12,
-		"verified": 12,
-		"maximum": 12
+		"minimum": 13,
+		"verified": 13
 	},
 	"url": "This is auto replaced",
 	"manifest": "This is auto replaced",

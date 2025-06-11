@@ -158,105 +158,258 @@ Hooks.on("canvasInit", () => {
 /**
  * Add control buttons
  */
-Hooks.on("getSceneControlButtons", (controls) => {
-	if (!game.user.isGM) return;
-	const tools = [
-		{
-			name: "simplefogtoggle",
-			title: game.i18n.localize("SIMPLEFOG.onoff"),
-			icon: "fas fa-eye",
-			onClick: () => toggleSimpleFog(),
-			active: canvas.simplefog?.visible,
-			toggle: true,
-		},
-		{
-			name: "brush",
-			title: game.i18n.localize("SIMPLEFOG.brushTool"),
-			icon: "fas fa-paint-brush",
-			onClick: () => canvas.simplefog?._changeTool(),
-		},
-		{
-			name: "room",
-			title: game.i18n.localize("SIMPLEFOG.roomTool"),
-			icon: "fas fa-block-brick",
-			onClick: () => canvas.simplefog?._changeTool(),
-		},
-		{
-			name: "polygon",
-			title: game.i18n.localize("SIMPLEFOG.polygonTool"),
-			icon: "fas fa-draw-polygon",
-			onClick: () => canvas.simplefog?._changeTool(),
-		},
-		{
-			name: "box",
-			title: game.i18n.localize("SIMPLEFOG.boxTool"),
-			icon: "far fa-square",
-			onClick: () => canvas.simplefog?._changeTool(),
-		},
-		{
-			name: "ellipse",
-			title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
-			icon: "far fa-circle",
-			onClick: () => canvas.simplefog?._changeTool(),
-		},
-		{
-			name: "sceneConfig",
-			title: game.i18n.localize("SIMPLEFOG.sceneConfig"),
-			icon: "fas fa-cog",
-			onClick: () => {
-				new SimplefogConfig().render(true);
-			},
-			button: true,
-		},
-		{
-			name: "clearfog",
-			title: game.i18n.localize("SIMPLEFOG.reset"),
-			icon: "fas fa-trash",
-			onClick: () => {
-				const dg = new Dialog({
-					title: game.i18n.localize("SIMPLEFOG.reset"),
-					content: game.i18n.localize("SIMPLEFOG.confirmReset"),
-					buttons: {
-						reset: {
-							icon: '<i class="fas fa-trash"></i>',
-							label: "Reset",
-							callback: () => canvas.simplefog.resetMask(),
-						},
-						blank: {
-							icon: '<i class="fas fa-eye"></i>',
-							label: "Blank",
-							callback: () => canvas.simplefog.blankMask(),
-						},
-						cancel: {
-							icon: '<i class="fas fa-times"></i>',
-							label: "Cancel",
-						},
+// Hooks.on("getSceneControlButtons", (controls) => {
+// 	if (!game.user.isGM) return;
+// 	const tools = {
+// 		"simplefogtoggle": {
+// 			name: "simplefogtoggle",
+// 			title: game.i18n.localize("SIMPLEFOG.onoff"),
+// 			icon: "fas fa-eye",
+// 			onClick: () => toggleSimpleFog(),
+// 			active: canvas.simplefog?.visible,
+// 			toggle: true,
+// 		},
+// 		"brush": {
+// 			name: "brush",
+// 			title: game.i18n.localize("SIMPLEFOG.brushTool"),
+// 			icon: "fas fa-paint-brush",
+// 			onClick: () => canvas.simplefog?._changeTool(),
+// 		},
+// 		"room": {
+// 			name: "room",
+// 			title: game.i18n.localize("SIMPLEFOG.roomTool"),
+// 			icon: "fas fa-block-brick",
+// 			onClick: () => canvas.simplefog?._changeTool(),
+// 		},
+// 		"polygon": {
+// 			name: "polygon",
+// 			title: game.i18n.localize("SIMPLEFOG.polygonTool"),
+// 			icon: "fas fa-draw-polygon",
+// 			onClick: () => canvas.simplefog?._changeTool(),
+// 		},
+// 		"box": {
+// 			name: "box",
+// 			title: game.i18n.localize("SIMPLEFOG.boxTool"),
+// 			icon: "far fa-square",
+// 			onClick: () => canvas.simplefog?._changeTool(),
+// 		},
+// 		"ellipse": {
+// 			name: "ellipse",
+// 			title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
+// 			icon: "far fa-circle",
+// 			onClick: () => canvas.simplefog?._changeTool(),
+// 		},
+// 		"sceneConfig": {
+// 			name: "sceneConfig",
+// 			title: game.i18n.localize("SIMPLEFOG.sceneConfig"),
+// 			icon: "fas fa-cog",
+// 			onClick: () => {
+// 				new SimplefogConfig().render(true);
+// 			},
+// 			button: true,
+// 		},
+// 		"clearfog": {
+// 			name: "clearfog",
+// 			title: game.i18n.localize("SIMPLEFOG.reset"),
+// 			icon: "fas fa-trash",
+// 			onClick: () => {
+// 				const dg = new Dialog({
+// 					title: game.i18n.localize("SIMPLEFOG.reset"),
+// 					content: game.i18n.localize("SIMPLEFOG.confirmReset"),
+// 					buttons: {
+// 						reset: {
+// 							icon: '<i class="fas fa-trash"></i>',
+// 							label: "Reset",
+// 							callback: () => canvas.simplefog.resetMask(),
+// 						},
+// 						blank: {
+// 							icon: '<i class="fas fa-eye"></i>',
+// 							label: "Blank",
+// 							callback: () => canvas.simplefog.blankMask(),
+// 						},
+// 						cancel: {
+// 							icon: '<i class="fas fa-times"></i>',
+// 							label: "Cancel",
+// 						},
+// 					},
+// 					default: "reset",
+// 				});
+// 				dg.render(true);
+// 			},
+// 			button: true,
+// 		},
+// 	};
+// 	let activeTool = game.settings.get("simplefog", "toolHotKeys");
+// 	if (canvas.grid?.type) {
+// 		tools.splice(2, 0, {
+// 			name: "grid",
+// 			title: game.i18n.localize("SIMPLEFOG.gridTool"),
+// 			icon: "fas fa-border-none",
+// 			onClick: () => canvas.simplefog?._changeTool(),
+// 		});
+// 	} else if (activeTool === "grid") activeTool = "brush";
+// 	controls["simplefog"] = {
+// 		name: "simplefog",
+// 		title: game.i18n.localize("SIMPLEFOG.sf"),
+// 		icon: "fas fa-cloud",
+// 		layer: "simplefog",
+// 		tools,
+// 		activeTool,
+// 	};
+// });
+Hooks.on('getSceneControlButtons', controls => {
+        if (!game.user.isGM) return;
+
+        controls.simplefog = {
+            name: "simplefog",
+            title: "Simple Fog",
+            icon: "fas fa-eye",
+            activeTool: "dummy",
+            tools: {
+                dummy: {
+                    //Dummy tool because Foundry does not like it when there's no valid 'active' tool available, it's hidden on the 'renderSceneControls' hook. https://github.com/foundryvtt/foundryvtt/issues/12966
+                    name: "dummy",
+                    visible: true,
+                    order: 9
+                },
+                simplefogtoggle: {
+                    name: "simplefogtoggle",
+                    icon: "fas fa-eye",
+                    visible: true,
+                    button: true,
+                    order: 0,
+                    onChange: () => toggleSimpleFog(),
+					title: game.i18n.localize("SIMPLEFOG.onoff"),
+					active: canvas.simplefog?.visible,
+					toggle: true,
+                },
+                brush: {
+                    name: "brush",
+                    title: game.i18n.localize("SIMPLEFOG.brushTool"),
+                    icon: "fas fa-paint-brush",
+                    visible: true,
+                    order: 1,
+                    onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
+                        canvas.simplefog?._changeTool("brush");
+                    },
+                    button: true
+                },
+                room: {
+                    name: "room",
+                    title: game.i18n.localize("SIMPLEFOG.roomTool"),
+                    icon: "fas fa-block-brick",
+                    visible: true,
+                    order: 2,
+                    onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
+                        canvas.simplefog?._changeTool("room");
+                    },
+                    button: true
+                },
+				polygon: {
+                    name: "polygon",
+                    title: game.i18n.localize("SIMPLEFOG.polygonTool"),
+                    icon: "fas fa-draw-polygon",
+                    visible: true,
+                    order: 2,
+                    onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
+                        canvas.simplefog?._changeTool("polygon");
+                    },
+                    button: true
+                },
+				box: {
+                    name: "box",
+                    title: game.i18n.localize("SIMPLEFOG.boxTool"),
+                    icon: "far fa-square",
+                    visible: true,
+                    order: 2,
+                    onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
+                        canvas.simplefog?._changeTool("box");
+                    },
+                    button: true
+                },
+				ellipse: {
+                    name: "ellipse",
+                    title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
+                    icon: "far fa-circle",
+                    visible: true,
+                    order: 2,
+                    onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
+                        canvas.simplefog?._changeTool("ellipse");
+                    },
+                    button: true
+                },
+				sceneConfig: {
+                    name: "sceneConfig",
+                    title: game.i18n.localize("SIMPLEFOG.sceneConfig"),
+                    icon: "fas fa-cog",
+                    visible: true,
+                    order: 2,
+                    onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
+                        new SimplefogConfig().render(true);
+                    },
+                    button: true
+                },
+				reset: {
+                    name: "reset",
+                    title: game.i18n.localize("SIMPLEFOG.reset"),
+                    icon: "fas fa-trash",
+                    visible: true,
+                    order: 2,
+                    onClick: () => {
+						const layer = "simplefog";
+						canvas[layer].activate();
+						const dg = new Dialog({
+							title: game.i18n.localize("SIMPLEFOG.reset"),
+							content: game.i18n.localize("SIMPLEFOG.confirmReset"),
+							buttons: {
+								reset: {
+									icon: '<i class="fas fa-trash"></i>',
+									label: "Reset",
+									callback: () => canvas.simplefog.resetMask(),
+								},
+								blank: {
+									icon: '<i class="fas fa-eye"></i>',
+									label: "Blank",
+									callback: () => canvas.simplefog.blankMask(),
+								},
+								cancel: {
+									icon: '<i class="fas fa-times"></i>',
+									label: "Cancel",
+								},
+							},
+							default: "reset",
+						});
+						dg.render(true);
 					},
-					default: "reset",
-				});
-				dg.render(true);
-			},
-			button: true,
-		},
-	];
-	let activeTool = game.settings.get("simplefog", "toolHotKeys");
-	if (canvas.grid?.type) {
-		tools.splice(2, 0, {
-			name: "grid",
-			title: game.i18n.localize("SIMPLEFOG.gridTool"),
-			icon: "fas fa-border-none",
-			onClick: () => canvas.simplefog?._changeTool(),
-		});
-	} else if (activeTool === "grid") activeTool = "brush";
-	controls.push({
-		name: "simplefog",
-		title: game.i18n.localize("SIMPLEFOG.sf"),
-		icon: "fas fa-cloud",
-		layer: "simplefog",
-		tools,
-		activeTool,
-	});
-});
+                    button: true
+                }
+            },
+        }
+    });
+
+    Hooks.on('renderSceneControls', () => {
+         if (!game.user.isGM) return;
+        if (ui.controls.control.name !== 'simplefog') {
+            // lockView.viewbox.enableEdit(false);
+            // ui.controls.controls.lockView.tools.editViewbox.active = false;
+        }
+        else {
+            //hide dummy tool
+            document.querySelector('button[data-tool="dummy"]').parentElement.style.display = 'none' 
+        }
+    })
 
 /**
  * Toggle Simple Fog
