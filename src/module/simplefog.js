@@ -239,29 +239,28 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				visible: true,
 				order: 2,
 				onChange: () => {
-					const dg = new Dialog({
-						title: game.i18n.localize("SIMPLEFOG.reset"),
+					foundry.applications.api.DialogV2.wait({
+						window: { title: game.i18n.localize("SIMPLEFOG.reset") },
 						content: game.i18n.localize("SIMPLEFOG.confirmReset"),
-						buttons: {
-							reset: {
-								icon: '<i class="fas fa-trash"></i>',
+						buttons: [
+							{
 								label: "Reset",
+								action: "reset",
 								callback: () => canvas.simplefog.resetMask(),
+								icon: "fas fa-trash",
 							},
-							blank: {
-								icon: '<i class="fas fa-eye"></i>',
+							{
 								label: "Blank",
+								action: "blank",
 								callback: () => canvas.simplefog.blankMask(),
+								icon: "fas fa-eye",
 							},
-							cancel: {
-								icon: '<i class="fas fa-times"></i>',
+							{
 								label: "Cancel",
-								callback: () => false
-							},
-						},
-						default: "reset",
+								icon: "fas fa-times",
+							}
+						]
 					});
-					dg.render(true);
 				},
 				button: true
 			}
@@ -273,17 +272,20 @@ Hooks.on("getSceneControlButtons", (controls) => {
  * Toggle Simple Fog
  */
 async function toggleSimpleFog() {
-	if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
-		await Dialog.confirm({
-			title: game.i18n.localize("SIMPLEFOG.disableFog"),
-			content: game.i18n.localize("SIMPLEFOG.confirmDisableFog"),
-			yes: () => toggleOffSimpleFog(),
-			defaultYes: false,
-		});
-		ui.controls.render({ reset: true });
-	} else {
-		toggleOffSimpleFog();
-	}
+    if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
+        await foundry.applications.api.DialogV2.confirm({
+            window: {
+                title: game.i18n.localize("SIMPLEFOG.disableFog")
+            },
+            content: game.i18n.localize("SIMPLEFOG.confirmDisableFog"),
+            yes: {
+                callback: () => toggleOffSimpleFog()
+            }
+        });
+        ui.controls.render({ reset: true });
+    } else {
+        toggleOffSimpleFog();
+    }
 }
 
 function toggleOffSimpleFog() {

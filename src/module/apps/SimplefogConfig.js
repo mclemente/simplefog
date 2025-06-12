@@ -1,19 +1,38 @@
 import { hexToWeb, webToHex } from "../helpers.js";
+const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
-export default class SimplefogConfig extends FormApplication {
-	static get defaultOptions() {
-		return foundry.utils.mergeObject(super.defaultOptions, {
-			classes: ["form"],
-			closeOnSubmit: false,
-			submitOnChange: true,
-			submitOnClose: true,
-			popOut: true,
-			editable: game.user.isGM,
+export default class SimplefogConfig extends HandlebarsApplicationMixin(ApplicationV2) {
+	static DEFAULT_OPTIONS = {
+		id: "simplefog-scene-config",
+		form: {
+			handler: SimplefogConfig.handler,
+			closeOnSubmit: true,
+		},
+		position: {
 			width: 500,
+			height: "auto",
+		},
+		tag: "form",
+		window: {
+			title: "simplefog.app_title",
+			contentClasses: ["standard-form"],
+		},
+		options: {
+			scrollable: true,
+		},
+	};
+
+	static PARTS = {
+		body: {
 			template: "modules/simplefog/templates/scene-config.html",
-			id: "simplefog-scene-config",
-			title: game.i18n.localize("Simple Fog Options"),
-		});
+		},
+		footer: {
+			template: "templates/generic/form-footer.hbs",
+		},
+	};
+
+	get title() {
+		return `${game.i18n.format("Simple Fog Options")}`;
 	}
 
 	/* -------------------------------------------- */
@@ -22,7 +41,8 @@ export default class SimplefogConfig extends FormApplication {
 	 * Obtain module metadata and merge it with game settings which track current module visibility
 	 * @return {Object}   The data provided to the template when rendering the form
 	 */
-	getData() {
+	async _preparePartContext(partId, context, options) {
+		context = await super._preparePartContext(partId, context, options);
 		// Return data to the template
 		return {
 			gmColorAlpha: Math.round(canvas.simplefog.getSetting("gmColorAlpha") * 100),
@@ -46,12 +66,22 @@ export default class SimplefogConfig extends FormApplication {
 				6000: "Overlay Image Above Color Tint",
 			},
 			versionNotification: canvas.simplefog.getSetting("versionNotification"),
+			buttons: [
+				{
+					type: "submit",
+					action: "saveDefaults",
+					icon: "fas fa-save",
+					label: "SIMPLEFOG.saveAsDef",
+				},
+				{
+					type: "submit",
+					action: "ok",
+					icon: "fa fa-check",
+					label: "SIMPLEFOG.ok",
+				},
+			],
 		};
 	}
-
-	/* -------------------------------------------- */
-	/*  Event Listeners and Handlers                */
-	/* -------------------------------------------- */
 
 	/**
 	 * This method is called upon form submission after form data is validated
@@ -59,8 +89,9 @@ export default class SimplefogConfig extends FormApplication {
 	 * @param formData {Object}   The object of validated form data with which to update the object
 	 * @private
 	 */
-	async _updateObject(event, formData) {
-		Object.entries(formData).forEach(async ([key, val]) => {
+	static async handler(event, form, formData) {
+		const settings = foundry.utils.expandObject(formData.object);
+		Object.entries(settings).forEach(async ([key, val]) => {
 			// If setting is an opacity slider, convert from 1-100 to 0-1
 			if (
 				[
@@ -76,21 +107,16 @@ export default class SimplefogConfig extends FormApplication {
 			// Save settings to scene
 			await canvas.simplefog.setSetting(key, val);
 			// If saveDefaults button clicked, also save to user's defaults
-			if (event.submitter?.name === "saveDefaults") {
+			if (event.submitter.dataset.action === "saveDefaults") {
 				canvas.simplefog.setUserSetting(key, val);
 			}
 		});
-
-		// If save button was clicked, close app
-		if (["submit", "saveDefaults"].includes(event.submitter?.name)) {
-			this.close();
-		}
 
 		// Update sight layer
 		canvas.perception.update({
 			refreshLighting: true,
 			refreshVision: true,
-			refreshOcclusion: true
+			refreshOcclusion: true,
 		});
 	}
 }
