@@ -22,6 +22,7 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			scrollable: true,
 		},
 	};
+
 	static PARTS = {
 		body: {
 			template: "modules/simplefog/templates/scene-config.html",
@@ -102,8 +103,7 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 					"fogImageOverlayGMAlpha",
 					"fogImageOverlayPlayerAlpha",
 				].includes(key)
-			)
-				val /= 100;
+			) val /= 100;
 			// If setting is a color value, convert webcolor to hex before saving
 			if (["gmColorTint", "playerColorTint"].includes(key)) val = webToHex(val);
 			// Save settings to scene

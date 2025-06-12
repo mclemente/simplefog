@@ -281,7 +281,7 @@ async function toggleSimpleFog() {
             yes: {
                 callback: () => toggleOffSimpleFog()
             }
-        })
+        });
         ui.controls.render({ reset: true });
     } else {
         toggleOffSimpleFog();
