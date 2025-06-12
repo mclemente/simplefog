@@ -6,8 +6,7 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 		id: "simplefog-scene-config",
 		form: {
 			handler: SimplefogConfig.handler,
-			closeOnSubmit: false,
-			submitOnChange: true,
+			closeOnSubmit: true,
 		},
 		position: {
 			width: 500,
@@ -91,7 +90,6 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 	 * @private
 	 */
 	static async handler(event, form, formData) {
-		if (event.type !== "submit") return;
 		const settings = foundry.utils.expandObject(formData.object);
 		Object.entries(settings).forEach(async ([key, val]) => {
 			// If setting is an opacity slider, convert from 1-100 to 0-1
@@ -113,11 +111,6 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 				canvas.simplefog.setUserSetting(key, val);
 			}
 		});
-
-		// If save button was clicked, close app
-		if (event.submitter.dataset.action === "saveDefaults") {
-			this.close();
-		}
 
 		// Update sight layer
 		canvas.perception.update({
