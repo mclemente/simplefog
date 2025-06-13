@@ -1,4 +1,4 @@
-import { hexToWeb, webToHex } from "../helpers.js";
+import { hexToWeb } from "../helpers.js";
 const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
 export default class SimplefogConfig extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -20,6 +20,9 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 		options: {
 			scrollable: true,
 		},
+		actions: {
+			reset: SimplefogConfig.#reset
+		}
 	};
 
 	static PARTS = {
@@ -43,11 +46,14 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 	 */
 	async _preparePartContext(partId, context, options) {
 		context = await super._preparePartContext(partId, context, options);
+		context.fields = game.settings.settings.get("simplefog.config").type.fields;
+
 		// Return data to the template
 		return {
-			gmColorAlpha: Math.round(canvas.simplefog.getSetting("gmColorAlpha") * 100),
+			...context,
+			gmColorAlpha: Math.round(canvas.simplefog.getSetting("gmColorAlpha")),
 			gmColorTint: hexToWeb(canvas.simplefog.getSetting("gmColorTint")),
-			playerColorAlpha: Math.round(canvas.simplefog.getSetting("playerColorAlpha") * 100),
+			playerColorAlpha: Math.round(canvas.simplefog.getSetting("playerColorAlpha")),
 			playerColorTint: hexToWeb(canvas.simplefog.getSetting("playerColorTint")),
 			transition: canvas.simplefog.getSetting("transition"),
 			transitionSpeed: canvas.simplefog.getSetting("transitionSpeed"),
@@ -56,16 +62,15 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			blurQuality: canvas.simplefog.getSetting("blurQuality"),
 			autoVisibility: canvas.simplefog.getSetting("autoVisibility"),
 			autoVisGM: canvas.simplefog.getSetting("autoVisGM"),
-			vThreshold: Math.round(canvas.simplefog.getSetting("vThreshold") * 100),
+			vThreshold: Math.round(canvas.simplefog.getSetting("vThreshold")),
 			fogImageOverlayFilePath: canvas.simplefog.getSetting("fogImageOverlayFilePath"),
-			fogImageOverlayGMAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayGMAlpha") * 100),
-			fogImageOverlayPlayerAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha") * 100),
+			fogImageOverlayGMAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayGMAlpha")),
+			fogImageOverlayPlayerAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha")),
 			fogImageOverlayZIndex: canvas.simplefog.getSetting("fogImageOverlayZIndex"),
 			fogImageOverlayZIndexOptions: {
 				4000: "Color Tint Above Overlay Image",
 				6000: "Overlay Image Above Color Tint",
 			},
-			versionNotification: canvas.simplefog.getSetting("versionNotification"),
 			buttons: [
 				{
 					type: "submit",
@@ -74,10 +79,15 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 					label: "SIMPLEFOG.saveAsDef",
 				},
 				{
+					type: "button",
+					action: "reset",
+					icon: "fas fa-undo",
+					label: "SETTINGS.Reset",
+				},
+				{
 					type: "submit",
-					action: "ok",
 					icon: "fa fa-check",
-					label: "SIMPLEFOG.ok",
+					label: "Save",
 				},
 			],
 		};
@@ -90,27 +100,15 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 	 * @private
 	 */
 	static async handler(event, form, formData) {
-		const settings = foundry.utils.expandObject(formData.object);
+		const settings = foundry.utils.expandObject(formData.object).simplefog.config;
 		Object.entries(settings).forEach(async ([key, val]) => {
-			// If setting is an opacity slider, convert from 1-100 to 0-1
-			if (
-				[
-					"gmColorAlpha",
-					"playerColorAlpha",
-					"vThreshold",
-					"fogImageOverlayGMAlpha",
-					"fogImageOverlayPlayerAlpha",
-				].includes(key)
-			) val /= 100;
-			// If setting is a color value, convert webcolor to hex before saving
-			if (["gmColorTint", "playerColorTint"].includes(key)) val = webToHex(val);
 			// Save settings to scene
-			await canvas.simplefog.setSetting(key, val);
-			// If saveDefaults button clicked, also save to user's defaults
-			if (event.submitter.dataset.action === "saveDefaults") {
-				canvas.simplefog.setUserSetting(key, val);
-			}
+			await canvas.scene.setFlag("simplefog", key, val);
 		});
+		// If saveDefaults button clicked, also save to user's defaults
+		if (event.submitter.dataset.action === "saveDefaults") {
+			await game.settings.set("simplefog", "config", settings);
+		}
 
 		// Update sight layer
 		canvas.perception.update({
@@ -118,5 +116,12 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			refreshVision: true,
 			refreshOcclusion: true,
 		});
+	}
+
+	static async #reset() {
+		await Promise.all(
+			Object.keys(canvas.simplefog.settings).map((key) => canvas.scene.unsetFlag("simplefog", key))
+		);
+		this.render();
 	}
 }

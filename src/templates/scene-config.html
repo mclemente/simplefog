@@ -3,110 +3,51 @@
         <legend>
             <i class="fas fa-crown"></i> {{localize 'SIMPLEFOG.gmFogSettings'}}
         </legend>
-        <div class="form-group">
-            <label for="gmColorTint">{{localize 'SIMPLEFOG.gmColorTint'}}</label>
-            <color-picker name="gmColorTint" value="{{ gmColorTint }}"></color-picker>
-        </div>
-        <div class="form-group">
-            <label for="gmColorAlpha">{{localize 'SIMPLEFOG.gmColorAlpha'}}</label>
-            <range-picker name="gmColorAlpha" value="{{ gmColorAlpha }}" min=0 max=100 step=1></range-picker>
-        </div>
+        {{formGroup fields.gmColorTint value=gmColorTint rootId=rootId localize=true}}
+        {{formGroup fields.gmColorAlpha value=gmColorAlpha rootId=rootId localize=true}}
     </fieldset>
 
     <fieldset>
         <legend>
             <i class="fas fa-users"></i> {{localize 'SIMPLEFOG.playerFogSettings'}}
         </legend>
-        <div class="form-group">
-            <label for="playerColorTint">{{localize 'SIMPLEFOG.playerColorTint'}}</label>
-            <color-picker name="playerColorTint" value="{{ playerColorTint }}"></color-picker>
-        </div>
-        <div class="form-group">
-            <label for="playerColorAlpha">{{localize 'SIMPLEFOG.playerColorAlpha'}}</label>
-            <range-picker name="playerColorAlpha" value="{{ playerColorAlpha }}" min=0 max=100 step=1></range-picker>
-        </div>
+        {{formGroup fields.playerColorTint value=playerColorTint rootId=rootId localize=true}}
+        {{formGroup fields.playerColorAlpha value=playerColorAlpha rootId=rootId localize=true}}
     </fieldset>
 
     <fieldset>
         <legend>
             <i class="fas fa-image"></i> {{localize 'SIMPLEFOG.fogImageOverlaySettings'}}
         </legend>
-        <div class="form-group">
-            <label for="fogImageOverlayFilePath">{{localize 'SIMPLEFOG.fogImageOverlay'}}</label>
-            <file-picker name="fogImageOverlayFilePath" type="imagevideo"
-                value="{{ fogImageOverlayFilePath }}"></file-picker>
-        </div>
-        <p class="hint">
-            {{ localize 'SIMPLEFOG.fogImageOverlayNotes' }}
-        </p>
-        <div class="form-group">
-            <label for="fogImageOverlayGMAlpha">{{localize 'SIMPLEFOG.fogImageOverlayGMAlpha'}}</label>
-            <range-picker name="fogImageOverlayGMAlpha" value="{{ fogImageOverlayGMAlpha }}" min=0 max=100
-                step=1></range-picker>
-        </div>
-        <div class="form-group">
-            <label for="fogImageOverlayPlayerAlpha">{{localize 'SIMPLEFOG.fogImageOverlayPlayerAlpha'}}</label>
-            <range-picker name="fogImageOverlayPlayerAlpha" value="{{ fogImageOverlayPlayerAlpha }}" min=0 max=100
-                step=1></range-picker>
-        </div>
-        <div class="form-group">
-            <label for="fogImageOverlayZIndex">{{localize 'SIMPLEFOG.fogImageOverlayZIndex'}}</label>
-            <select name="fogImageOverlayZIndex">
-                {{selectOptions fogImageOverlayZIndexOptions selected=fogImageOverlayZIndex}}
-            </select>
-        </div>
+        {{formGroup fields.fogImageOverlayFilePath value=fogImageOverlayFilePath rootId=rootId localize=true}}
+        {{formGroup fields.fogImageOverlayGMAlpha value=fogImageOverlayGMAlpha rootId=rootId localize=true}}
+        {{formGroup fields.fogImageOverlayPlayerAlpha value=fogImageOverlayPlayerAlpha rootId=rootId localize=true}}
+        {{formGroup fields.fogImageOverlayZIndex value=fogImageOverlayZIndex rootId=rootId localize=true}}
     </fieldset>
 
     <fieldset>
         <legend>
             <i class="fas fa-filter"></i> {{localize 'SIMPLEFOG.filterSettings'}}
         </legend>
-        <div class="form-group">
-            <label for="blurEnable">{{localize 'SIMPLEFOG.blurEnable'}}</label>
-            <input type='checkbox' {{checked blurEnable}} name='blurEnable' />
-        </div>
-        <div class="form-group">
-            <label for="blurRadius">{{localize 'SIMPLEFOG.blurRadius'}}</label>
-            <range-picker name="blurRadius" value="{{ blurRadius}}" min=0 max=50 step=1></range-picker>
-        </div>
-        <div class="form-group">
-            <label for="blurQuality">{{localize 'SIMPLEFOG.blurQuality'}}</label>
-            <range-picker name="blurQuality" value=" {{blurQuality }}" min=1 max=8 step=1></range-picker>
-            <p class="hint">{{localize 'SIMPLEFOG.blurQualityDesc'}}</p>
-        </div>
+        {{formGroup fields.blurEnable value=blurEnable rootId=rootId localize=true}}
+        {{formGroup fields.blurRadius value=blurRadius rootId=rootId localize=true}}
+        {{formGroup fields.blurQuality value=blurQuality rootId=rootId localize=true}}
     </fieldset>
 
     <fieldset>
         <legend>
             <i class="fas fa-adjust"></i> {{localize 'SIMPLEFOG.transitionSettings'}}
         </legend>
-        <div class="form-group">
-            <label for="transition">{{localize 'SIMPLEFOG.enableTransitions'}}</label>
-            <input type='checkbox' {{checked transition}} name='transition' />
-        </div>
-        <div class="form-group">
-            <label for="transitionSpeed">{{localize 'SIMPLEFOG.transitionSpeed'}}</label>
-            <range-picker name="transitionSpeed" value=" {{transitionSpeed}} " min=100 max=5000 step=100></range-picker>
-        </div>
+        {{formGroup fields.transition value=transition rootId=rootId localize=true}}
+        {{formGroup fields.transitionSpeed value=transitionSpeed rootId=rootId localize=true}}
     </fieldset>
 
     <fieldset>
         <legend>
             <i class="fas fa-low-vision"></i> {{localize 'SIMPLEFOG.visibilitySettings'}}
         </legend>
-        <p class="hint">{{ localize 'SIMPLEFOG.autoVisNotes' }}</p>
-        <div class="form-group">
-            <label for="autoVisibility">{{localize 'SIMPLEFOG.enableAutovis'}}</label>
-            <input type='checkbox' {{checked autoVisibility}} name='autoVisibility' />
-        </div>
-
-        <div class="form-group">
-            <label for="autoVisGM">{{localize 'SIMPLEFOG.enableForGM'}}</label>
-            <input type='checkbox' {{checked autoVisGM}} name='autoVisGM' />
-        </div>
-        <div class="form-group">
-            <label for="vThreshold">{{localize 'SIMPLEFOG.visThreshold'}}</label>
-            <range-picker name="vThreshold" value={{ "vThreshold" }} min=0 max=100 step=1></range-picker>
-        </div>
+        {{formGroup fields.autoVisibility value=autoVisibility rootId=rootId localize=true}}
+        {{formGroup fields.autoVisGM value=autoVisGM rootId=rootId localize=true}}
+        {{formGroup fields.vThreshold value=vThreshold rootId=rootId localize=true}}
     </fieldset>
 </div>

@@ -21,21 +21,6 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 			ROUNDED_RECT: 2,
 			POLYGON: 3,
 		};
-		this.DEFAULTS = {
-			visible: false,
-			blurEnable: true,
-			blurQuality: 2,
-			blurRadius: 5,
-			gmColorAlpha: 0.6,
-			gmColorTint: "0x000000",
-			playerColorAlpha: 1,
-			playerColorTint: "0x000000",
-			fogImageOverlayFilePath: "",
-			fogImageOverlayGMAlpha: 0.6,
-			fogImageOverlayPlayerAlpha: 1,
-			fogImageOverlayZIndex: 6000,
-			layerZindex: 220,
-		};
 	}
 
 	static get layerOptions() {
@@ -57,18 +42,19 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		if (game.user.isGM) alpha = this.getSetting("gmColorAlpha");
 		else alpha = this.getSetting("playerColorAlpha");
 		if (!alpha) {
-			if (game.user.isGM) alpha = this.DEFAULTS.gmColorAlpha;
-			else alpha = this.DEFAULTS.playerColorAlpha;
+			if (game.user.isGM) alpha = this.settings.gmColorAlpha;
+			else alpha = this.settings.playerColorAlpha;
 		}
 		return alpha;
 	}
 
 	/**
 	 * Sets the scene's alpha for the primary layer.
-	 * @param alpha {Number} 0-1 opacity representation
+	 * @param alpha {Number} 0-100 opacity representation
 	 * @param skip {Boolean} Optional override to skip using animated transition
 	 */
 	async setColorAlpha(alpha, skip = false) {
+		alpha = alpha / 100;
 		// If skip is false, do not transition and just set alpha immediately
 		if (skip || !this.getSetting("transition")) {
 			this.fogColorLayer.alpha = alpha;
@@ -147,8 +133,8 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		if (game.user.isGM) alpha = this.getSetting("fogImageOverlayGMAlpha");
 		else alpha = this.getSetting("fogImageOverlayPlayerAlpha");
 		if (!alpha) {
-			if (game.user.isGM) alpha = this.DEFAULTS.fogImageOverlayGMAlpha;
-			else alpha = this.DEFAULTS.fogImageOverlayAlpha;
+			if (game.user.isGM) alpha = this.settings.fogImageOverlayGMAlpha;
+			else alpha = this.settings.fogImageOverlayAlpha;
 		}
 		return alpha;
 	}
@@ -173,23 +159,19 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		this.fogImageOverlayLayer.alpha = alpha;
 	}
 
+	settings = game.settings.get("simplefog", "config");
+
 	/**
 	 * Gets and sets various layer wide properties
 	 * Some properties have different values depending on if user is a GM or player
 	 */
 
 	getSetting(name) {
-		return canvas.scene.getFlag("simplefog", name)
-			?? this.getUserSetting(name)
-			?? this.DEFAULTS[name];
+		return canvas.scene.getFlag("simplefog", name) ?? this.settings[name];
 	}
 
 	async setSetting(name, value) {
 		return await canvas.scene.setFlag("simplefog", name, value);
-	}
-
-	getUserSetting(name) {
-		return game.user.getFlag("simplefog", name) ?? this.DEFAULTS[name];
 	}
 
 	async setUserSetting(name, value) {
@@ -263,8 +245,9 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		// Push the new history buffer to the scene
 		history.events.push(this.historyBuffer);
 		history.pointer = history.events.length;
+		// Need to unset arrays first, otherwise they get concatenated
 		await canvas.scene.unsetFlag("simplefog", "history");
-		await this.setSetting("history", history);
+		await canvas.scene.setFlag("simplefog", "history", history);
 		// Clear the history buffer
 		this.historyBuffer = [];
 		this.lock = false;
@@ -426,16 +409,16 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	/**
 	 * Toggles visibility of primary layer
 	 */
-	toggle() {
-		const v = this.getSetting("visible");
+	async toggle() {
+		const v = canvas.scene.getFlag("simplefog", "visible") ?? game.settings.get("simplefog", "autoEnableSceneFog");
 		this.visible = !v;
-		this.setSetting("visible", !v);
+		await canvas.scene.setFlag("simplefog", "visible", !v);
 
 		// If first time, set autofog to opposite so it doesn't reapply it.
 		let history = canvas.scene.getFlag("simplefog", "history");
 
 		if (history === undefined) {
-			this.setSetting("autoFog", !v);
+			await canvas.scene.setFlag("simplefog", "autoFog", !v);
 		}
 	}
 

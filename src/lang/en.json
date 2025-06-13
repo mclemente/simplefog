@@ -59,7 +59,7 @@
 		"enableForGM": "Enable for GM",
 		"enableAutoFog": "Enable fog Automatically for new scenes",
 		"visThreshold": "Visibility Threshold",
-		"saveAsDef": "Save current settings as default",
+		"saveAsDef": "Save as Default",
 		"ok": "OK",
 		"sf": "Simple Fog",
 		"onoff": "Enable/Disable Simple Fog",

@@ -1,4 +1,3 @@
-import { hexToPercent, percentToHex } from "../helpers.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -74,7 +73,7 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 	/** @override */
 	_onClose(options) {
 		super._onClose(options);
-		delete canvas.scene.apps[this.id];
+		delete canvas.scene?.apps[this.id];
 	}
 
 	/* -------------------------------------------- */
@@ -84,8 +83,8 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 		const displayContainer = canvas.simplefog.activeTool === "brush";
 		return {
 			displayContainer,
-			brushSize: canvas.simplefog.getUserSetting("brushSize"),
-			brushOpacity: hexToPercent(canvas.simplefog.getUserSetting("brushOpacity")),
+			brushSize: game.settings.get("simplefog", "brushSize"),
+			brushOpacity: game.settings.get("simplefog", "brushOpacity"),
 		};
 	}
 
@@ -95,7 +94,7 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 		event?.preventDefault();
 		target ??= event?.target.closest("[data-action]") ?? this.element.querySelector("input[name='brushSize']");
 		const value = Number(target.value);
-		await canvas.simplefog.setUserSetting("brushSize", value);
+		await game.settings.set("simplefog", "brushSize", value);
 		target.parentNode.querySelector(".range-value").innerText = `${value}px`;
 		canvas.simplefog.setPreviewTint();
 	}
@@ -104,7 +103,7 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 		event?.preventDefault();
 		target ??= event?.target.closest("[data-action]") ?? this.element.querySelector("input[name='brushOpacity']");
 		const value = Number(target.value);
-		await canvas.simplefog.setUserSetting("brushOpacity", percentToHex(value));
+		await game.settings.set("simplefog", "brushOpacity", value);
 		target.parentNode.querySelector(".range-value").innerText = `${value}%`;
 		canvas.simplefog.setPreviewTint();
 	}

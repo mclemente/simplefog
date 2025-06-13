@@ -6,7 +6,7 @@
 import { Layout } from "../../libs/hexagons.js";
 import { BrushControls } from "../apps/BrushControls.js";
 import { CWSPNoDoors } from "../ClockwiseSweep.js";
-import { hexObjsToArr, hexToPercent } from "../helpers.js";
+import { hexObjsToArr, hexToPercent, percentToHex } from "../helpers.js";
 import MaskLayer from "./MaskLayer.js";
 
 export default class SimplefogLayer extends MaskLayer {
@@ -18,24 +18,19 @@ export default class SimplefogLayer extends MaskLayer {
 			this._registerMouseListeners();
 		});
 
-		this.DEFAULTS = Object.assign(this.DEFAULTS, {
-			transition: true,
-			transitionSpeed: 800,
-			previewColor: "0x00FFFF",
+		this.DEFAULTS = {
 			handlefill: "0xff6400",
 			handlesize: 20,
-			previewAlpha: 0.4,
-			brushSize: 50,
-			brushOpacity: 1,
-			autoVisibility: false,
-			autoVisGM: false,
-			vThreshold: 1,
-			hotKeyTool: "Brush",
-		});
+			previewAlpha: 0.4
+		};
 
 		// React to changes to current scene
 		Hooks.on("updateScene", (scene, data) => this._updateScene(scene, data));
 	}
+
+	brushSize = game.settings.get("simplefog", "brushSize");
+
+	brushOpacity = percentToHex(game.settings.get("simplefog", "brushOpacity"));
 
 	static get layerOptions() {
 		return foundry.utils.mergeObject(super.layerOptions, {
@@ -110,10 +105,6 @@ export default class SimplefogLayer extends MaskLayer {
 	_updateScene(scene, data) {
 		// Check if update applies to current viewed scene
 		if (!scene._view) return;
-		// React to visibility change
-		if (foundry.utils.hasProperty(data, "flags.simplefog.visible")) {
-			canvas.simplefog.visible = data.flags.simplefog.visible;
-		}
 		// React to composite history change
 		if (foundry.utils.hasProperty(data, "flags.simplefog.blurEnable")) {
 			if (this.fogColorLayer !== undefined) {
@@ -195,8 +186,8 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	setPreviewTint() {
-		const vt = this.getSetting("vThreshold");
-		const bo = hexToPercent(this.getUserSetting("brushOpacity")) / 100;
+		const vt = this.getSetting("vThreshold") / 100;
+		const bo = hexToPercent(this.brushOpacity) / 100;
 		this.#previewTint = 0xff0000;
 		if (bo < vt) this.#previewTint = 0x00ff00;
 		this.ellipsePreview.tint = this.#previewTint;
@@ -377,7 +368,7 @@ export default class SimplefogLayer extends MaskLayer {
 			this.ellipsePreview.visible = false;
 			return;
 		} else this.ellipsePreview.visible = true;
-		const size = this.getUserSetting("brushSize");
+		const size = this.brushSize;
 		this.ellipsePreview.width = size * 2;
 		this.ellipsePreview.height = size * 2;
 		this.ellipsePreview.x = p.x;
@@ -389,9 +380,9 @@ export default class SimplefogLayer extends MaskLayer {
 				shape: this.BRUSH_TYPES.ELLIPSE,
 				x: p.x,
 				y: p.y,
-				fill: this.getUserSetting("brushOpacity"),
-				width: this.getUserSetting("brushSize"),
-				height: this.getUserSetting("brushSize"),
+				fill: this.brushOpacity,
+				width: this.brushSize,
+				height: this.brushSize,
 			});
 		}
 	}
@@ -430,7 +421,7 @@ export default class SimplefogLayer extends MaskLayer {
 			y: this.dragStart.y,
 			width: d.w,
 			height: d.h,
-			fill: this.getUserSetting("brushOpacity"),
+			fill: this.brushOpacity,
 		});
 		this.boxPreview.visible = false;
 	}
@@ -468,7 +459,7 @@ export default class SimplefogLayer extends MaskLayer {
 			y: this.dragStart.y,
 			width: Math.abs(d.w),
 			height: Math.abs(d.h),
-			fill: this.getUserSetting("brushOpacity"),
+			fill: this.brushOpacity,
 		});
 		this.ellipsePreview.visible = false;
 	}
@@ -513,7 +504,7 @@ export default class SimplefogLayer extends MaskLayer {
 			x: 0,
 			y: 0,
 			vertices: verts,
-			fill: this.getUserSetting("brushOpacity"),
+			fill: this.brushOpacity,
 		});
 		// Reset the preview shape
 		this.polygonPreview.clear();
@@ -542,7 +533,7 @@ export default class SimplefogLayer extends MaskLayer {
 			x: 0,
 			y: 0,
 			vertices,
-			fill: this.getUserSetting("brushOpacity"),
+			fill: this.brushOpacity,
 		});
 		return true;
 	}
@@ -594,7 +585,7 @@ export default class SimplefogLayer extends MaskLayer {
 						y,
 						width: size,
 						height: size,
-						fill: this.getUserSetting("brushOpacity"),
+						fill: this.brushOpacity,
 					});
 				}
 			}
@@ -624,7 +615,7 @@ export default class SimplefogLayer extends MaskLayer {
 						vertices: vertexArray,
 						x: 0,
 						y: 0,
-						fill: this.getUserSetting("brushOpacity"),
+						fill: this.brushOpacity,
 					});
 					// Flag cell as drawn in dupes
 					this.dupes.push(coord);

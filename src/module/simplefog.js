@@ -132,18 +132,10 @@ Hooks.once("ready", async () => {
 	});
 });
 
-Hooks.once("canvasInit", () => {
-	if (!game.user.isGM) return;
-	Object.keys(canvas.simplefog.DEFAULTS).forEach((key) => {
-		// Check for existing scene specific setting
-		if (canvas.simplefog.getSetting(key) !== undefined) return;
-		// Check for custom default
-		const def = canvas.simplefog.getUserSetting(key);
-		// If user has custom default, set it for scene
-		if (def !== undefined) canvas.simplefog.setSetting(key, def);
-		// Otherwise fall back to module default
-		else canvas.simplefog.setSetting(key, canvas.simplefog.DEFAULTS[key]);
-	});
+Hooks.on("createScene", (doc, options, userId) => {
+	if (game.settings.get("simplefog", "autoEnableSceneFog")) {
+		doc.setFlag("simplefog", "visible", true);
+	}
 });
 
 Hooks.on("canvasInit", () => {
@@ -284,12 +276,12 @@ async function toggleSimpleFog() {
         });
         ui.controls.render({ reset: true });
     } else {
-        toggleOffSimpleFog();
+        await toggleOffSimpleFog();
     }
 }
 
-function toggleOffSimpleFog() {
-	canvas.simplefog.toggle();
+async function toggleOffSimpleFog() {
+	await canvas.simplefog.toggle();
 	canvas.perception.update({
 		refreshLighting: true,
 		refreshVision: true,
