@@ -31,6 +31,18 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 
 	/* -------------------------------------------- */
 
+	_configureRenderOptions(options) {
+		super._configureRenderOptions(options);
+		if ( options.isFirstRender && ui.nav ) {
+			const {right, top} = ui.nav.element.getBoundingClientRect();
+			const uiScale = game.settings.get("core", "uiConfig").uiScale;
+			options.position.left ??= right + (16 * uiScale);
+			options.position.top ??= top;
+		}
+	}
+
+	/* -------------------------------------------- */
+
 	/** @inheritDoc */
 	async _renderFrame(options) {
 		const frame = await super._renderFrame(options);
@@ -51,9 +63,6 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 	/** @inheritDoc */
 	_onFirstRender(context, options) {
 		super._onFirstRender(context, options);
-		const left = ui.nav?.element.getBoundingClientRect().left;
-		const top = ui.controls?.element.getBoundingClientRect().top;
-		options.position = {...options.position, left, top};
 		canvas.scene.apps[this.id] = this;
 	}
 
