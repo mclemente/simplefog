@@ -156,7 +156,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 	controls.simplefog = {
 		name: "simplefog",
 		title: "Simple Fog",
-		icon: "fas fa-eye",
+		icon: "fas fa-cloud",
 		onChange: (event, active) => {
 			if ( active ) canvas.simplefog.activate();
 		},
@@ -221,7 +221,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				icon: "fas fa-cog",
 				visible: true,
 				order: 2,
-				onChange: () => new SimplefogConfig().render(true),
+				onChange: () => new SimplefogConfig(canvas.scene).render(true),
 				button: true
 			},
 			reset: {

@@ -1,6 +1,12 @@
 {
 	"SIMPLEFOG": {
+		"fogConfiguration": "Fog Configuration",
 		"SETTINGS": {
+			"config": {
+				"name": "Default Fog Configuration",
+				"label": "Configure Fog Configuration",
+				"hint": "Configure settings that get used by all scenes that don't have a specific fog configuration."
+			},
 			"confirmFogDisable": {
 				"name": "Confirm Disabling of Scene Simple Fog",
 				"hint": "When enabled, a confirmation dialog will be displayed before Simple Fog can be toggled off for a scene"

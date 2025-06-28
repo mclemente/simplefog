@@ -2,6 +2,11 @@ import { hexToWeb } from "../helpers.js";
 const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
 export default class SimplefogConfig extends HandlebarsApplicationMixin(ApplicationV2) {
+	constructor(scene, options) {
+		super(options);
+		this.scene = scene;
+	}
+
 	static DEFAULT_OPTIONS = {
 		id: "simplefog-scene-config",
 		form: {
@@ -14,7 +19,8 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 		},
 		tag: "form",
 		window: {
-			title: "simplefog.app_title",
+			icon: "fas fa-cloud",
+			title: "SIMPLEFOG.fogConfiguration",
 			contentClasses: ["standard-form"],
 		},
 		options: {
@@ -34,23 +40,15 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 		},
 	};
 
-	get title() {
-		return `${game.i18n.format("Simple Fog Options")}`;
-	}
-
 	/* -------------------------------------------- */
 
 	/**
 	 * Obtain module metadata and merge it with game settings which track current module visibility
 	 * @return {Object}   The data provided to the template when rendering the form
 	 */
-	async _preparePartContext(partId, context, options) {
-		context = await super._preparePartContext(partId, context, options);
-		context.fields = game.settings.settings.get("simplefog.config").type.fields;
-
-		// Return data to the template
+	async _prepareContext() {
 		return {
-			...context,
+			fields: game.settings.settings.get("simplefog.config").type.fields,
 			gmColorAlpha: Math.round(canvas.simplefog.getSetting("gmColorAlpha")),
 			gmColorTint: hexToWeb(canvas.simplefog.getSetting("gmColorTint")),
 			playerColorAlpha: Math.round(canvas.simplefog.getSetting("playerColorAlpha")),
@@ -67,28 +65,18 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			fogImageOverlayGMAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayGMAlpha")),
 			fogImageOverlayPlayerAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha")),
 			fogImageOverlayZIndex: canvas.simplefog.getSetting("fogImageOverlayZIndex"),
-			fogImageOverlayZIndexOptions: {
-				4000: "Color Tint Above Overlay Image",
-				6000: "Overlay Image Above Color Tint",
-			},
 			buttons: [
 				{
 					type: "submit",
-					action: "saveDefaults",
 					icon: "fas fa-save",
-					label: "SIMPLEFOG.saveAsDef",
+					label: this.scene ? "Save" : "SIMPLEFOG.saveAsDef",
 				},
 				{
 					type: "button",
 					action: "reset",
 					icon: "fas fa-undo",
 					label: "SETTINGS.Reset",
-				},
-				{
-					type: "submit",
-					icon: "fa fa-check",
-					label: "Save",
-				},
+				}
 			],
 		};
 	}
@@ -101,12 +89,14 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 	 */
 	static async handler(event, form, formData) {
 		const settings = foundry.utils.expandObject(formData.object).simplefog.config;
-		Object.entries(settings).forEach(async ([key, val]) => {
-			// Save settings to scene
-			await canvas.scene.setFlag("simplefog", key, val);
-		});
-		// If saveDefaults button clicked, also save to user's defaults
-		if (event.submitter.dataset.action === "saveDefaults") {
+		if (this.scene) {
+			const defaultSettings = game.settings.get("simplefog", "config");
+			for (const [key, val] of Object.entries(settings)) {
+				const isEqualToDefault = defaultSettings[key] === val || defaultSettings[key]?.css === val;
+				if (!val || isEqualToDefault) await this.scene.unsetFlag("simplefog", key);
+				else await this.scene.setFlag("simplefog", key, val);
+			}
+		} else {
 			await game.settings.set("simplefog", "config", settings);
 		}
 
@@ -119,9 +109,13 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 	}
 
 	static async #reset() {
-		await Promise.all(
-			Object.keys(canvas.simplefog.settings).map((key) => canvas.scene.unsetFlag("simplefog", key))
-		);
+		if (this.scene) {
+			for (const key of Object.keys(canvas.simplefog.settings)) {
+				await this.scene.unsetFlag("simplefog", key);
+			}
+		} else {
+			await game.settings.set("simplefog", "config", undefined);
+		}
 		this.render();
 	}
 }

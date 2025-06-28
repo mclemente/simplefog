@@ -1,8 +1,18 @@
+import SimplefogConfig from "./apps/SimplefogConfig.js";
 import { percentToHex } from "./helpers.js";
 
 export const registerSettings = function () {
 	const { BooleanField, ColorField, FilePathField, NumberField, SchemaField } = foundry.data.fields;
 	// Register global config settings
+	game.settings.registerMenu("simplefog", "config", {
+		name: "SIMPLEFOG.SETTINGS.config.name",
+		label: "SIMPLEFOG.SETTINGS.config.label",
+		hint: "SIMPLEFOG.SETTINGS.config.hint",
+		icon: "fas fa-cloud",
+		type: SimplefogConfig,
+		restricted: true,
+	});
+
 	game.settings.register("simplefog", "config", {
 		scope: "world",
 		config: false,
