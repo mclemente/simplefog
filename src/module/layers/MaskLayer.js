@@ -136,7 +136,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 			if (game.user.isGM) alpha = this.settings.fogImageOverlayGMAlpha;
 			else alpha = this.settings.fogImageOverlayAlpha;
 		}
-		return alpha;
+		return alpha / 100;
 	}
 
 	async setFogImageOverlayAlpha(alpha, skip = false) {
