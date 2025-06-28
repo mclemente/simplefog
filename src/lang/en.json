@@ -29,7 +29,13 @@
 			},
 			"zIndex": {
 				"name": "Z-Index",
-				"hint": "The z-index determines the order in which various layers are rendered within the Foundry canvas. A higher number will be rendered on top of lower numbered layers (and the objects on that layer). This allows for the adjustment of the z-index to allow for Simple Fog to be rendered above/below other layers; particularly ones added by other modules. Going below 200 will intermingle with Foundry layers such as the foreground image (200), tokens (100), etc... (Default: 220)"
+				"hint": "Displays the overlay over specific canvas layers and its objects.",
+				"choices": {
+					"tokens": "Tokens",
+					"controls": "Controls, such as doors",
+					"interface": "Interface, such as scrolling numbers",
+					"healthEstimate": "Interface, such as Health Estimates"
+				}
 			}
 		},
 		"brushOpacity": "Brush Opacity",
@@ -51,6 +57,10 @@
 		"fogImageOverlayGMAlpha": "GM Image Opacity",
 		"fogImageOverlayPlayerAlpha": "Player Image Opacity",
 		"fogImageOverlayZIndex": "Mask Sorting Order",
+		"fogImageOverlayZIndexOptions": {
+			"4000": "Color Tint Above Overlay Image",
+			"6000": "Overlay Image Above Color Tint"
+		},
 
 		"filterSettings": "Filter Settings",
 		"blurEnable": "Enable Reveal Blur",
@@ -66,7 +76,6 @@
 		"enableAutoFog": "Enable fog Automatically for new scenes",
 		"visThreshold": "Visibility Threshold",
 		"saveAsDef": "Save as Default",
-		"ok": "OK",
 		"sf": "Simple Fog",
 		"onoff": "Enable/Disable Simple Fog",
 
@@ -82,27 +91,9 @@
 		"autoFogSettings": "AutoFog Settings",
 		"autoFogNotes": "When enabled AND saved as default, fog will automatically render when you create a scene. Please check box and click 'Save current setings as defualt' in order to enable. Do the same to disable",
 
-		"advancedSettings": "Advanced Settings",
-		"configurableZindex": "Simple Fog Z-Index",
-		"configurableZindexNotes": "The z-index determines the order in which various layers are rendered within the Foundry canvas.  A higher number will be rendered on top of lower numbered layers (and the objects on that layer).  This allows for the adjustment of the z-index to allow for Simple Fog to be rendered above/below other layers; particularly ones added by other modules. Going below 200 will intermingle with Foundry layers such as the foreground image (200), tokens (100), etc...  (Default: 220)",
-
-		"confirmDisablingFogSettings": "Toggle Confirmation Settings",
-		"confirmDisablingFog": "Enable confirmation to disable Simple Fog.",
-		"confirmDisablingFogNotes": "When disabling Simple Fog for a scene, present a dialog to confirm disabling before doing so.",
 		"confirmDisableFog": "Are you sure you want to toggle off Simple Fog for this scene?",
 		"disableFog": "Disable Simple Fog",
 
-		"hotkeySettings": "Hotkey Settings",
-		"enableHotkeys": "Enable hotkeys",
-		"hotkeyNotes": "When enabled, you will be able to quickly swap to the simplefog control by using Ctrl+S and toggle the opacity using the hotkey 'T'",
-		"hotKeyToolDesc": "Hotkey Tool",
-		"hotKeyToolNotes": "Determine which tool will be selected when hotkey is activated.",
-
-		"autoVisNotes": "When enabled, Automatic Visibility will show/hide tokens based on fog opacity level at their location based on the threshold setting. Brush color changes to green/red to indicate whether a token would be visible.",
-
-		"versionNotification": "<b>Simple Fog 0.3.4</b><p>This release includes:</p><ul><li>Fixes for v11 by macskay <a href='https://github.com/League-of-Foundry-Developers/simplefog/pull/110'>#110</a></li><li>Fixes for v11 by mattd <a href='https://github.com/League-of-Foundry-Developers/simplefog/pull/111'>#111</a></li></ul></p>",
-
-		"migration2Notification": "<b>Simple Fog Data Migration</b><p>The Simple Fog data has been migrated to a format supporting v3. It is <b>HIGHLY</b> recommended to review all scenes and fog visibility, both from a GM and a Player view before showing the scene to players."
-
+		"autoVisNotes": "When enabled, Automatic Visibility will show/hide tokens based on fog opacity level at their location based on the threshold setting. Brush color changes to green/red to indicate whether a token would be visible."
 	}
 }

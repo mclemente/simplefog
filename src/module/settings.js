@@ -95,8 +95,8 @@ export const registerSettings = function () {
 				initial: 6000,
 				integer: true,
 				choices: {
-					4000: "Color Tint Above Overlay Image",
-					6000: "Overlay Image Above Color Tint",
+					4000: "SIMPLEFOG.fogImageOverlayZIndexOptions.4000",
+					6000: "SIMPLEFOG.fogImageOverlayZIndexOptions.6000",
 				},
 				label: "SIMPLEFOG.fogImageOverlayZIndex"
 			}),
@@ -186,13 +186,23 @@ export const registerSettings = function () {
 			ellipse: "SIMPLEFOG.SETTINGS.toolHotKeys.choices.ellipse",
 		},
 	});
+	const hasHealthEstimate = game.modules.get("healthEstimate")?.active;
 	game.settings.register("simplefog", "zIndex", {
 		name: "SIMPLEFOG.SETTINGS.zIndex.name",
 		hint: "SIMPLEFOG.SETTINGS.zIndex.hint",
 		scope: "world",
 		config: true,
-		default: 220,
-		type: Number,
+		type: new NumberField({
+			required: true,
+			nullable: false,
+			initial: 1120,
+			choices: {
+				220: "SIMPLEFOG.SETTINGS.zIndex.choices.tokens",
+				1020: "SIMPLEFOG.SETTINGS.zIndex.choices.controls",
+				1120: hasHealthEstimate ? "SIMPLEFOG.SETTINGS.zIndex.choices.healthEstimate" : "SIMPLEFOG.SETTINGS.zIndex.choices.interface"
+			},
+			integer: true
+		}),
 		onChange: (value) => canvas.simplefog.zIndex = value
 	});
 };

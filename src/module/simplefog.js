@@ -123,6 +123,7 @@ Hooks.once("init", async () => {
 });
 
 Hooks.once("ready", async () => {
+	if (!canvas.ready) return;
 	canvas.simplefog.zIndex = game.settings.get("simplefog", "zIndex");
 
 	canvas.perception.update({
