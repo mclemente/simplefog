@@ -115,13 +115,13 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	/* -------------------------------------------- */
 	getFogImageOverlayTexture(fogImageOverlayFilePath) {
 		if (fogImageOverlayFilePath) {
-			return getTexture(fogImageOverlayFilePath);
+			return foundry.canvas.getTexture(fogImageOverlayFilePath);
 		}
 	}
 
 	setFogImageOverlayTexture(fogImageOverlayFilePath) {
 		if (fogImageOverlayFilePath) {
-			const texture = getTexture(fogImageOverlayFilePath);
+			const texture = foundry.canvas.getTexture(fogImageOverlayFilePath);
 			this.fogImageOverlayLayer.texture = texture;
 		} else {
 			this.fogImageOverlayLayer.texture = undefined;

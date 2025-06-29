@@ -6,7 +6,7 @@ Hooks.once("init", async () => {
 	registerSettings();
 	CONFIG.Canvas.layers.simplefog = { group: "interface", layerClass: SimplefogLayer };
 
-	const isActiveControl = () => ui.controls.activeControl === "simplefog";
+	const isActiveControl = () => ui.controls.control.name === "simplefog";
 	game.keybindings.register("simplefog", "swap", {
 		name: "Swap to Simple Fog's Controls",
 		hint: "Toggles between the Token and Simple Fog layers. Check the module's settings to define which tool will be selected by default.",
