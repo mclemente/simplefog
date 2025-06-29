@@ -106,6 +106,7 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			refreshVision: true,
 			refreshOcclusion: true,
 		});
+		if (this.scene) await canvas.draw(this.scene);
 	}
 
 	static async #reset() {
