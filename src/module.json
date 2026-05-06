@@ -1,40 +1,51 @@
 {
-	"id": "simplefog",
-	"title": "Simple Fog - Manual Fog of War",
-	"description": "Simple Fog allows you to draw fog of war manually, optionally automatically hiding and revealing tokens underneath based on opacity. It provides a number of tools to quickly draw and erase fog in various shapes - brush, rectangles, ellipses, polygons or to reveal tiles you click/drag on the grid.",
-	"version": "This is auto replaced",
-	"authors": [
-		{
-			"name": "Matheus Clemente",
-			"discord": "mclemente#5524"
-		}
-	],
-	"socket": true,
-	"languages": [
-		{
-			"lang": "en",
-			"name": "English",
-			"path": "lang/en.json"
-		},
-		{
-			"lang": "es",
-			"name": "Español",
-			"path": "lang/es.json"
-		},
-		{
-			"lang": "ja",
-			"name": "日本語 (Japanese)",
-			"path": "lang/ja.json"
-		}
-	],
-	"esmodules": ["module/simplefog.js"],
-	"styles": ["styles/simplefog.css"],
-	"compatibility": {
-		"minimum": 13,
-		"verified": 13,
-		"maximum": 13
-	},
-	"url": "This is auto replaced",
-	"manifest": "This is auto replaced",
-	"download": "This is auto replaced"
+  "id": "simplefog",
+  "title": "Simple Fog - Manual Fog of War",
+  "description": "Simple Fog allows you to draw fog of war manually, optionally automatically hiding and revealing tokens underneath based on opacity. It provides a number of tools to quickly draw and erase fog in various shapes - brush, rectangles, ellipses, polygons or to reveal tiles you click/drag on the grid.",
+  "version": "This is auto replaced",
+  "authors": [
+    {
+      "name": "Matheus Clemente",
+      "discord": "mclemente#5524"
+    }
+  ],
+  "socket": true,
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "lang/es.json"
+    },
+    {
+      "lang": "it",
+      "name": "Italiano",
+      "path": "lang/it.json"
+    },
+    {
+      "lang": "ja",
+      "name": "日本語 (Japanese)",
+      "path": "lang/ja.json"
+    }
+  ],
+  "esmodules": [
+    "module/simplefog.js"
+  ],
+  "styles": [
+    {
+      "src": "styles/simplefog.css"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14",
+    "maximum": "14"
+  },
+  "url": "This is auto replaced",
+  "manifest": "This is auto replaced",
+  "download": "This is auto replaced"
 }

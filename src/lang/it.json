@@ -1,0 +1,92 @@
+{
+  "SIMPLEFOG": {
+    "fogConfiguration": "Configurazione della Nebbia di guerra",
+    "SETTINGS": {
+      "config": {
+        "name": "Configurazione predefinita della Nebbia di guerra",
+        "label": "Configura la Nebbia di guerra",
+        "hint": "Configura le impostazioni usate da tutte le scene senza una configurazione specifica della nebbia di guerra."
+      },
+      "confirmFogDisable": {
+        "name": "Conferma disattivazione nebbia",
+        "hint": "Se abilitato, viene mostrata una finestra di conferma prima di disattivare la Nebbia di guerra per una scena."
+      },
+      "autoEnableSceneFog": {
+        "name": "Abilita automaticamente la nebbia",
+        "hint": "Se abilitato, la Nebbia di guerra viene attivata automaticamente alla prima creazione di una scena."
+      },
+      "toolHotKeys": {
+        "name": "Strumento predefinito per il tasto rapido",
+        "hint": "Definisce quale strumento viene selezionato usando la scorciatoia da tastiera.",
+        "choices": {
+          "brush": "Pennello",
+          "grid": "Griglia",
+          "room": "Stanza",
+          "polygon": "Poligono",
+          "box": "Rettangolo",
+          "ellipse": "Ellisse"
+        }
+      },
+      "zIndex": {
+        "name": "Z-Index",
+        "hint": "Mostra il livello sopra specifici strati della mappa e i relativi oggetti.",
+        "choices": {
+          "tokens": "Token",
+          "controls": "Controlli, come le porte",
+          "interface": "Interfaccia, come i numeri scorrevoli",
+          "healthEstimate": "Interfaccia, come le Stime della Salute"
+        }
+      }
+    },
+    "brushOpacity": "Opacità del pennello",
+    "brushSize": "Dimensione del pennello",
+    "hide": "Nascondi",
+    "reveal": "Rivela",
+    "gmFogSettings": "Impostazioni nebbia per il GM",
+    "gmColorTint": "Colore",
+    "gmColorAlpha": "Opacità del colore",
+    "playerFogSettings": "Impostazioni nebbia per i giocatori",
+    "playerColorTint": "Colore",
+    "playerColorAlpha": "Opacità del colore",
+    "fogImageOverlaySettings": "Immagine sovrapposta alla nebbia",
+    "fogImageOverlay": "Immagine",
+    "fogImageOverlayNotes": "L'immagine selezionata viene visualizzata sopra o sotto la tinta colore. Deve avere le stesse dimensioni dell'immagine di sfondo della scena.",
+    "fogImageOverlayGMAlpha": "Opacità immagine GM",
+    "fogImageOverlayPlayerAlpha": "Opacità immagine giocatori",
+    "fogImageOverlayZIndex": "Ordine di sovrapposizione",
+    "fogImageOverlayZIndexOptions": {
+      "4000": "Tinta colore sopra l'immagine sovrapposta",
+      "6000": "Immagine sovrapposta sopra la tinta colore"
+    },
+    "filterSettings": "Impostazioni filtri",
+    "blurEnable": "Abilita sfumatura dei bordi",
+    "blurRadius": "Raggio sfumatura",
+    "blurQuality": "Qualità sfumatura",
+    "blurQualityDesc": "Una qualità maggiore migliora l'aspetto della sfumatura, ma può ridurre le prestazioni.",
+    "transitionSettings": "Impostazioni transizione",
+    "enableTransitions": "Abilita transizioni",
+    "transitionSpeed": "Velocità transizione",
+    "visibilitySettings": "Impostazioni visibilità",
+    "enableAutovis": "Abilita visibilità automatica",
+    "enableForGM": "Abilita per il GM",
+    "enableAutoFog": "Abilita la nebbia automaticamente per le nuove scene",
+    "visThreshold": "Soglia di visibilità",
+    "saveAsDef": "Salva come predefinito",
+    "sf": "Nebbia di guerra",
+    "onoff": "Attiva/Disattiva Nebbia di guerra",
+    "brushTool": "Pennello",
+    "gridTool": "Griglia",
+    "roomTool": "Stanza",
+    "polygonTool": "Poligono",
+    "boxTool": "Rettangolo",
+    "ellipseTool": "Ellisse",
+    "sceneConfig": "Configurazione scena",
+    "reset": "Reimposta la Nebbia di guerra",
+    "confirmReset": "Sicuro? La nebbia di guerra verrà reimpostata.",
+    "autoFogSettings": "Impostazioni nebbia automatica",
+    "autoFogNotes": "Se abilitato e salvato come predefinito, la nebbia viene applicata automaticamente alla creazione di nuove scene. Seleziona la casella e clicca 'Salva come predefinito' per abilitare o disabilitare.",
+    "confirmDisableFog": "Disattivare la Nebbia di guerra per questa scena?",
+    "disableFog": "Disattiva Nebbia di guerra",
+    "autoVisNotes": "Se abilitata, la visibilità automatica mostra o nasconde i token in base all'opacità della nebbia nella loro posizione, secondo la soglia impostata. Il colore del pennello diventa verde o rosso per indicare se un token sarebbe visibile."
+  }
+}
