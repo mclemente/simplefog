@@ -32,14 +32,8 @@
 			"path": "lang/ja.json"
 		}
 	],
-	"esmodules": [
-		"module/simplefog.js"
-	],
-	"styles": [
-		{
-			"src": "styles/simplefog.css"
-		}
-	],
+	"esmodules": ["module/simplefog.js"],
+	"styles": ["styles/simplefog.css"],
 	"compatibility": {
 		"minimum": "14",
 		"verified": "14",
