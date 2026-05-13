@@ -29,7 +29,7 @@ Hooks.once("init", async () => {
 		hint: "",
 		editable: [
 			{
-				key: "Z",
+				key: "KeyZ",
 				modifiers: ["Control"]
 			}
 		],
