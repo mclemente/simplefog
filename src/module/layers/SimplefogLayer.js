@@ -177,7 +177,7 @@ export default class SimplefogLayer extends MaskLayer {
 		// React to autoVisibility setting changes
 		if (
 			foundry.utils.hasProperty(data, "flags.simplefog.autoVisibility")
-      || foundry.utils.hasProperty(data, "flags.simplefog.vThreshold")
+			|| foundry.utils.hasProperty(data, "flags.simplefog.vThreshold")
 		) {
 			canvas.perception.update({
 				refreshLighting: true,
@@ -445,7 +445,8 @@ export default class SimplefogLayer extends MaskLayer {
 		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
 			this.ellipsePreview.visible = false;
 			return;
-		} this.ellipsePreview.visible = true;
+		}
+		this.ellipsePreview.visible = true;
 		const size = this.brushSize;
 		this.ellipsePreview.width = size * 2;
 		this.ellipsePreview.height = size * 2;
@@ -739,7 +740,8 @@ export default class SimplefogLayer extends MaskLayer {
 		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
 			this.polygonPreview.visible = false;
 			return;
-		} this.polygonPreview.visible = true;
+		}
+		this.polygonPreview.visible = true;
 		this.polygonPreview.clear();
 		this.polygonPreview.beginFill(0xffffff);
 		this.polygonPreview.drawPolygon(this._getRoomVertices(p, e));
