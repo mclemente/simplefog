@@ -12,7 +12,7 @@ Hooks.once("init", async () => {
 		hint: "Toggles between the Token and Simple Fog layers. Check the module's settings to define which tool will be selected by default.",
 		editable: [
 			{
-				key: "S",
+				key: "KeyS",
 				modifiers: ["Control"]
 			}
 		],
@@ -48,7 +48,7 @@ Hooks.once("init", async () => {
 		uneditable: [],
 		editable: [
 			{
-				key: "T"
+				key: "KeyT"
 			}
 		],
 		onDown: () => {
