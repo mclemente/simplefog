@@ -10,935 +10,935 @@ import { hexObjsToArr, hexToPercent, percentToHex } from "../helpers.js";
 import MaskLayer from "./MaskLayer.js";
 
 export default class SimplefogLayer extends MaskLayer {
-  constructor() {
-    super();
+	constructor() {
+		super();
 
-    // Register event listerenrs
-    Hooks.on("ready", () => {
-      this._registerMouseListeners();
-    });
+		// Register event listerenrs
+		Hooks.on("ready", () => {
+			this._registerMouseListeners();
+		});
 
-    this.DEFAULTS = {
-      handlefill: "0xff6400",
-      handlesize: 20,
-      previewAlpha: 0.4
-    };
+		this.DEFAULTS = {
+			handlefill: "0xff6400",
+			handlesize: 20,
+			previewAlpha: 0.4
+		};
 
-    // React to changes to current scene
-    Hooks.on("updateScene", (scene, data) => this._updateScene(scene, data));
-    Hooks.on("canvasReady", () => {
-      this._onCanvasLevelChange(canvas.level?.id ?? null);
-    });
-    Hooks.on("canvasPan", (_canvas, position) => {
-      const levelId = position?.level ?? canvas.level?.id ?? null;
-      this._onCanvasLevelChange(levelId);
-    });
-  }
+		// React to changes to current scene
+		Hooks.on("updateScene", (scene, data) => this._updateScene(scene, data));
+		Hooks.on("canvasReady", () => {
+			this._onCanvasLevelChange(canvas.level?.id ?? null);
+		});
+		Hooks.on("canvasPan", (_canvas, position) => {
+			const levelId = position?.level ?? canvas.level?.id ?? null;
+			this._onCanvasLevelChange(levelId);
+		});
+	}
 
-  brushSize = game.settings.get("simplefog", "brushSize");
+	brushSize = game.settings.get("simplefog", "brushSize");
 
-  brushOpacity = percentToHex(game.settings.get("simplefog", "brushOpacity"));
+	brushOpacity = percentToHex(game.settings.get("simplefog", "brushOpacity"));
 
-  static get layerOptions() {
-    return foundry.utils.mergeObject(super.layerOptions, {
-      name: "simplefog",
-    });
-  }
+	static get layerOptions() {
+		return foundry.utils.mergeObject(super.layerOptions, {
+			name: "simplefog",
+		});
+	}
 
-  get activeTool() {
-    return this.#activeTool;
-  }
+	get activeTool() {
+		return this.#activeTool;
+	}
 
-  set activeTool(tool) {
-    this.#activeTool = tool;
-  }
+	set activeTool(tool) {
+		this.#activeTool = tool;
+	}
 
-  get brushControls() {
-    return this.#brushControls ??= new BrushControls();
-  }
+	get brushControls() {
+		return this.#brushControls ??= new BrushControls();
+	}
 
-  #activeTool;
+	#activeTool;
 
-  #brushControls;
+	#brushControls;
 
-  #gridType;
+	#gridType;
 
-  #lastPosition;
+	#lastPosition;
 
-  #brushPrev;
+	#brushPrev;
 
-  #suppressHistoryUpdates = false;
+	#suppressHistoryUpdates = false;
 
-  #previewTint = 0xff0000;
+	#previewTint = 0xff0000;
 
-  #rightclick;
+	#rightclick;
 
-  _activate() {
-    super._activate();
-    const tools = ["brush", "grid", "room", "polygon", "box", "ellipse"];
-    const userTool = game.user.getFlag("simplefog", "activeTool");
-    const controlTool = ui.controls?.control?.name === "simplefog" ? ui.controls.control.activeTool : null;
-    let tool = userTool ?? controlTool ?? game.settings.get("simplefog", "toolHotKeys");
-    if (!tools.includes(tool)) tool = "brush";
-    if (canvas.grid?.type === 0 && tool === "grid") tool = "brush";
-    this._changeTool(tool, { persist: false, syncUI: true });
-  }
+	_activate() {
+		super._activate();
+		const tools = ["brush", "grid", "room", "polygon", "box", "ellipse"];
+		const userTool = game.user.getFlag("simplefog", "activeTool");
+		const controlTool = ui.controls?.control?.name === "simplefog" ? ui.controls.control.activeTool : null;
+		let tool = userTool ?? controlTool ?? game.settings.get("simplefog", "toolHotKeys");
+		if (!tools.includes(tool)) tool = "brush";
+		if (canvas.grid?.type === 0 && tool === "grid") tool = "brush";
+		this._changeTool(tool, { persist: false, syncUI: true });
+	}
 
-  /* -------------------------------------------- */
+	/* -------------------------------------------- */
 
-  /** @inheritDoc */
-  _deactivate() {
-    super._deactivate();
-    this.brushControls.close({ animate: false });
-    this.clearActiveTool();
-  }
+	/** @inheritDoc */
+	_deactivate() {
+		super._deactivate();
+		this.brushControls.close({ animate: false });
+		this.clearActiveTool();
+	}
 
-  _changeTool(tool = "", { persist = true, syncUI = true } = {}) {
-    const tools = ["brush", "grid", "room", "polygon", "box", "ellipse"];
-    if (!tools.includes(tool)) tool = "brush";
-    if (canvas.grid?.type === 0 && tool === "grid") tool = "brush";
-    this.clearActiveTool();
-    this.activeTool = tool;
-    if (persist) {
-      this.setUserSetting("activeTool", tool);
-    }
-    if (syncUI) {
-      this._syncActiveToolUI(tool);
-    }
-    this.setPreviewTint();
-    if (this.activeTool === "brush") {
-      this.ellipsePreview.visible = true;
-      this._pointerMoveBrush(canvas.mousePosition);
-    } else if (this.activeTool === "grid") {
-      this._initGrid();
-      this._pointerMoveGrid(canvas.mousePosition);
-    } else if (this.activeTool === "room") {
-      this._pointerMoveRoom(canvas.mousePosition);
-      canvas.walls.objects.visible = true;
-      canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
-    }
-    this.brushControls.render({ force: true });
-  }
+	_changeTool(tool = "", { persist = true, syncUI = true } = {}) {
+		const tools = ["brush", "grid", "room", "polygon", "box", "ellipse"];
+		if (!tools.includes(tool)) tool = "brush";
+		if (canvas.grid?.type === 0 && tool === "grid") tool = "brush";
+		this.clearActiveTool();
+		this.activeTool = tool;
+		if (persist) {
+			this.setUserSetting("activeTool", tool);
+		}
+		if (syncUI) {
+			this._syncActiveToolUI(tool);
+		}
+		this.setPreviewTint();
+		if (this.activeTool === "brush") {
+			this.ellipsePreview.visible = true;
+			this._pointerMoveBrush(canvas.mousePosition);
+		} else if (this.activeTool === "grid") {
+			this._initGrid();
+			this._pointerMoveGrid(canvas.mousePosition);
+		} else if (this.activeTool === "room") {
+			this._pointerMoveRoom(canvas.mousePosition);
+			canvas.walls.objects.visible = true;
+			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
+		}
+		this.brushControls.render({ force: true });
+	}
 
-  _syncActiveToolUI(tool) {
-    if (!ui.controls) return;
-    if (ui.controls.control?.name === "simplefog") {
-      ui.controls.control.activeTool = tool;
-    }
-    const controls = ui.controls.controls;
-    const simplefogControl = Array.isArray(controls)
-      ? controls.find((c) => c.name === "simplefog")
-      : controls?.simplefog;
-    if (simplefogControl) {
-      simplefogControl.activeTool = tool;
-    }
-  }
+	_syncActiveToolUI(tool) {
+		if (!ui.controls) return;
+		if (ui.controls.control?.name === "simplefog") {
+			ui.controls.control.activeTool = tool;
+		}
+		const controls = ui.controls.controls;
+		const simplefogControl = Array.isArray(controls)
+			? controls.find((c) => c.name === "simplefog")
+			: controls?.simplefog;
+		if (simplefogControl) {
+			simplefogControl.activeTool = tool;
+		}
+	}
 
-  /* -------------------------------------------- */
-  /*  Event Listeners and Handlers                */
-  /* -------------------------------------------- */
+	/* -------------------------------------------- */
+	/*  Event Listeners and Handlers                */
+	/* -------------------------------------------- */
 
-  /**
+	/**
    * React to updates of canvas.scene flags
    */
-  _updateScene(scene, data) {
-    // Check if update applies to current viewed scene
-    if (!scene._view) return;
-    // React to composite history change
-    if (foundry.utils.hasProperty(data, "flags.simplefog.blurEnable")) {
-      if (this.fogColorLayer !== undefined) {
-        if (this.getSetting("blurEnable")) {
-          this.fogColorLayer.filters = [this.blur];
-        } else {
-          this.fogColorLayer.filters = [];
-        }
-      }
-    }
-    if (foundry.utils.hasProperty(data, "flags.simplefog.blurRadius")) {
-      canvas.simplefog.blur.blur = this.getSetting("blurRadius");
-    }
-    // React to composite history change
-    if (foundry.utils.hasProperty(data, "flags.simplefog.blurQuality")) {
-      canvas.simplefog.blur.quality = this.getSetting("blurQuality");
-    }
-    // React to composite history change
-    if (foundry.utils.hasProperty(data, `flags.simplefog.${this.getHistoryKey()}`)) {
-      if (this.#suppressHistoryUpdates) return;
-      const history = canvas.scene.getFlag("simplefog", this.getHistoryKey());
-      if (history === undefined) return;
-      canvas.simplefog.renderStack({ history });
+	_updateScene(scene, data) {
+		// Check if update applies to current viewed scene
+		if (!scene._view) return;
+		// React to composite history change
+		if (foundry.utils.hasProperty(data, "flags.simplefog.blurEnable")) {
+			if (this.fogColorLayer !== undefined) {
+				if (this.getSetting("blurEnable")) {
+					this.fogColorLayer.filters = [this.blur];
+				} else {
+					this.fogColorLayer.filters = [];
+				}
+			}
+		}
+		if (foundry.utils.hasProperty(data, "flags.simplefog.blurRadius")) {
+			canvas.simplefog.blur.blur = this.getSetting("blurRadius");
+		}
+		// React to composite history change
+		if (foundry.utils.hasProperty(data, "flags.simplefog.blurQuality")) {
+			canvas.simplefog.blur.quality = this.getSetting("blurQuality");
+		}
+		// React to composite history change
+		if (foundry.utils.hasProperty(data, `flags.simplefog.${this.getHistoryKey()}`)) {
+			if (this.#suppressHistoryUpdates) return;
+			const history = canvas.scene.getFlag("simplefog", this.getHistoryKey());
+			if (history === undefined) return;
+			canvas.simplefog.renderStack({ history });
 
-      canvas.perception.update({
-        refreshLighting: true,
-        refreshVision: true,
-        refreshOcclusion: true
-      });
-    }
-    // React to autoVisibility setting changes
-    if (
-      foundry.utils.hasProperty(data, "flags.simplefog.autoVisibility")
+			canvas.perception.update({
+				refreshLighting: true,
+				refreshVision: true,
+				refreshOcclusion: true
+			});
+		}
+		// React to autoVisibility setting changes
+		if (
+			foundry.utils.hasProperty(data, "flags.simplefog.autoVisibility")
       || foundry.utils.hasProperty(data, "flags.simplefog.vThreshold")
-    ) {
-      canvas.perception.update({
-        refreshLighting: true,
-        refreshVision: true,
-        refreshOcclusion: true
-      });
-    }
-    // React to alpha/tint changes
-    if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorAlpha")) {
-      canvas.simplefog.setColorAlpha(data.flags.simplefog.playerColorAlpha);
-    }
-    if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.gmColorAlpha")) {
-      canvas.simplefog.setColorAlpha(data.flags.simplefog.gmColorAlpha);
-    }
-    if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorTint")) {
-      canvas.simplefog.setColorTint(data.flags.simplefog.playerColorTint);
-    }
-    if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.gmColorTint")) {
-      canvas.simplefog.setColorTint(data.flags.simplefog.gmColorTint);
-    }
+		) {
+			canvas.perception.update({
+				refreshLighting: true,
+				refreshVision: true,
+				refreshOcclusion: true
+			});
+		}
+		// React to alpha/tint changes
+		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorAlpha")) {
+			canvas.simplefog.setColorAlpha(data.flags.simplefog.playerColorAlpha);
+		}
+		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.gmColorAlpha")) {
+			canvas.simplefog.setColorAlpha(data.flags.simplefog.gmColorAlpha);
+		}
+		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorTint")) {
+			canvas.simplefog.setColorTint(data.flags.simplefog.playerColorTint);
+		}
+		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.gmColorTint")) {
+			canvas.simplefog.setColorTint(data.flags.simplefog.gmColorTint);
+		}
 
-    // React to Image Overylay file changes
-    if (foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayFilePath")) {
-      canvas.simplefog.setFogImageOverlayTexture(data.flags.simplefog.fogImageOverlayFilePath);
-    }
+		// React to Image Overylay file changes
+		if (foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayFilePath")) {
+			canvas.simplefog.setFogImageOverlayTexture(data.flags.simplefog.fogImageOverlayFilePath);
+		}
 
-    if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayGMAlpha")) {
-      canvas.simplefog.setFogImageOverlayAlpha(data.flags.simplefog.fogImageOverlayGMAlpha / 100);
-    }
-    if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayPlayerAlpha")) {
-      canvas.simplefog.setFogImageOverlayAlpha(data.flags.simplefog.fogImageOverlayPlayerAlpha / 100);
-    }
-    if (foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayZIndex")) {
-      canvas.simplefog.fogImageOverlayLayer.zIndex = data.flags.simplefog.fogImageOverlayZIndex;
-    }
-  }
+		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayGMAlpha")) {
+			canvas.simplefog.setFogImageOverlayAlpha(data.flags.simplefog.fogImageOverlayGMAlpha / 100);
+		}
+		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayPlayerAlpha")) {
+			canvas.simplefog.setFogImageOverlayAlpha(data.flags.simplefog.fogImageOverlayPlayerAlpha / 100);
+		}
+		if (foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayZIndex")) {
+			canvas.simplefog.fogImageOverlayLayer.zIndex = data.flags.simplefog.fogImageOverlayZIndex;
+		}
+	}
 
-  async _onCanvasLevelChange(newLevelId) {
-    if (newLevelId === this._activeLevelId) return;
-    if (this.historyBuffer.length > 0) {
-      await this.commitHistory();
-    }
-    this._activeLevelId = newLevelId;
-    if (!this.maskTexture) return;
-    this.pointer = 0;
-    this.resetMask(false);
-    this.renderStack({ start: 0, isInit: true });
-  }
+	async _onCanvasLevelChange(newLevelId) {
+		if (newLevelId === this._activeLevelId) return;
+		if (this.historyBuffer.length > 0) {
+			await this.commitHistory();
+		}
+		this._activeLevelId = newLevelId;
+		if (!this.maskTexture) return;
+		this.pointer = 0;
+		this.resetMask(false);
+		this.renderStack({ start: 0, isInit: true });
+	}
 
-  /**
+	/**
    * Adds the mouse listeners to the layer
    */
-  _registerMouseListeners() {
-    this.addListener("pointerup", this._pointerUp);
-    this.addListener("pointermove", this._pointerMove);
-  }
+	_registerMouseListeners() {
+		this.addListener("pointerup", this._pointerUp);
+		this.addListener("pointermove", this._pointerMove);
+	}
 
-  highlightConfig(x, y) {
-    return { x, y, color: this.#previewTint, alpha: this.DEFAULTS.previewAlpha };
-  }
+	highlightConfig(x, y) {
+		return { x, y, color: this.#previewTint, alpha: this.DEFAULTS.previewAlpha };
+	}
 
-  setPreviewTint() {
-    const vt = this.getSetting("vThreshold") / 100;
-    const bo = hexToPercent(this.brushOpacity) / 100;
-    this.#previewTint = 0xff0000;
-    if (bo < vt) this.#previewTint = 0x00ff00;
-    this.ellipsePreview.tint = this.#previewTint;
-    this.boxPreview.tint = this.#previewTint;
-    this.polygonPreview.tint = this.#previewTint;
-    if (this.activeTool === "grid" && this.#lastPosition) {
-      const { x, y } = this.#lastPosition;
-      canvas.interface.grid.clearHighlightLayer("simplefog");
-      canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
-    }
-  }
+	setPreviewTint() {
+		const vt = this.getSetting("vThreshold") / 100;
+		const bo = hexToPercent(this.brushOpacity) / 100;
+		this.#previewTint = 0xff0000;
+		if (bo < vt) this.#previewTint = 0x00ff00;
+		this.ellipsePreview.tint = this.#previewTint;
+		this.boxPreview.tint = this.#previewTint;
+		this.polygonPreview.tint = this.#previewTint;
+		if (this.activeTool === "grid" && this.#lastPosition) {
+			const { x, y } = this.#lastPosition;
+			canvas.interface.grid.clearHighlightLayer("simplefog");
+			canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
+		}
+	}
 
-  /**
+	/**
    * Sets the active tool & shows preview for brush & grid tools
    * @param {Number}  Size in pixels
    */
-  async setBrushSize(s) {
-    await this.setUserSetting("brushSize", s);
-    const p = { x: this.ellipsePreview.x, y: this.ellipsePreview.y };
-    this._pointerMoveBrush(p);
-  }
+	async setBrushSize(s) {
+		await this.setUserSetting("brushSize", s);
+		const p = { x: this.ellipsePreview.x, y: this.ellipsePreview.y };
+		this._pointerMoveBrush(p);
+	}
 
-  /**
+	/**
    * Aborts any active drawing tools
    */
-  clearActiveTool() {
-    canvas.interface.grid.clearHighlightLayer("simplefog");
-    // Box preview
-    this.boxPreview.visible = false;
-    // Ellipse Preview
-    this.ellipsePreview.visible = false;
-    this.polygonPreview.clear();
-    this.polygonPreview.visible = false;
-    this.polygonHandle.visible = false;
-    this.polygon = [];
-    // Cancel op flag only if not in a brush operation
-    if (this.activeTool !== "brush") {
-      this.op = false;
-    }
-    if (this.#suppressHistoryUpdates) {
-      this.#suppressHistoryUpdates = false;
-    }
-    if (this.activeTool === "room") {
-      canvas.walls.objects.visible = false;
-      canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
-    }
-  }
+	clearActiveTool() {
+		canvas.interface.grid.clearHighlightLayer("simplefog");
+		// Box preview
+		this.boxPreview.visible = false;
+		// Ellipse Preview
+		this.ellipsePreview.visible = false;
+		this.polygonPreview.clear();
+		this.polygonPreview.visible = false;
+		this.polygonHandle.visible = false;
+		this.polygon = [];
+		// Cancel op flag only if not in a brush operation
+		if (this.activeTool !== "brush") {
+			this.op = false;
+		}
+		if (this.#suppressHistoryUpdates) {
+			this.#suppressHistoryUpdates = false;
+		}
+		if (this.activeTool === "room") {
+			canvas.walls.objects.visible = false;
+			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
+		}
+	}
 
-  _onClickLeft(e) {
-    // Don't allow new action if history push still in progress
-    if (this.historyBuffer.length > 0) return;
-    const p = canvas.mousePosition;
-    if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
-    // Round positions to nearest pixel
-    p.x = Math.round(p.x);
-    p.y = Math.round(p.y);
-    this.op = true;
-    // Check active tool
-    switch (this.activeTool) {
-      case "brush":
-        this._pointerDownBrush(p);
-        break;
-      case "grid":
-        this._pointerDownGrid();
-        break;
-      case "box":
-        this._pointerDownBox(p);
-        break;
-      case "ellipse":
-        this._pointerDownEllipse(p);
-        break;
-      case "polygon":
-        this._pointerDownPolygon(p);
-        break;
-      case "room":
-        this._pointerDownRoom(p, e);
-        break;
-      default: // Do nothing
-        break;
-    }
-    // Call _pointermove so single click will still draw brush if mouse does not move
-    this._pointerMove(e);
-  }
+	_onClickLeft(e) {
+		// Don't allow new action if history push still in progress
+		if (this.historyBuffer.length > 0) return;
+		const p = canvas.mousePosition;
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
+		// Round positions to nearest pixel
+		p.x = Math.round(p.x);
+		p.y = Math.round(p.y);
+		this.op = true;
+		// Check active tool
+		switch (this.activeTool) {
+			case "brush":
+				this._pointerDownBrush(p);
+				break;
+			case "grid":
+				this._pointerDownGrid();
+				break;
+			case "box":
+				this._pointerDownBox(p);
+				break;
+			case "ellipse":
+				this._pointerDownEllipse(p);
+				break;
+			case "polygon":
+				this._pointerDownPolygon(p);
+				break;
+			case "room":
+				this._pointerDownRoom(p, e);
+				break;
+			default: // Do nothing
+				break;
+		}
+		// Call _pointermove so single click will still draw brush if mouse does not move
+		this._pointerMove(e);
+	}
 
-  _onClickLeft2(e) {
-    // Don't allow new action if history push still in progress
-    if (this.historyBuffer.length > 0) return;
-    const p = canvas.mousePosition;
-    if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
-    // Round positions to nearest pixel
-    p.x = Math.round(p.x);
-    p.y = Math.round(p.y);
-    this.op = true;
-    // Check active tool
-    switch (this.activeTool) {
-      case "polygon":
-        this._pointerDown2Polygon(p);
-        break;
-      default: // Do nothing
-        break;
-    }
-    // Call _pointermove so single click will still draw brush if mouse does not move
-    this._pointerMove(e);
-  }
+	_onClickLeft2(e) {
+		// Don't allow new action if history push still in progress
+		if (this.historyBuffer.length > 0) return;
+		const p = canvas.mousePosition;
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
+		// Round positions to nearest pixel
+		p.x = Math.round(p.x);
+		p.y = Math.round(p.y);
+		this.op = true;
+		// Check active tool
+		switch (this.activeTool) {
+			case "polygon":
+				this._pointerDown2Polygon(p);
+				break;
+			default: // Do nothing
+				break;
+		}
+		// Call _pointermove so single click will still draw brush if mouse does not move
+		this._pointerMove(e);
+	}
 
-  _onClickRight(e) {
-    if (this.historyBuffer.length > 0) return;
-    // Todo: Not sure why this doesnt trigger when drawing ellipse & box
-    if (["box", "ellipse"].includes(this.activeTool)) {
-      this.clearActiveTool();
-    } else if (this.activeTool === "polygon") this.#rightclick = true;
-  }
+	_onClickRight(e) {
+		if (this.historyBuffer.length > 0) return;
+		// Todo: Not sure why this doesnt trigger when drawing ellipse & box
+		if (["box", "ellipse"].includes(this.activeTool)) {
+			this.clearActiveTool();
+		} else if (this.activeTool === "polygon") this.#rightclick = true;
+	}
 
-  _pointerMove(e) {
-    // Get mouse position translated to canvas coords
-    const p = canvas.mousePosition;
-    // Round positions to nearest pixel
-    p.x = Math.round(p.x);
-    p.y = Math.round(p.y);
-    switch (this.activeTool) {
-      case "brush":
-        this._pointerMoveBrush(p);
-        break;
-      case "box":
-        this._pointerMoveBox(p, e);
-        break;
-      case "grid":
-        this._pointerMoveGrid(p);
-        break;
-      case "ellipse":
-        this._pointerMoveEllipse(p, e);
-        break;
-      case "polygon":
-        this._pointerMovePolygon(p);
-        this.#rightclick = false;
-        break;
-      case "room":
-        this._pointerMoveRoom(p, e);
-        break;
-      default:
-        break;
-    }
-  }
+	_pointerMove(e) {
+		// Get mouse position translated to canvas coords
+		const p = canvas.mousePosition;
+		// Round positions to nearest pixel
+		p.x = Math.round(p.x);
+		p.y = Math.round(p.y);
+		switch (this.activeTool) {
+			case "brush":
+				this._pointerMoveBrush(p);
+				break;
+			case "box":
+				this._pointerMoveBox(p, e);
+				break;
+			case "grid":
+				this._pointerMoveGrid(p);
+				break;
+			case "ellipse":
+				this._pointerMoveEllipse(p, e);
+				break;
+			case "polygon":
+				this._pointerMovePolygon(p);
+				this.#rightclick = false;
+				break;
+			case "room":
+				this._pointerMoveRoom(p, e);
+				break;
+			default:
+				break;
+		}
+	}
 
-  async _pointerUp(e) {
-    if (e.data.button === 0) {
-      // Translate click to canvas position
-      const p = canvas.mousePosition;
-      // Round positions to nearest pixel
-      p.x = Math.round(p.x);
-      p.y = Math.round(p.y);
-      switch (this.op) {
-        case "box":
-          this._pointerUpBox(p, e);
-          break;
-        case "ellipse":
-          this._pointerUpEllipse(p, e);
-          break;
-        default: // Do nothing
-          break;
-      }
-      // Reset operation
-      this.op = false;
-      this.#brushPrev = null;
-      // Always stop partial sync
-      this._stopPartialSync();
-      // Wait for any in-progress partial sync to finish
-      while (this.lock) {
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-      // Only commit if there is anything left in the buffer
-      if (this.historyBuffer.length > 0) {
-        await this.commitHistory();
-      }
-      if (this.#suppressHistoryUpdates) {
-        this.#suppressHistoryUpdates = false;
-        canvas.perception.update({
-          refreshLighting: true,
-          refreshVision: true,
-          refreshOcclusion: true
-        });
-      }
-    } else if (e.data.button === 2) {
-      if (this.activeTool === "polygon" && this.#rightclick) {
-        this.clearActiveTool();
-      }
-    }
-  }
+	async _pointerUp(e) {
+		if (e.data.button === 0) {
+			// Translate click to canvas position
+			const p = canvas.mousePosition;
+			// Round positions to nearest pixel
+			p.x = Math.round(p.x);
+			p.y = Math.round(p.y);
+			switch (this.op) {
+				case "box":
+					this._pointerUpBox(p, e);
+					break;
+				case "ellipse":
+					this._pointerUpEllipse(p, e);
+					break;
+				default: // Do nothing
+					break;
+			}
+			// Reset operation
+			this.op = false;
+			this.#brushPrev = null;
+			// Always stop partial sync
+			this._stopPartialSync();
+			// Wait for any in-progress partial sync to finish
+			while (this.lock) {
+				await new Promise((resolve) => setTimeout(resolve, 10));
+			}
+			// Only commit if there is anything left in the buffer
+			if (this.historyBuffer.length > 0) {
+				await this.commitHistory();
+			}
+			if (this.#suppressHistoryUpdates) {
+				this.#suppressHistoryUpdates = false;
+				canvas.perception.update({
+					refreshLighting: true,
+					refreshVision: true,
+					refreshOcclusion: true
+				});
+			}
+		} else if (e.data.button === 2) {
+			if (this.activeTool === "polygon" && this.#rightclick) {
+				this.clearActiveTool();
+			}
+		}
+	}
 
-  /**
+	/**
    * Brush Tool
    */
-  _pointerDownBrush(p) {
-    // Always allow starting a new brush operation
-    this.op = true;
-    this.#brushPrev = { x: p.x, y: p.y };
-    this.#suppressHistoryUpdates = true;
-  }
+	_pointerDownBrush(p) {
+		// Always allow starting a new brush operation
+		this.op = true;
+		this.#brushPrev = { x: p.x, y: p.y };
+		this.#suppressHistoryUpdates = true;
+	}
 
-  _pointerMoveBrush(p) {
-    if (!canvas.dimensions.rect.contains(p.x, p.y)) {
-      this.ellipsePreview.visible = false;
-      return;
-    } else this.ellipsePreview.visible = true;
-    const size = this.brushSize;
-    this.ellipsePreview.width = size * 2;
-    this.ellipsePreview.height = size * 2;
-    this.ellipsePreview.x = p.x;
-    this.ellipsePreview.y = p.y;
-    // If drag operation has started
-    if (this.op) {
-      if (this.#brushPrev) {
-        this._renderBrushLine(this.#brushPrev, p);
-      } else {
-        this.renderBrush({
-          shape: this.BRUSH_TYPES.ELLIPSE,
-          x: p.x,
-          y: p.y,
-          fill: this.brushOpacity,
-          width: this.brushSize,
-          height: this.brushSize,
-        });
-      }
-      this.#brushPrev = { x: p.x, y: p.y };
-    }
-  }
+	_pointerMoveBrush(p) {
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
+			this.ellipsePreview.visible = false;
+			return;
+		} this.ellipsePreview.visible = true;
+		const size = this.brushSize;
+		this.ellipsePreview.width = size * 2;
+		this.ellipsePreview.height = size * 2;
+		this.ellipsePreview.x = p.x;
+		this.ellipsePreview.y = p.y;
+		// If drag operation has started
+		if (this.op) {
+			if (this.#brushPrev) {
+				this._renderBrushLine(this.#brushPrev, p);
+			} else {
+				this.renderBrush({
+					shape: this.BRUSH_TYPES.ELLIPSE,
+					x: p.x,
+					y: p.y,
+					fill: this.brushOpacity,
+					width: this.brushSize,
+					height: this.brushSize,
+				});
+			}
+			this.#brushPrev = { x: p.x, y: p.y };
+		}
+	}
 
-  _renderBrushLine(a, b) {
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const distance = Math.hypot(dx, dy);
-    const step = Math.max(this.brushSize * 0.5, 4);
-    const count = Math.max(1, Math.ceil(distance / step));
-    for (let i = 0; i <= count; i += 1) {
-      const t = i / count;
-      this.renderBrush({
-        shape: this.BRUSH_TYPES.ELLIPSE,
-        x: a.x + dx * t,
-        y: a.y + dy * t,
-        fill: this.brushOpacity,
-        width: this.brushSize,
-        height: this.brushSize,
-      });
-    }
-  }
+	_renderBrushLine(a, b) {
+		const dx = b.x - a.x;
+		const dy = b.y - a.y;
+		const distance = Math.hypot(dx, dy);
+		const step = Math.max(this.brushSize * 0.5, 4);
+		const count = Math.max(1, Math.ceil(distance / step));
+		for (let i = 0; i <= count; i += 1) {
+			const t = i / count;
+			this.renderBrush({
+				shape: this.BRUSH_TYPES.ELLIPSE,
+				x: a.x + dx * t,
+				y: a.y + dy * t,
+				fill: this.brushOpacity,
+				width: this.brushSize,
+				height: this.brushSize,
+			});
+		}
+	}
 
-  /*
+	/*
    * Box Tool
    */
-  _pointerDownBox(p) {
-    // Set active drag operation
-    this.op = "box";
-    // Set drag start coords
-    this.dragStart.x = p.x;
-    this.dragStart.y = p.y;
-    // Reveal the preview shape
-    this.boxPreview.visible = true;
-    this.boxPreview.x = p.x;
-    this.boxPreview.y = p.y;
-  }
+	_pointerDownBox(p) {
+		// Set active drag operation
+		this.op = "box";
+		// Set drag start coords
+		this.dragStart.x = p.x;
+		this.dragStart.y = p.y;
+		// Reveal the preview shape
+		this.boxPreview.visible = true;
+		this.boxPreview.x = p.x;
+		this.boxPreview.y = p.y;
+	}
 
-  _pointerMoveBox(p, e) {
-    if (!this.op) {
-      this.boxPreview.visible = false;
-      return;
-    }
-    const d = this._getDragBounds(p, e);
-    const x = this.dragStart.x + Math.min(0, d.w);
-    const y = this.dragStart.y + Math.min(0, d.h);
-    const width = Math.abs(d.w);
-    const height = Math.abs(d.h);
-    this.boxPreview.visible = true;
-    this.boxPreview.x = x;
-    this.boxPreview.y = y;
-    this.boxPreview.width = width;
-    this.boxPreview.height = height;
-  }
+	_pointerMoveBox(p, e) {
+		if (!this.op) {
+			this.boxPreview.visible = false;
+			return;
+		}
+		const d = this._getDragBounds(p, e);
+		const x = this.dragStart.x + Math.min(0, d.w);
+		const y = this.dragStart.y + Math.min(0, d.h);
+		const width = Math.abs(d.w);
+		const height = Math.abs(d.h);
+		this.boxPreview.visible = true;
+		this.boxPreview.x = x;
+		this.boxPreview.y = y;
+		this.boxPreview.width = width;
+		this.boxPreview.height = height;
+	}
 
-  _pointerUpBox(p, e) {
-    const d = this._getDragBounds(p, e);
-    const x = this.dragStart.x + Math.min(0, d.w);
-    const y = this.dragStart.y + Math.min(0, d.h);
-    const width = Math.abs(d.w);
-    const height = Math.abs(d.h);
-    this.renderBrush({
-      shape: this.BRUSH_TYPES.BOX,
-      x,
-      y,
-      width,
-      height,
-      fill: this.brushOpacity,
-    });
-    this.boxPreview.visible = false;
-  }
+	_pointerUpBox(p, e) {
+		const d = this._getDragBounds(p, e);
+		const x = this.dragStart.x + Math.min(0, d.w);
+		const y = this.dragStart.y + Math.min(0, d.h);
+		const width = Math.abs(d.w);
+		const height = Math.abs(d.h);
+		this.renderBrush({
+			shape: this.BRUSH_TYPES.BOX,
+			x,
+			y,
+			width,
+			height,
+			fill: this.brushOpacity,
+		});
+		this.boxPreview.visible = false;
+	}
 
-  // --- Throttled partial sync logic ---
-  _startPartialSync() {
-    if (this._partialSyncActive) return;
-    this._partialSyncActive = true;
-    const tick = async () => {
-      if (!this._partialSyncActive) return;
-      await this.commitHistoryPartial();
-      this._partialSyncTimer = setTimeout(tick, this._partialSyncInterval);
-    };
-    tick();
-  }
+	// --- Throttled partial sync logic ---
+	_startPartialSync() {
+		if (this._partialSyncActive) return;
+		this._partialSyncActive = true;
+		const tick = async () => {
+			if (!this._partialSyncActive) return;
+			await this.commitHistoryPartial();
+			this._partialSyncTimer = setTimeout(tick, this._partialSyncInterval);
+		};
+		tick();
+	}
 
-  _stopPartialSync() {
-    this._partialSyncActive = false;
-    if (this._partialSyncTimer) {
-      clearTimeout(this._partialSyncTimer);
-      this._partialSyncTimer = null;
-    }
-  }
+	_stopPartialSync() {
+		this._partialSyncActive = false;
+		if (this._partialSyncTimer) {
+			clearTimeout(this._partialSyncTimer);
+			this._partialSyncTimer = null;
+		}
+	}
 
-  async commitHistoryPartial() {
-    if (this.historyBuffer.length === 0 || this.lock) return;
-    this.lock = true;
-    const historyKey = this.getHistoryKey();
-    let history = canvas.scene.getFlag("simplefog", historyKey);
-    if (!history) {
-      history = {
-        events: [],
-        pointer: 0,
-      };
-    }
-    // Truncate if pointer is behind (undo case)
-    history.events = history.events.slice(0, history.pointer);
-    // Push a shallow copy of the buffer (so final commit can still push the full buffer)
-    history.events.push([...this.historyBuffer]);
-    history.pointer = history.events.length;
-    // Do NOT unset the flag, just set it (partial update)
-    await canvas.scene.setFlag("simplefog", historyKey, history);
-    this.lock = false;
-  }
+	async commitHistoryPartial() {
+		if (this.historyBuffer.length === 0 || this.lock) return;
+		this.lock = true;
+		const historyKey = this.getHistoryKey();
+		let history = canvas.scene.getFlag("simplefog", historyKey);
+		if (!history) {
+			history = {
+				events: [],
+				pointer: 0,
+			};
+		}
+		// Truncate if pointer is behind (undo case)
+		history.events = history.events.slice(0, history.pointer);
+		// Push a shallow copy of the buffer (so final commit can still push the full buffer)
+		history.events.push([...this.historyBuffer]);
+		history.pointer = history.events.length;
+		// Do NOT unset the flag, just set it (partial update)
+		await canvas.scene.setFlag("simplefog", historyKey, history);
+		this.lock = false;
+	}
 
-  /*
+	/*
    * Ellipse Tool
    */
-  _pointerDownEllipse(p) {
-    // Set active drag operation
-    this.op = "ellipse";
-    // Set drag start coords
-    this.dragStart.x = p.x;
-    this.dragStart.y = p.y;
-    // Reveal the preview shape
-    this.ellipsePreview.x = p.x;
-    this.ellipsePreview.y = p.y;
-    this.ellipsePreview.visible = true;
-  }
+	_pointerDownEllipse(p) {
+		// Set active drag operation
+		this.op = "ellipse";
+		// Set drag start coords
+		this.dragStart.x = p.x;
+		this.dragStart.y = p.y;
+		// Reveal the preview shape
+		this.ellipsePreview.x = p.x;
+		this.ellipsePreview.y = p.y;
+		this.ellipsePreview.visible = true;
+	}
 
-  _pointerMoveEllipse(p, e) {
-    // If drag operation has started
-    const d = this._getDragBounds(p, e);
-    if (this.op) {
-      // Just update the preview shape
-      this.ellipsePreview.width = d.w * 2;
-      this.ellipsePreview.height = d.h * 2;
-    }
-  }
+	_pointerMoveEllipse(p, e) {
+		// If drag operation has started
+		const d = this._getDragBounds(p, e);
+		if (this.op) {
+			// Just update the preview shape
+			this.ellipsePreview.width = d.w * 2;
+			this.ellipsePreview.height = d.h * 2;
+		}
+	}
 
-  _pointerUpEllipse(p, e) {
-    const d = this._getDragBounds(p, e);
-    this.renderBrush({
-      shape: this.BRUSH_TYPES.ELLIPSE,
-      x: this.dragStart.x,
-      y: this.dragStart.y,
-      width: Math.abs(d.w),
-      height: Math.abs(d.h),
-      fill: this.brushOpacity,
-    });
-    this.ellipsePreview.visible = false;
-  }
+	_pointerUpEllipse(p, e) {
+		const d = this._getDragBounds(p, e);
+		this.renderBrush({
+			shape: this.BRUSH_TYPES.ELLIPSE,
+			x: this.dragStart.x,
+			y: this.dragStart.y,
+			width: Math.abs(d.w),
+			height: Math.abs(d.h),
+			fill: this.brushOpacity,
+		});
+		this.ellipsePreview.visible = false;
+	}
 
-  /*
+	/*
    * Polygon Tool
    */
-  _pointerDownPolygon(p) {
-    if (!this.polygon) this.polygon = [];
-    const x = Math.floor(p.x);
-    const y = Math.floor(p.y);
-    // If this is not the first vertex...
-    if (this.polygon.length) {
-      // Check if new point is close enough to start to close the polygon
-      const xo = Math.abs(this.polygon[0].x - x);
-      const yo = Math.abs(this.polygon[0].y - y);
-      if (xo < this.DEFAULTS.handlesize && yo < this.DEFAULTS.handlesize) {
-        this._pointerClosePolygon();
-        return;
-      }
-    }
-    // If this is first vertex...
-    else {
-      // Draw shape handle
-      this.polygonHandle.x = x - this.DEFAULTS.handlesize;
-      this.polygonHandle.y = y - this.DEFAULTS.handlesize;
-      this.polygonHandle.visible = true;
-    }
-    this._pointerUpdatePolygon(x, y);
-  }
+	_pointerDownPolygon(p) {
+		if (!this.polygon) this.polygon = [];
+		const x = Math.floor(p.x);
+		const y = Math.floor(p.y);
+		// If this is not the first vertex...
+		if (this.polygon.length) {
+			// Check if new point is close enough to start to close the polygon
+			const xo = Math.abs(this.polygon[0].x - x);
+			const yo = Math.abs(this.polygon[0].y - y);
+			if (xo < this.DEFAULTS.handlesize && yo < this.DEFAULTS.handlesize) {
+				this._pointerClosePolygon();
+				return;
+			}
+		}
+		// If this is first vertex...
+		else {
+			// Draw shape handle
+			this.polygonHandle.x = x - this.DEFAULTS.handlesize;
+			this.polygonHandle.y = y - this.DEFAULTS.handlesize;
+			this.polygonHandle.visible = true;
+		}
+		this._pointerUpdatePolygon(x, y);
+	}
 
-  _pointerDown2Polygon() {
-    if (!this.polygon || this.polygon.length < 3) return;
-    this._pointerClosePolygon();
-  }
+	_pointerDown2Polygon() {
+		if (!this.polygon || this.polygon.length < 3) return;
+		this._pointerClosePolygon();
+	}
 
-  _pointerClosePolygon() {
-    const verts = hexObjsToArr(this.polygon);
-    // render the new shape to history
-    this.renderBrush({
-      shape: this.BRUSH_TYPES.POLYGON,
-      x: 0,
-      y: 0,
-      vertices: verts,
-      fill: this.brushOpacity,
-    });
-    // Reset the preview shape
-    this.polygonPreview.clear();
-    this.polygonPreview.visible = false;
-    this.polygonHandle.visible = false;
-    this.polygon = [];
-    return true;
-  }
+	_pointerClosePolygon() {
+		const verts = hexObjsToArr(this.polygon);
+		// render the new shape to history
+		this.renderBrush({
+			shape: this.BRUSH_TYPES.POLYGON,
+			x: 0,
+			y: 0,
+			vertices: verts,
+			fill: this.brushOpacity,
+		});
+		// Reset the preview shape
+		this.polygonPreview.clear();
+		this.polygonPreview.visible = false;
+		this.polygonHandle.visible = false;
+		this.polygon = [];
+		return true;
+	}
 
-  _pointerUpdatePolygon(x, y) {
-    // Add new vertex to polygon
-    this.polygon.push({ x, y });
-    this._updatePolygonPreview();
-  }
+	_pointerUpdatePolygon(x, y) {
+		// Add new vertex to polygon
+		this.polygon.push({ x, y });
+		this._updatePolygonPreview();
+	}
 
-  _updatePolygonPreview() {
-    // Redraw polygon with all edges and vertices visible
-    this.polygonPreview.clear();
-    if (this.polygon.length === 0) {
-      this.polygonPreview.visible = false;
-      return;
-    }
-    // Draw filled polygon (semi-transparent)
-    this.polygonPreview.beginFill(0xffffff, 0.3);
-    this.polygonPreview.drawPolygon(hexObjsToArr(this.polygon));
-    this.polygonPreview.endFill();
-    // Draw edges with zoom-independent width
-    const zoomInverse = 1 / canvas.stage.scale.x;
-    this.polygonPreview.lineStyle(2 * zoomInverse, 0xffffff, 0.8);
-    for (let i = 0; i < this.polygon.length; i++) {
-      const curr = this.polygon[i];
-      const next = this.polygon[(i + 1) % this.polygon.length];
-      this.polygonPreview.moveTo(curr.x, curr.y);
-      this.polygonPreview.lineTo(next.x, next.y);
-    }
-    // Draw vertex handles
-    const handleSize = this.DEFAULTS.handlesize / 2;
-    for (const vert of this.polygon) {
-      this.polygonPreview.lineStyle(0);
-      this.polygonPreview.beginFill(0xff6400, 0.8);
-      this.polygonPreview.drawRect(vert.x - handleSize, vert.y - handleSize, handleSize * 2, handleSize * 2);
-      this.polygonPreview.endFill();
-    }
-    this.polygonPreview.visible = true;
-  }
+	_updatePolygonPreview() {
+		// Redraw polygon with all edges and vertices visible
+		this.polygonPreview.clear();
+		if (this.polygon.length === 0) {
+			this.polygonPreview.visible = false;
+			return;
+		}
+		// Draw filled polygon (semi-transparent)
+		this.polygonPreview.beginFill(0xffffff, 0.3);
+		this.polygonPreview.drawPolygon(hexObjsToArr(this.polygon));
+		this.polygonPreview.endFill();
+		// Draw edges with zoom-independent width
+		const zoomInverse = 1 / canvas.stage.scale.x;
+		this.polygonPreview.lineStyle(2 * zoomInverse, 0xffffff, 0.8);
+		for (let i = 0; i < this.polygon.length; i++) {
+			const curr = this.polygon[i];
+			const next = this.polygon[(i + 1) % this.polygon.length];
+			this.polygonPreview.moveTo(curr.x, curr.y);
+			this.polygonPreview.lineTo(next.x, next.y);
+		}
+		// Draw vertex handles
+		const handleSize = this.DEFAULTS.handlesize / 2;
+		for (const vert of this.polygon) {
+			this.polygonPreview.lineStyle(0);
+			this.polygonPreview.beginFill(0xff6400, 0.8);
+			this.polygonPreview.drawRect(vert.x - handleSize, vert.y - handleSize, handleSize * 2, handleSize * 2);
+			this.polygonPreview.endFill();
+		}
+		this.polygonPreview.visible = true;
+	}
 
-  _pointerMovePolygon(p) {
-    // Show preview with ghost line from last vertex to cursor
-    if (!this.polygon || this.polygon.length === 0) return;
-    if (!canvas.dimensions.rect.contains(p.x, p.y)) {
-      this.polygonPreview.visible = false;
-      return;
-    }
-    this.polygonPreview.visible = true;
-    // Update polygon preview first (edges + vertices)
-    this._updatePolygonPreview();
-    // Draw ghost line from last vertex to cursor
-    const lastVert = this.polygon[this.polygon.length - 1];
-    const zoomInverse = 1 / canvas.stage.scale.x;
-    this.polygonPreview.lineStyle(2 * zoomInverse, 0xffff00, 0.6);
-    this.polygonPreview.moveTo(lastVert.x, lastVert.y);
-    this.polygonPreview.lineTo(p.x, p.y);
-  }
+	_pointerMovePolygon(p) {
+		// Show preview with ghost line from last vertex to cursor
+		if (!this.polygon || this.polygon.length === 0) return;
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
+			this.polygonPreview.visible = false;
+			return;
+		}
+		this.polygonPreview.visible = true;
+		// Update polygon preview first (edges + vertices)
+		this._updatePolygonPreview();
+		// Draw ghost line from last vertex to cursor
+		const lastVert = this.polygon[this.polygon.length - 1];
+		const zoomInverse = 1 / canvas.stage.scale.x;
+		this.polygonPreview.lineStyle(2 * zoomInverse, 0xffff00, 0.6);
+		this.polygonPreview.moveTo(lastVert.x, lastVert.y);
+		this.polygonPreview.lineTo(p.x, p.y);
+	}
 
-  _pointerDownRoom(p, e) {
-    const vertices = this._getRoomVertices(p, e);
-    if (!vertices) return false;
+	_pointerDownRoom(p, e) {
+		const vertices = this._getRoomVertices(p, e);
+		if (!vertices) return false;
 
-    this.renderBrush({
-      shape: this.BRUSH_TYPES.POLYGON,
-      x: 0,
-      y: 0,
-      vertices,
-      fill: this.brushOpacity,
-    });
-    return true;
-  }
+		this.renderBrush({
+			shape: this.BRUSH_TYPES.POLYGON,
+			x: 0,
+			y: 0,
+			vertices,
+			fill: this.brushOpacity,
+		});
+		return true;
+	}
 
-  _pointerMoveRoom(p, e) {
-    if (!canvas.dimensions.rect.contains(p.x, p.y)) {
-      this.polygonPreview.visible = false;
-      return;
-    } else this.polygonPreview.visible = true;
-    this.polygonPreview.clear();
-    this.polygonPreview.beginFill(0xffffff);
-    this.polygonPreview.drawPolygon(this._getRoomVertices(p, e));
-    this.polygonPreview.endFill();
-  }
+	_pointerMoveRoom(p, e) {
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
+			this.polygonPreview.visible = false;
+			return;
+		} this.polygonPreview.visible = true;
+		this.polygonPreview.clear();
+		this.polygonPreview.beginFill(0xffffff);
+		this.polygonPreview.drawPolygon(this._getRoomVertices(p, e));
+		this.polygonPreview.endFill();
+	}
 
-  _getRoomVertices(p, e) {
-    const sceneRect = canvas.dimensions.sceneRect;
-    if (p.x < sceneRect.left || p.x > sceneRect.right || p.y < sceneRect.top || p.y > sceneRect.bottom) return [];
-    const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", edgeTypes: { innerBounds: { mode: 2 } }, shiftKey: e?.shiftKey });
-    return Array.from(sweep.points);
-  }
+	_getRoomVertices(p, e) {
+		const sceneRect = canvas.dimensions.sceneRect;
+		if (p.x < sceneRect.left || p.x > sceneRect.right || p.y < sceneRect.top || p.y > sceneRect.bottom) return [];
+		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", edgeTypes: { innerBounds: { mode: 2 } }, shiftKey: e?.shiftKey });
+		return Array.from(sweep.points);
+	}
 
-  /**
+	/**
    * Grid Tool
    */
-  _pointerDownGrid() {
-    // Set active drag operation
-    this.op = "grid";
-    this._initGrid();
-  }
+	_pointerDownGrid() {
+		// Set active drag operation
+		this.op = "grid";
+		this._initGrid();
+	}
 
-  _pointerMoveGrid(p) {
-    canvas.interface.grid.clearHighlightLayer("simplefog");
-    if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
-    const { size, type } = canvas.scene.grid;
-    // Square grid
-    if (type === 1) {
-      const { x, y } = canvas.grid.getTopLeftPoint({ x: p.x, y: p.y });
-      canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
-      this.#lastPosition = { x, y };
-      if (this.op) {
-        const coord = `${x},${y}`;
-        if (!this.dupes.includes(coord)) {
-          // Flag cell as drawn in dupes
-          this.dupes.push(coord);
-          this.renderBrush({
-            shape: this.BRUSH_TYPES.BOX,
-            x,
-            y,
-            width: size,
-            height: size,
-            fill: this.brushOpacity,
-          });
-        }
-      }
-    }
-    // Hex Grid
-    else if ([2, 3, 4, 5].includes(type)) {
-      const coords = canvas.grid.getCenterPoint({ x: p.x, y: p.y });
-      const cube = canvas.grid.getCube(coords);
-      const offset = canvas.grid.getOffset(cube);
-      const { x, y } = canvas.grid.getTopLeftPoint(offset);
-      canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
-      this.#lastPosition = { x, y };
-      // If drag operation has started
-      if (this.op) {
-        // Convert pixel coord to hex coord
-        const qr = this.gridLayout.pixelToHex(p).round();
-        const coord = `${qr.q},${qr.r}`;
-        // Check if this grid cell was already drawn
-        if (!this.dupes.includes(coord)) {
-          // Get current grid coord verts
-          const vertices = this.gridLayout.polygonCorners({ q: qr.q, r: qr.r });
-          // Convert to array of individual verts
-          const vertexArray = hexObjsToArr(vertices);
-          // Get the vert coords for the hex
-          this.renderBrush({
-            shape: this.BRUSH_TYPES.POLYGON,
-            vertices: vertexArray,
-            x: 0,
-            y: 0,
-            fill: this.brushOpacity,
-          });
-          // Flag cell as drawn in dupes
-          this.dupes.push(coord);
-        }
-      }
-    }
-  }
+	_pointerMoveGrid(p) {
+		canvas.interface.grid.clearHighlightLayer("simplefog");
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
+		const { size, type } = canvas.scene.grid;
+		// Square grid
+		if (type === 1) {
+			const { x, y } = canvas.grid.getTopLeftPoint({ x: p.x, y: p.y });
+			canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
+			this.#lastPosition = { x, y };
+			if (this.op) {
+				const coord = `${x},${y}`;
+				if (!this.dupes.includes(coord)) {
+					// Flag cell as drawn in dupes
+					this.dupes.push(coord);
+					this.renderBrush({
+						shape: this.BRUSH_TYPES.BOX,
+						x,
+						y,
+						width: size,
+						height: size,
+						fill: this.brushOpacity,
+					});
+				}
+			}
+		}
+		// Hex Grid
+		else if ([2, 3, 4, 5].includes(type)) {
+			const coords = canvas.grid.getCenterPoint({ x: p.x, y: p.y });
+			const cube = canvas.grid.getCube(coords);
+			const offset = canvas.grid.getOffset(cube);
+			const { x, y } = canvas.grid.getTopLeftPoint(offset);
+			canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
+			this.#lastPosition = { x, y };
+			// If drag operation has started
+			if (this.op) {
+				// Convert pixel coord to hex coord
+				const qr = this.gridLayout.pixelToHex(p).round();
+				const coord = `${qr.q},${qr.r}`;
+				// Check if this grid cell was already drawn
+				if (!this.dupes.includes(coord)) {
+					// Get current grid coord verts
+					const vertices = this.gridLayout.polygonCorners({ q: qr.q, r: qr.r });
+					// Convert to array of individual verts
+					const vertexArray = hexObjsToArr(vertices);
+					// Get the vert coords for the hex
+					this.renderBrush({
+						shape: this.BRUSH_TYPES.POLYGON,
+						vertices: vertexArray,
+						x: 0,
+						y: 0,
+						fill: this.brushOpacity,
+					});
+					// Flag cell as drawn in dupes
+					this.dupes.push(coord);
+				}
+			}
+		}
+	}
 
-  /*
+	/*
    * Returns height and width given a pointer coord and event for modifer keys
    */
-  _getDragBounds(p, e) {
-    let h = p.y - this.dragStart.y;
-    let w = p.x - this.dragStart.x;
-    if (e.data.originalEvent.shiftKey) {
-      const ws = Math.sign(w);
-      const hs = Math.sign(h);
-      if (Math.abs(h) > Math.abs(w)) w = Math.abs(h) * ws;
-      else h = Math.abs(w) * hs;
-    }
-    return { w, h };
-  }
+	_getDragBounds(p, e) {
+		let h = p.y - this.dragStart.y;
+		let w = p.x - this.dragStart.x;
+		if (e.data.originalEvent.shiftKey) {
+			const ws = Math.sign(w);
+			const hs = Math.sign(h);
+			if (Math.abs(h) > Math.abs(w)) w = Math.abs(h) * ws;
+			else h = Math.abs(w) * hs;
+		}
+		return { w, h };
+	}
 
-  /*
+	/*
    * Checks grid type, creates a dupe detection matrix & if hex grid init a layout
    */
-  _initGrid() {
-    const { size, type } = canvas.scene.grid;
-    this.dupes = [];
-    if (this.#gridType === type) return;
-    const legacyHex = !!canvas.scene.flags.core?.legacyHex;
-    const divisor = legacyHex ? 2 : Math.sqrt(3);
-    switch (type) {
-      // Square grid
-      // Pointy Hex Odd
-      case 2:
-        this.gridLayout = new Layout(
-          Layout.pointy,
-          { x: size / divisor, y: size / divisor },
-          { x: 0, y: size / divisor }
-        );
-        break;
-      // Pointy Hex Even
-      case 3: {
-        const x = legacyHex ? (Math.sqrt(3) * size) / 4 : size / 2;
-        this.gridLayout = new Layout(
-          Layout.pointy,
-          { x: size / divisor, y: size / divisor },
-          { x, y: size / divisor }
-        );
-        break;
-      }
-      // Flat Hex Odd
-      case 4:
-        this.gridLayout = new Layout(
-          Layout.flat,
-          { x: size / divisor, y: size / divisor },
-          { x: size / divisor, y: 0 }
-        );
-        break;
-      // Flat Hex Even
-      case 5: {
-        const y = legacyHex ? (Math.sqrt(3) * size) / 4 : size / 2;
-        this.gridLayout = new Layout(
-          Layout.flat,
-          { x: size / divisor, y: size / divisor },
-          { x: size / divisor, y }
-        );
-        break;
-      }
-      default:
-        break;
-    }
-    this.#gridType = type;
-  }
+	_initGrid() {
+		const { size, type } = canvas.scene.grid;
+		this.dupes = [];
+		if (this.#gridType === type) return;
+		const legacyHex = !!canvas.scene.flags.core?.legacyHex;
+		const divisor = legacyHex ? 2 : Math.sqrt(3);
+		switch (type) {
+			// Square grid
+			// Pointy Hex Odd
+			case 2:
+				this.gridLayout = new Layout(
+					Layout.pointy,
+					{ x: size / divisor, y: size / divisor },
+					{ x: 0, y: size / divisor }
+				);
+				break;
+				// Pointy Hex Even
+			case 3: {
+				const x = legacyHex ? (Math.sqrt(3) * size) / 4 : size / 2;
+				this.gridLayout = new Layout(
+					Layout.pointy,
+					{ x: size / divisor, y: size / divisor },
+					{ x, y: size / divisor }
+				);
+				break;
+			}
+			// Flat Hex Odd
+			case 4:
+				this.gridLayout = new Layout(
+					Layout.flat,
+					{ x: size / divisor, y: size / divisor },
+					{ x: size / divisor, y: 0 }
+				);
+				break;
+				// Flat Hex Even
+			case 5: {
+				const y = legacyHex ? (Math.sqrt(3) * size) / 4 : size / 2;
+				this.gridLayout = new Layout(
+					Layout.flat,
+					{ x: size / divisor, y: size / divisor },
+					{ x: size / divisor, y }
+				);
+				break;
+			}
+			default:
+				break;
+		}
+		this.#gridType = type;
+	}
 
-  async _draw() {
-    super._draw();
-    this.boxPreview = this.brush({
-      shape: this.BRUSH_TYPES.BOX,
-      x: 0,
-      y: 0,
-      fill: 0xffffff,
-      alpha: this.DEFAULTS.previewAlpha,
-      width: 100,
-      height: 100,
-      visible: false,
-      zIndex: 10,
-    });
-    this.ellipsePreview = this.brush({
-      shape: this.BRUSH_TYPES.ELLIPSE,
-      x: 0,
-      y: 0,
-      fill: 0xffffff,
-      alpha: this.DEFAULTS.previewAlpha,
-      width: 100,
-      height: 100,
-      visible: false,
-      zIndex: 10,
-    });
-    this.polygonPreview = this.brush({
-      shape: this.BRUSH_TYPES.POLYGON,
-      x: 0,
-      y: 0,
-      vertices: [],
-      fill: 0xffffff,
-      alpha: this.DEFAULTS.previewAlpha,
-      visible: false,
-      zIndex: 10,
-    });
-    this.polygonHandle = this.brush({
-      shape: this.BRUSH_TYPES.BOX,
-      x: 0,
-      y: 0,
-      fill: this.DEFAULTS.handlefill,
-      width: this.DEFAULTS.handlesize * 2,
-      height: this.DEFAULTS.handlesize * 2,
-      alpha: this.DEFAULTS.previewAlpha,
-      visible: false,
-      zIndex: 15,
-    });
+	async _draw() {
+		super._draw();
+		this.boxPreview = this.brush({
+			shape: this.BRUSH_TYPES.BOX,
+			x: 0,
+			y: 0,
+			fill: 0xffffff,
+			alpha: this.DEFAULTS.previewAlpha,
+			width: 100,
+			height: 100,
+			visible: false,
+			zIndex: 10,
+		});
+		this.ellipsePreview = this.brush({
+			shape: this.BRUSH_TYPES.ELLIPSE,
+			x: 0,
+			y: 0,
+			fill: 0xffffff,
+			alpha: this.DEFAULTS.previewAlpha,
+			width: 100,
+			height: 100,
+			visible: false,
+			zIndex: 10,
+		});
+		this.polygonPreview = this.brush({
+			shape: this.BRUSH_TYPES.POLYGON,
+			x: 0,
+			y: 0,
+			vertices: [],
+			fill: 0xffffff,
+			alpha: this.DEFAULTS.previewAlpha,
+			visible: false,
+			zIndex: 10,
+		});
+		this.polygonHandle = this.brush({
+			shape: this.BRUSH_TYPES.BOX,
+			x: 0,
+			y: 0,
+			fill: this.DEFAULTS.handlefill,
+			width: this.DEFAULTS.handlesize * 2,
+			height: this.DEFAULTS.handlesize * 2,
+			alpha: this.DEFAULTS.previewAlpha,
+			visible: false,
+			zIndex: 15,
+		});
 
-    this.addChild(this.boxPreview);
-    this.addChild(this.ellipsePreview);
-    this.addChild(this.polygonPreview);
-    this.addChild(this.polygonHandle);
-    canvas.interface.grid.addHighlightLayer("simplefog");
-  }
+		this.addChild(this.boxPreview);
+		this.addChild(this.ellipsePreview);
+		this.addChild(this.polygonPreview);
+		this.addChild(this.polygonHandle);
+		canvas.interface.grid.addHighlightLayer("simplefog");
+	}
 }
