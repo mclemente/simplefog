@@ -424,7 +424,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
    * Toggles visibility of primary layer
    */
 	async toggle() {
-		const v = canvas.scene.getFlag("simplefog", "visible") ?? game.settings.get("simplefog", "autoEnableSceneFog");
+		const v = canvas.scene.getFlag("simplefog", "visible") ?? false;
 		this.visible = !v;
 		await canvas.scene.setFlag("simplefog", "visible", !v);
 
@@ -438,9 +438,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 
 	async _draw() {
 		// Check if masklayer is flagged visible
-		let v = this.getSetting("visible");
-		if (v === undefined) v = false;
-		this.visible = v;
+		this.visible = this.getSetting("visible") ?? false;
 
 		// The layer is the primary sprite to be displayed
 		this.fogColorLayer = MaskLayer.getCanvasSprite();
