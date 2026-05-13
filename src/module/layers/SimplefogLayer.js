@@ -26,6 +26,13 @@ export default class SimplefogLayer extends MaskLayer {
 
 		// React to changes to current scene
 		Hooks.on("updateScene", (scene, data) => this._updateScene(scene, data));
+		Hooks.on("canvasReady", () => {
+			this._onCanvasLevelChange(canvas.level?.id ?? null);
+		});
+		Hooks.on("canvasPan", (_canvas, position) => {
+			const levelId = position?.level ?? canvas.level?.id ?? null;
+			this._onCanvasLevelChange(levelId);
+		});
 	}
 
 	brushSize = game.settings.get("simplefog", "brushSize");
@@ -58,27 +65,46 @@ export default class SimplefogLayer extends MaskLayer {
 
 	#lastPosition;
 
+	#brushPrev;
+
+	#suppressHistoryUpdates = false;
+
 	#previewTint = 0xff0000;
 
 	#rightclick;
 
 	_activate() {
 		super._activate();
-		this._changeTool();
+		const tools = ["brush", "grid", "room", "polygon", "box", "ellipse"];
+		const userTool = game.user.getFlag("simplefog", "activeTool");
+		const controlTool = ui.controls?.control?.name === "simplefog" ? ui.controls.control.activeTool : null;
+		let tool = userTool ?? controlTool ?? game.settings.get("simplefog", "toolHotKeys");
+		if (!tools.includes(tool)) tool = "brush";
+		if (canvas.grid?.type === 0 && tool === "grid") tool = "brush";
+		this._changeTool(tool, { persist: false, syncUI: true });
 	}
 
-		/* -------------------------------------------- */
+	/* -------------------------------------------- */
 
-		/** @inheritDoc */
+	/** @inheritDoc */
 	_deactivate() {
 		super._deactivate();
-		this.brushControls.close({animate: false});
+		this.brushControls.close({ animate: false });
 		this.clearActiveTool();
 	}
 
-	_changeTool(tool = "") {
+	_changeTool(tool = "", { persist = true, syncUI = true } = {}) {
+		const tools = ["brush", "grid", "room", "polygon", "box", "ellipse"];
+		if (!tools.includes(tool)) tool = "brush";
+		if (canvas.grid?.type === 0 && tool === "grid") tool = "brush";
 		this.clearActiveTool();
 		this.activeTool = tool;
+		if (persist) {
+			this.setUserSetting("activeTool", tool);
+		}
+		if (syncUI) {
+			this._syncActiveToolUI(tool);
+		}
 		this.setPreviewTint();
 		if (this.activeTool === "brush") {
 			this.ellipsePreview.visible = true;
@@ -89,9 +115,23 @@ export default class SimplefogLayer extends MaskLayer {
 		} else if (this.activeTool === "room") {
 			this._pointerMoveRoom(canvas.mousePosition);
 			canvas.walls.objects.visible = true;
-			canvas.walls.placeables.forEach((l) => l.renderFlags.set({refreshState: true}));
+			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
 		}
 		this.brushControls.render({ force: true });
+	}
+
+	_syncActiveToolUI(tool) {
+		if (!ui.controls) return;
+		if (ui.controls.control?.name === "simplefog") {
+			ui.controls.control.activeTool = tool;
+		}
+		const controls = ui.controls.controls;
+		const simplefogControl = Array.isArray(controls)
+			? controls.find((c) => c.name === "simplefog")
+			: controls?.simplefog;
+		if (simplefogControl) {
+			simplefogControl.activeTool = tool;
+		}
 	}
 
 	/* -------------------------------------------- */
@@ -99,8 +139,8 @@ export default class SimplefogLayer extends MaskLayer {
 	/* -------------------------------------------- */
 
 	/**
-	 * React to updates of canvas.scene flags
-	 */
+   * React to updates of canvas.scene flags
+   */
 	_updateScene(scene, data) {
 		// Check if update applies to current viewed scene
 		if (!scene._view) return;
@@ -122,8 +162,11 @@ export default class SimplefogLayer extends MaskLayer {
 			canvas.simplefog.blur.quality = this.getSetting("blurQuality");
 		}
 		// React to composite history change
-		if (foundry.utils.hasProperty(data, "flags.simplefog.history")) {
-			canvas.simplefog.renderStack({ history: data.flags.simplefog.history });
+		if (foundry.utils.hasProperty(data, `flags.simplefog.${this.getHistoryKey()}`)) {
+			if (this.#suppressHistoryUpdates) return;
+			const history = canvas.scene.getFlag("simplefog", this.getHistoryKey());
+			if (history === undefined) return;
+			canvas.simplefog.renderStack({ history });
 
 			canvas.perception.update({
 				refreshLighting: true,
@@ -172,9 +215,21 @@ export default class SimplefogLayer extends MaskLayer {
 		}
 	}
 
+	async _onCanvasLevelChange(newLevelId) {
+		if (newLevelId === this._activeLevelId) return;
+		if (this.historyBuffer.length > 0) {
+			await this.commitHistory();
+		}
+		this._activeLevelId = newLevelId;
+		if (!this.maskTexture) return;
+		this.pointer = 0;
+		this.resetMask(false);
+		this.renderStack({ start: 0, isInit: true });
+	}
+
 	/**
-	 * Adds the mouse listeners to the layer
-	 */
+   * Adds the mouse listeners to the layer
+   */
 	_registerMouseListeners() {
 		this.addListener("pointerup", this._pointerUp);
 		this.addListener("pointermove", this._pointerMove);
@@ -200,9 +255,9 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	/**
-	 * Sets the active tool & shows preview for brush & grid tools
-	 * @param {Number}  Size in pixels
-	 */
+   * Sets the active tool & shows preview for brush & grid tools
+   * @param {Number}  Size in pixels
+   */
 	async setBrushSize(s) {
 		await this.setUserSetting("brushSize", s);
 		const p = { x: this.ellipsePreview.x, y: this.ellipsePreview.y };
@@ -210,8 +265,8 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	/**
-	 * Aborts any active drawing tools
-	 */
+   * Aborts any active drawing tools
+   */
 	clearActiveTool() {
 		canvas.interface.grid.clearHighlightLayer("simplefog");
 		// Box preview
@@ -222,13 +277,16 @@ export default class SimplefogLayer extends MaskLayer {
 		this.polygonPreview.visible = false;
 		this.polygonHandle.visible = false;
 		this.polygon = [];
-		// Cancel op flag
-		this.op = false;
-		// Clear history buffer
-		this.historyBuffer = [];
+		// Cancel op flag only if not in a brush operation
+		if (this.activeTool !== "brush") {
+			this.op = false;
+		}
+		if (this.#suppressHistoryUpdates) {
+			this.#suppressHistoryUpdates = false;
+		}
 		if (this.activeTool === "room") {
 			canvas.walls.objects.visible = false;
-			canvas.walls.placeables.forEach((l) => l.renderFlags.set({refreshState: true}));
+			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
 		}
 	}
 
@@ -244,7 +302,7 @@ export default class SimplefogLayer extends MaskLayer {
 		// Check active tool
 		switch (this.activeTool) {
 			case "brush":
-				this._pointerDownBrush();
+				this._pointerDownBrush(p);
 				break;
 			case "grid":
 				this._pointerDownGrid();
@@ -317,6 +375,7 @@ export default class SimplefogLayer extends MaskLayer {
 				this._pointerMoveEllipse(p, e);
 				break;
 			case "polygon":
+				this._pointerMovePolygon(p);
 				this.#rightclick = false;
 				break;
 			case "room":
@@ -327,7 +386,7 @@ export default class SimplefogLayer extends MaskLayer {
 		}
 	}
 
-	_pointerUp(e) {
+	async _pointerUp(e) {
 		if (e.data.button === 0) {
 			// Translate click to canvas position
 			const p = canvas.mousePosition;
@@ -346,8 +405,25 @@ export default class SimplefogLayer extends MaskLayer {
 			}
 			// Reset operation
 			this.op = false;
-			// Push the history buffer
-			this.commitHistory();
+			this.#brushPrev = null;
+			// Always stop partial sync
+			this._stopPartialSync();
+			// Wait for any in-progress partial sync to finish
+			while (this.lock) {
+				await new Promise((resolve) => setTimeout(resolve, 10));
+			}
+			// Only commit if there is anything left in the buffer
+			if (this.historyBuffer.length > 0) {
+				await this.commitHistory();
+			}
+			if (this.#suppressHistoryUpdates) {
+				this.#suppressHistoryUpdates = false;
+				canvas.perception.update({
+					refreshLighting: true,
+					refreshVision: true,
+					refreshOcclusion: true
+				});
+			}
 		} else if (e.data.button === 2) {
 			if (this.activeTool === "polygon" && this.#rightclick) {
 				this.clearActiveTool();
@@ -356,17 +432,21 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	/**
-	 * Brush Tool
-	 */
-	_pointerDownBrush() {
+   * Brush Tool
+   */
+	_pointerDownBrush(p) {
+		// Always allow starting a new brush operation
 		this.op = true;
+		this.#brushPrev = { x: p.x, y: p.y };
+		this.#suppressHistoryUpdates = true;
 	}
 
 	_pointerMoveBrush(p) {
 		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
 			this.ellipsePreview.visible = false;
 			return;
-		} else this.ellipsePreview.visible = true;
+		}
+		this.ellipsePreview.visible = true;
 		const size = this.brushSize;
 		this.ellipsePreview.width = size * 2;
 		this.ellipsePreview.height = size * 2;
@@ -374,11 +454,34 @@ export default class SimplefogLayer extends MaskLayer {
 		this.ellipsePreview.y = p.y;
 		// If drag operation has started
 		if (this.op) {
-			// Send brush movement events to renderbrush to be drawn and added to history stack
+			if (this.#brushPrev) {
+				this._renderBrushLine(this.#brushPrev, p);
+			} else {
+				this.renderBrush({
+					shape: this.BRUSH_TYPES.ELLIPSE,
+					x: p.x,
+					y: p.y,
+					fill: this.brushOpacity,
+					width: this.brushSize,
+					height: this.brushSize,
+				});
+			}
+			this.#brushPrev = { x: p.x, y: p.y };
+		}
+	}
+
+	_renderBrushLine(a, b) {
+		const dx = b.x - a.x;
+		const dy = b.y - a.y;
+		const distance = Math.hypot(dx, dy);
+		const step = Math.max(this.brushSize * 0.5, 4);
+		const count = Math.max(1, Math.ceil(distance / step));
+		for (let i = 0; i <= count; i += 1) {
+			const t = i / count;
 			this.renderBrush({
 				shape: this.BRUSH_TYPES.ELLIPSE,
-				x: p.x,
-				y: p.y,
+				x: a.x + dx * t,
+				y: a.y + dy * t,
 				fill: this.brushOpacity,
 				width: this.brushSize,
 				height: this.brushSize,
@@ -387,8 +490,8 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	/*
-	 * Box Tool
-	 */
+   * Box Tool
+   */
 	_pointerDownBox(p) {
 		// Set active drag operation
 		this.op = "box";
@@ -402,32 +505,83 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerMoveBox(p, e) {
-		// If drag operation has started
-		if (this.op) {
-			// update the preview shape
-			const d = this._getDragBounds(p, e);
-			this.boxPreview.width = d.w;
-			this.boxPreview.height = d.h;
+		if (!this.op) {
+			this.boxPreview.visible = false;
+			return;
 		}
+		const d = this._getDragBounds(p, e);
+		const x = this.dragStart.x + Math.min(0, d.w);
+		const y = this.dragStart.y + Math.min(0, d.h);
+		const width = Math.abs(d.w);
+		const height = Math.abs(d.h);
+		this.boxPreview.visible = true;
+		this.boxPreview.x = x;
+		this.boxPreview.y = y;
+		this.boxPreview.width = width;
+		this.boxPreview.height = height;
 	}
 
 	_pointerUpBox(p, e) {
-		// update the preview shape
 		const d = this._getDragBounds(p, e);
+		const x = this.dragStart.x + Math.min(0, d.w);
+		const y = this.dragStart.y + Math.min(0, d.h);
+		const width = Math.abs(d.w);
+		const height = Math.abs(d.h);
 		this.renderBrush({
 			shape: this.BRUSH_TYPES.BOX,
-			x: this.dragStart.x,
-			y: this.dragStart.y,
-			width: d.w,
-			height: d.h,
+			x,
+			y,
+			width,
+			height,
 			fill: this.brushOpacity,
 		});
 		this.boxPreview.visible = false;
 	}
 
+	// --- Throttled partial sync logic ---
+	_startPartialSync() {
+		if (this._partialSyncActive) return;
+		this._partialSyncActive = true;
+		const tick = async () => {
+			if (!this._partialSyncActive) return;
+			await this.commitHistoryPartial();
+			this._partialSyncTimer = setTimeout(tick, this._partialSyncInterval);
+		};
+		tick();
+	}
+
+	_stopPartialSync() {
+		this._partialSyncActive = false;
+		if (this._partialSyncTimer) {
+			clearTimeout(this._partialSyncTimer);
+			this._partialSyncTimer = null;
+		}
+	}
+
+	async commitHistoryPartial() {
+		if (this.historyBuffer.length === 0 || this.lock) return;
+		this.lock = true;
+		const historyKey = this.getHistoryKey();
+		let history = canvas.scene.getFlag("simplefog", historyKey);
+		if (!history) {
+			history = {
+				events: [],
+				pointer: 0,
+			};
+		}
+		// Truncate if pointer is behind (undo case)
+		history.events = history.events.slice(0, history.pointer);
+		// Push a shallow copy of the buffer (so final commit can still push the full buffer)
+		history.events.push([...this.historyBuffer]);
+		history.pointer = history.events.length;
+		// Do NOT unset the flag, just set it (partial update)
+		await canvas.scene.setFlag("simplefog", historyKey, history);
+		this.lock = false;
+	}
+
 	/*
-	 * Ellipse Tool
-	 */
+   * Ellipse Tool
+   */
 	_pointerDownEllipse(p) {
 		// Set active drag operation
 		this.op = "ellipse";
@@ -464,8 +618,8 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	/*
-	 * Polygon Tool
-	 */
+   * Polygon Tool
+   */
 	_pointerDownPolygon(p) {
 		if (!this.polygon) this.polygon = [];
 		const x = Math.floor(p.x);
@@ -514,13 +668,58 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerUpdatePolygon(x, y) {
-		// If intermediate vertex, add it to array and redraw the preview
+		// Add new vertex to polygon
 		this.polygon.push({ x, y });
+		this._updatePolygonPreview();
+	}
+
+	_updatePolygonPreview() {
+		// Redraw polygon with all edges and vertices visible
 		this.polygonPreview.clear();
-		this.polygonPreview.beginFill(0xffffff);
+		if (this.polygon.length === 0) {
+			this.polygonPreview.visible = false;
+			return;
+		}
+		// Draw filled polygon (semi-transparent)
+		this.polygonPreview.beginFill(0xffffff, 0.3);
 		this.polygonPreview.drawPolygon(hexObjsToArr(this.polygon));
 		this.polygonPreview.endFill();
+		// Draw edges with zoom-independent width
+		const zoomInverse = 1 / canvas.stage.scale.x;
+		this.polygonPreview.lineStyle(2 * zoomInverse, 0xffffff, 0.8);
+		for (let i = 0; i < this.polygon.length; i++) {
+			const curr = this.polygon[i];
+			const next = this.polygon[(i + 1) % this.polygon.length];
+			this.polygonPreview.moveTo(curr.x, curr.y);
+			this.polygonPreview.lineTo(next.x, next.y);
+		}
+		// Draw vertex handles
+		const handleSize = this.DEFAULTS.handlesize / 2;
+		for (const vert of this.polygon) {
+			this.polygonPreview.lineStyle(0);
+			this.polygonPreview.beginFill(0xff6400, 0.8);
+			this.polygonPreview.drawRect(vert.x - handleSize, vert.y - handleSize, handleSize * 2, handleSize * 2);
+			this.polygonPreview.endFill();
+		}
 		this.polygonPreview.visible = true;
+	}
+
+	_pointerMovePolygon(p) {
+		// Show preview with ghost line from last vertex to cursor
+		if (!this.polygon || this.polygon.length === 0) return;
+		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
+			this.polygonPreview.visible = false;
+			return;
+		}
+		this.polygonPreview.visible = true;
+		// Update polygon preview first (edges + vertices)
+		this._updatePolygonPreview();
+		// Draw ghost line from last vertex to cursor
+		const lastVert = this.polygon[this.polygon.length - 1];
+		const zoomInverse = 1 / canvas.stage.scale.x;
+		this.polygonPreview.lineStyle(2 * zoomInverse, 0xffff00, 0.6);
+		this.polygonPreview.moveTo(lastVert.x, lastVert.y);
+		this.polygonPreview.lineTo(p.x, p.y);
 	}
 
 	_pointerDownRoom(p, e) {
@@ -541,7 +740,8 @@ export default class SimplefogLayer extends MaskLayer {
 		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
 			this.polygonPreview.visible = false;
 			return;
-		} else this.polygonPreview.visible = true;
+		}
+		this.polygonPreview.visible = true;
 		this.polygonPreview.clear();
 		this.polygonPreview.beginFill(0xffffff);
 		this.polygonPreview.drawPolygon(this._getRoomVertices(p, e));
@@ -551,13 +751,13 @@ export default class SimplefogLayer extends MaskLayer {
 	_getRoomVertices(p, e) {
 		const sceneRect = canvas.dimensions.sceneRect;
 		if (p.x < sceneRect.left || p.x > sceneRect.right || p.y < sceneRect.top || p.y > sceneRect.bottom) return [];
-		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", useInnerBounds: true, shiftKey: e?.shiftKey });
+		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", edgeTypes: { innerBounds: { mode: 2 } }, shiftKey: e?.shiftKey });
 		return Array.from(sweep.points);
 	}
 
 	/**
-	 * Grid Tool
-	 */
+   * Grid Tool
+   */
 	_pointerDownGrid() {
 		// Set active drag operation
 		this.op = "grid";
@@ -570,7 +770,7 @@ export default class SimplefogLayer extends MaskLayer {
 		const { size, type } = canvas.scene.grid;
 		// Square grid
 		if (type === 1) {
-			const { x, y } = canvas.grid.getTopLeftPoint({x: p.x, y: p.y });
+			const { x, y } = canvas.grid.getTopLeftPoint({ x: p.x, y: p.y });
 			canvas.interface.grid.highlightPosition("simplefog", this.highlightConfig(x, y));
 			this.#lastPosition = { x, y };
 			if (this.op) {
@@ -624,8 +824,8 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	/*
-	 * Returns height and width given a pointer coord and event for modifer keys
-	 */
+   * Returns height and width given a pointer coord and event for modifer keys
+   */
 	_getDragBounds(p, e) {
 		let h = p.y - this.dragStart.y;
 		let w = p.x - this.dragStart.x;
@@ -639,8 +839,8 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	/*
-	 * Checks grid type, creates a dupe detection matrix & if hex grid init a layout
-	 */
+   * Checks grid type, creates a dupe detection matrix & if hex grid init a layout
+   */
 	_initGrid() {
 		const { size, type } = canvas.scene.grid;
 		this.dupes = [];
@@ -657,7 +857,7 @@ export default class SimplefogLayer extends MaskLayer {
 					{ x: 0, y: size / divisor }
 				);
 				break;
-			// Pointy Hex Even
+				// Pointy Hex Even
 			case 3: {
 				const x = legacyHex ? (Math.sqrt(3) * size) / 4 : size / 2;
 				this.gridLayout = new Layout(
@@ -675,7 +875,7 @@ export default class SimplefogLayer extends MaskLayer {
 					{ x: size / divisor, y: 0 }
 				);
 				break;
-			// Flat Hex Even
+				// Flat Hex Even
 			case 5: {
 				const y = legacyHex ? (Math.sqrt(3) * size) / 4 : size / 2;
 				this.gridLayout = new Layout(

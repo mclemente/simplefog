@@ -22,6 +22,11 @@
 			"path": "lang/es.json"
 		},
 		{
+			"lang": "it",
+			"name": "Italiano",
+			"path": "lang/it.json"
+		},
+		{
 			"lang": "ja",
 			"name": "日本語 (Japanese)",
 			"path": "lang/ja.json"
@@ -30,9 +35,9 @@
 	"esmodules": ["module/simplefog.js"],
 	"styles": ["styles/simplefog.css"],
 	"compatibility": {
-		"minimum": 13,
-		"verified": 13,
-		"maximum": 13
+		"minimum": "14",
+		"verified": "14",
+		"maximum": "14"
 	},
 	"url": "This is auto replaced",
 	"manifest": "This is auto replaced",

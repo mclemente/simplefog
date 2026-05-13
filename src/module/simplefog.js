@@ -29,7 +29,7 @@ Hooks.once("init", async () => {
 		hint: "",
 		editable: [
 			{
-				key: "Z",
+				key: "KeyZ",
 				modifiers: ["Control"]
 			}
 		],
@@ -265,20 +265,20 @@ Hooks.on("getSceneControlButtons", (controls) => {
  * Toggle Simple Fog
  */
 async function toggleSimpleFog() {
-    if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
-        await foundry.applications.api.DialogV2.confirm({
-            window: {
-                title: game.i18n.localize("SIMPLEFOG.disableFog")
-            },
-            content: game.i18n.localize("SIMPLEFOG.confirmDisableFog"),
-            yes: {
-                callback: () => toggleOffSimpleFog()
-            }
-        });
-        ui.controls.render({ reset: true });
-    } else {
-        await toggleOffSimpleFog();
-    }
+	if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
+		await foundry.applications.api.DialogV2.confirm({
+			window: {
+				title: game.i18n.localize("SIMPLEFOG.disableFog")
+			},
+			content: game.i18n.localize("SIMPLEFOG.confirmDisableFog"),
+			yes: {
+				callback: () => toggleOffSimpleFog()
+			}
+		});
+		ui.controls.render({ reset: true });
+	} else {
+		await toggleOffSimpleFog();
+	}
 }
 
 async function toggleOffSimpleFog() {

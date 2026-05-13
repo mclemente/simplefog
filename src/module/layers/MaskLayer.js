@@ -21,6 +21,17 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 			ROUNDED_RECT: 2,
 			POLYGON: 3,
 		};
+
+		// Throttled partial sync state
+		this._partialSyncTimer = null;
+		this._partialSyncInterval = 150;
+		this._partialSyncActive = false;
+		this._activeLevelId = null;
+	}
+
+	getHistoryKey() {
+		const levelId = this._activeLevelId ?? canvas.level?.id ?? null;
+		return levelId ? `levelHistory.${levelId}` : "history";
 	}
 
 	static get layerOptions() {
@@ -49,10 +60,10 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Sets the scene's alpha for the primary layer.
-	 * @param alpha {Number} 0-100 opacity representation
-	 * @param skip {Boolean} Optional override to skip using animated transition
-	 */
+   * Sets the scene's alpha for the primary layer.
+   * @param alpha {Number} 0-100 opacity representation
+   * @param skip {Boolean} Optional override to skip using animated transition
+   */
 	async setColorAlpha(alpha, skip = false) {
 		alpha = alpha / 100;
 		// If skip is false, do not transition and just set alpha immediately
@@ -162,9 +173,9 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	settings = game.settings.get("simplefog", "config");
 
 	/**
-	 * Gets and sets various layer wide properties
-	 * Some properties have different values depending on if user is a GM or player
-	 */
+   * Gets and sets various layer wide properties
+   * Some properties have different values depending on if user is a GM or player
+   */
 
 	getSetting(name) {
 		return canvas.scene.getFlag("simplefog", name) ?? this.settings[name];
@@ -179,18 +190,18 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Renders the history stack to the mask
-	 * @param history {Array}       A collection of history events
-	 * @param start {Number}        The position in the history stack to begin rendering from
-	 * @param start {Number}        The position in the history stack to stop rendering
-	 */
+   * Renders the history stack to the mask
+   * @param history {Array}       A collection of history events
+   * @param start {Number}        The position in the history stack to begin rendering from
+   * @param start {Number}        The position in the history stack to stop rendering
+   */
 	renderStack({
-		history = canvas.scene.getFlag("simplefog", "history"),
+		history = canvas.scene.getFlag("simplefog", this.getHistoryKey()),
 		start = this.pointer,
-		stop = canvas.scene.getFlag("simplefog", "history.pointer"),
+		stop = canvas.scene.getFlag("simplefog", `${this.getHistoryKey()}.pointer`),
 		isInit = false
 	}) {
-		history ||= { events: [], pointer: 0 };
+		if (!history || !Array.isArray(history.events)) history = { events: [], pointer: 0 };
 		// If history is blank, do nothing
 		if (history === undefined && !isInit) {
 			this.visible = game.settings.get("simplefog", "autoEnableSceneFog");
@@ -225,14 +236,15 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Add buffered history stack to scene flag and clear buffer
-	 */
+   * Add buffered history stack to scene flag and clear buffer
+   */
 	async commitHistory() {
 		// Do nothing if no history to be committed, otherwise get history
 		if (this.historyBuffer.length === 0) return;
 		if (this.lock) return;
 		this.lock = true;
-		let history = canvas.scene.getFlag("simplefog", "history");
+		const historyKey = this.getHistoryKey();
+		let history = canvas.scene.getFlag("simplefog", historyKey);
 		// If history storage doesnt exist, create it
 		if (!history) {
 			history = {
@@ -246,24 +258,25 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		history.events.push(this.historyBuffer);
 		history.pointer = history.events.length;
 		// Need to unset arrays first, otherwise they get concatenated
-		await canvas.scene.unsetFlag("simplefog", "history");
-		await canvas.scene.setFlag("simplefog", "history", history);
+		await canvas.scene.unsetFlag("simplefog", historyKey);
+		await canvas.scene.setFlag("simplefog", historyKey, history);
 		// Clear the history buffer
 		this.historyBuffer = [];
 		this.lock = false;
 	}
 
 	/**
-	 * Resets the mask of the layer
-	 * @param save {Boolean} If true, also resets the layer history
-	 */
+   * Resets the mask of the layer
+   * @param save {Boolean} If true, also resets the layer history
+   */
 	async resetMask(save = true) {
 		// Fill fog layer with solid
 		this.setFill();
 		// If save, also unset history and reset pointer
 		if (save) {
-			await canvas.scene.unsetFlag("simplefog", "history");
-			await canvas.scene.setFlag("simplefog", "history", {
+			const historyKey = this.getHistoryKey();
+			await canvas.scene.unsetFlag("simplefog", historyKey);
+			await canvas.scene.setFlag("simplefog", historyKey, {
 				events: [],
 				pointer: 0,
 			});
@@ -272,9 +285,9 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Resets the mask of the layer
-	 * @param save {Boolean} If true, also resets the layer history
-	 */
+   * Resets the mask of the layer
+   * @param save {Boolean} If true, also resets the layer history
+   */
 	async blankMask() {
 		await this.resetMask();
 		this.renderBrush({
@@ -289,16 +302,17 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Steps the history buffer back X steps and redraws
-	 * @param steps {Integer} Number of steps to undo, default 1
-	 */
+   * Steps the history buffer back X steps and redraws
+   * @param steps {Integer} Number of steps to undo, default 1
+   */
 	async undo(steps = 1) {
 		// Grab existing history
-		const history = canvas.scene.getFlag("simplefog", "history") ?? { events: [], pointer: 0 };
+		const historyKey = this.getHistoryKey();
+		const history = canvas.scene.getFlag("simplefog", historyKey) ?? { events: [], pointer: 0 };
 		// Set new pointer & update history
 		history.pointer = Math.max(0, this.pointer - steps);
-		await canvas.scene.unsetFlag("simplefog", "history");
-		await canvas.scene.setFlag("simplefog", "history", history);
+		await canvas.scene.unsetFlag("simplefog", historyKey);
+		await canvas.scene.setFlag("simplefog", historyKey, history);
 	}
 
 	/* -------------------------------------------- */
@@ -306,22 +320,22 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	/* -------------------------------------------- */
 
 	/**
-	 * Creates a PIXI graphic using the given brush parameters
-	 * @param data {Object}       A collection of brush parameters
-	 * @returns {Object}          PIXI.Graphics() instance
-	 *
-	 * @example
-	 * const myBrush = this.brush({
-	 *      shape: "ellipse",
-	 *      x: 0,
-	 *      y: 0,
-	 *      fill: 0x000000,
-	 *      width: 50,
-	 *      height: 50,
-	 *      alpha: 1,
-	 *      visible: true
-	 * });
-	 */
+   * Creates a PIXI graphic using the given brush parameters
+   * @param data {Object}       A collection of brush parameters
+   * @returns {Object}          PIXI.Graphics() instance
+   *
+   * @example
+   * const myBrush = this.brush({
+   *      shape: "ellipse",
+   *      x: 0,
+   *      y: 0,
+   *      fill: 0x000000,
+   *      width: 50,
+   *      height: 50,
+   *      alpha: 1,
+   *      visible: true
+   * });
+   */
 	brush(data) {
 		// Get new graphic & begin filling
 		const { alpha = 1, fill, height, shape, vertices, visible = true, width, x, y, zIndex } = data;
@@ -355,10 +369,10 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Gets a brush using the given parameters, renders it to mask and saves the event to history
-	 * @param data {Object}       A collection of brush parameters
-	 * @param save {Boolean}      If true, will add the operation to the history buffer
-	 */
+   * Gets a brush using the given parameters, renders it to mask and saves the event to history
+   * @param data {Object}       A collection of brush parameters
+   * @param save {Boolean}      If true, will add the operation to the history buffer
+   */
 	renderBrush(data, save = true) {
 		const brush = this.brush(data);
 		this.composite(brush);
@@ -367,9 +381,9 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Renders the given brush to the layer mask
-	 * @param data {Object}       PIXI Object to be used as brush
-	 */
+   * Renders the given brush to the layer mask
+   * @param data {Object}       PIXI Object to be used as brush
+   */
 	composite(brush) {
 		const opt = {
 			renderTexture: this.maskTexture,
@@ -381,8 +395,8 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Returns a blank PIXI Sprite of canvas dimensions
-	 */
+   * Returns a blank PIXI Sprite of canvas dimensions
+   */
 	static getCanvasSprite() {
 		const sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
 		const d = canvas.dimensions;
@@ -395,8 +409,8 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Fills the mask layer with solid white
-	 */
+   * Fills the mask layer with solid white
+   */
 	setFill() {
 		const fill = new PIXI.Graphics();
 		fill.beginFill(0xffffff);
@@ -407,15 +421,15 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Toggles visibility of primary layer
-	 */
+   * Toggles visibility of primary layer
+   */
 	async toggle() {
 		const v = canvas.scene.getFlag("simplefog", "visible") ?? game.settings.get("simplefog", "autoEnableSceneFog");
 		this.visible = !v;
 		await canvas.scene.setFlag("simplefog", "visible", !v);
 
 		// If first time, set autofog to opposite so it doesn't reapply it.
-		let history = canvas.scene.getFlag("simplefog", "history");
+		let history = canvas.scene.getFlag("simplefog", this.getHistoryKey());
 
 		if (history === undefined) {
 			await canvas.scene.setFlag("simplefog", "autoFog", !v);
