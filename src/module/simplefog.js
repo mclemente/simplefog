@@ -170,55 +170,55 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				visible: true,
 				order: 0,
 				onChange: () => toggleSimpleFog(),
-				title: game.i18n.localize("SIMPLEFOG.onoff"),
+				title: "SIMPLEFOG.onoff",
 				active: canvas.simplefog?.visible,
 				toggle: true,
 			},
 			brush: {
 				name: "brush",
-				title: game.i18n.localize("SIMPLEFOG.brushTool"),
+				title: "SIMPLEFOG.brushTool",
 				icon: "fas fa-paint-brush",
 				visible: canvas.simplefog?.visible,
 				order: 1
 			},
 			grid: {
 				name: "grid",
-				title: game.i18n.localize("SIMPLEFOG.gridTool"),
+				title: "SIMPLEFOG.gridTool",
 				icon: "fas fa-border-none",
 				visible: canvas.grid?.type !== 0 && canvas.simplefog?.visible,
 				order: 1
 			},
 			room: {
 				name: "room",
-				title: game.i18n.localize("SIMPLEFOG.roomTool"),
+				title: "SIMPLEFOG.roomTool",
 				icon: "fas fa-block-brick",
 				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			polygon: {
 				name: "polygon",
-				title: game.i18n.localize("SIMPLEFOG.polygonTool"),
+				title: "SIMPLEFOG.polygonTool",
 				icon: "fas fa-draw-polygon",
 				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			box: {
 				name: "box",
-				title: game.i18n.localize("SIMPLEFOG.boxTool"),
+				title: "SIMPLEFOG.boxTool",
 				icon: "far fa-square",
 				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			ellipse: {
 				name: "ellipse",
-				title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
+				title: "SIMPLEFOG.ellipseTool",
 				icon: "far fa-circle",
 				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			sceneConfig: {
 				name: "sceneConfig",
-				title: game.i18n.localize("SIMPLEFOG.sceneConfig"),
+				title: "SIMPLEFOG.sceneConfig",
 				icon: "fas fa-cog",
 				visible: canvas.simplefog?.visible,
 				order: 2,
@@ -227,7 +227,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			},
 			reset: {
 				name: "reset",
-				title: game.i18n.localize("SIMPLEFOG.reset"),
+				title: "SIMPLEFOG.reset",
 				icon: "fas fa-trash",
 				visible: canvas.simplefog?.visible,
 				order: 2,
