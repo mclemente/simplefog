@@ -38,6 +38,8 @@
 				}
 			}
 		},
+
+		"brushControls": "Brush Controls",
 		"brushOpacity": "Brush Opacity",
 		"brushSize": "Brush Size",
 		"hide": "Hide",

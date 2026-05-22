@@ -10,7 +10,7 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 			height: "auto"
 		},
 		window: {
-			title: "Brush Controls",
+			title: "SIMPLEFOG.brushControls",
 			icon: "fas fa-cloud",
 			minimizable: false
 		},
