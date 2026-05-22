@@ -294,7 +294,7 @@ export default class SimplefogLayer extends MaskLayer {
 		// Don't allow new action if history push still in progress
 		if (this.historyBuffer.length > 0) return;
 		const p = canvas.mousePosition;
-		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
+		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) return;
 		// Round positions to nearest pixel
 		p.x = Math.round(p.x);
 		p.y = Math.round(p.y);
@@ -330,7 +330,7 @@ export default class SimplefogLayer extends MaskLayer {
 		// Don't allow new action if history push still in progress
 		if (this.historyBuffer.length > 0) return;
 		const p = canvas.mousePosition;
-		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
+		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) return;
 		// Round positions to nearest pixel
 		p.x = Math.round(p.x);
 		p.y = Math.round(p.y);
@@ -442,7 +442,7 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerMoveBrush(p) {
-		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
+		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) {
 			this.ellipsePreview.visible = false;
 			return;
 		}
@@ -707,7 +707,7 @@ export default class SimplefogLayer extends MaskLayer {
 	_pointerMovePolygon(p) {
 		// Show preview with ghost line from last vertex to cursor
 		if (!this.polygon || this.polygon.length === 0) return;
-		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
+		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) {
 			this.polygonPreview.visible = false;
 			return;
 		}
@@ -737,7 +737,7 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerMoveRoom(p, e) {
-		if (!canvas.dimensions.rect.contains(p.x, p.y)) {
+		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) {
 			this.polygonPreview.visible = false;
 			return;
 		}
@@ -766,7 +766,7 @@ export default class SimplefogLayer extends MaskLayer {
 
 	_pointerMoveGrid(p) {
 		canvas.interface.grid.clearHighlightLayer("simplefog");
-		if (!canvas.dimensions.rect.contains(p.x, p.y)) return;
+		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) return;
 		const { size, type } = canvas.scene.grid;
 		// Square grid
 		if (type === 1) {

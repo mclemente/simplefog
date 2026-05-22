@@ -106,19 +106,19 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		this.fogColorLayer.tint = tint;
 	}
 
+	/**
+	 * @returns {PIXI.RenderTexture}
+	 */
 	static getMaskTexture() {
-		const d = canvas.dimensions;
-		let res = 1.0;
-		if (d.width * d.height > 16000 ** 2) res = 0.25;
-		else if (d.width * d.height > 8000 ** 2) res = 0.5;
+		// PIXI.RenderTexture requires the whole canvas' size, not just the scene's rectangle
+		const { width, height } = canvas.dimensions;
+		const pixels = width * height;
+		let resolution = 1.0;
+		if (pixels > 16000 ** 2) resolution = 0.25;
+		else if (pixels > 8000 ** 2) resolution = 0.5;
 
 		// Create the mask elements
-		const tex = PIXI.RenderTexture.create({
-			width: canvas.dimensions.width,
-			height: canvas.dimensions.height,
-			resolution: res,
-		});
-		return tex;
+		return PIXI.RenderTexture.create({ width, height, resolution });
 	}
 
 	/* -------------------------------------------- */
@@ -399,11 +399,11 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
    */
 	static getCanvasSprite() {
 		const sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
-		const d = canvas.dimensions;
-		sprite.width = d.width;
-		sprite.height = d.height;
-		sprite.x = 0;
-		sprite.y = 0;
+		const { x, y, width, height } = canvas.dimensions.sceneRect;
+		sprite.width = width;
+		sprite.height = height;
+		sprite.x = x;
+		sprite.y = y;
 		sprite.zIndex = 5000;
 		return sprite;
 	}
@@ -414,7 +414,8 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	setFill() {
 		const fill = new PIXI.Graphics();
 		fill.beginFill(0xffffff);
-		fill.drawRect(0, 0, canvas.dimensions.width, canvas.dimensions.height);
+		const { x, y, width, height } = canvas.dimensions.sceneRect;
+		fill.drawRect(x, y, width, height);
 		fill.endFill();
 		this.composite(fill);
 		fill.destroy();
@@ -477,9 +478,10 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		const fogImageOverlayFilePath = this.getSetting("fogImageOverlayFilePath");
 		const texture = this.getFogImageOverlayTexture(fogImageOverlayFilePath);
 		this.fogImageOverlayLayer = new PIXI.Sprite(texture);
-		this.fogImageOverlayLayer.position.set(canvas.dimensions.sceneRect.x, canvas.dimensions.sceneRect.y);
-		this.fogImageOverlayLayer.width = canvas.dimensions.sceneRect.width;
-		this.fogImageOverlayLayer.height = canvas.dimensions.sceneRect.height;
+		const { x, y, width, height } = canvas.dimensions.sceneRect;
+		this.fogImageOverlayLayer.position.set(x, y);
+		this.fogImageOverlayLayer.width = width;
+		this.fogImageOverlayLayer.height = height;
 		this.fogImageOverlayLayer.mask = this.maskSprite;
 		this.fogImageOverlayLayer.zIndex = this.getSetting("fogImageOverlayZIndex");
 		this.setFogImageOverlayAlpha(this.getFogImageOverlayAlpha(), true);
