@@ -420,25 +420,14 @@ export default class SimplefogLayer extends MaskLayer {
 		this.ellipsePreview.y = p.y;
 		// If drag operation has started
 		if (this.op) {
-			if (this.#brushPrev) {
-				this._renderBrushLine(this.#brushPrev, p);
-			} else {
-				this.renderBrush({
-					shape: this.BRUSH_TYPES.ELLIPSE,
-					x: p.x,
-					y: p.y,
-					fill: this.brushOpacity,
-					width: this.brushSize,
-					height: this.brushSize,
-				});
-			}
+			this._renderBrushLine(this.#brushPrev, p);
 			this.#brushPrev = { x: p.x, y: p.y };
 		}
 	}
 
-	_renderBrushLine(a, b) {
-		const dx = b.x - a.x;
-		const dy = b.y - a.y;
+	_renderBrushLine(prev, current) {
+		const dx = current.x - prev.x;
+		const dy = current.y - prev.y;
 		const distance = Math.hypot(dx, dy);
 		const step = Math.max(this.brushSize * 0.5, 4);
 		const count = Math.max(1, Math.ceil(distance / step));
@@ -446,8 +435,8 @@ export default class SimplefogLayer extends MaskLayer {
 			const t = i / count;
 			this.renderBrush({
 				shape: this.BRUSH_TYPES.ELLIPSE,
-				x: a.x + dx * t,
-				y: a.y + dy * t,
+				x: prev.x + (dx * t),
+				y: prev.y + (dy * t),
 				fill: this.brushOpacity,
 				width: this.brushSize,
 				height: this.brushSize,
@@ -471,34 +460,21 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_pointerMoveBox(p, e) {
-		if (!this.op) {
-			this.boxPreview.visible = false;
-			return;
-		}
+		if (!this.op) return;
 		const d = this._getDragBounds(p, e);
-		const x = this.dragStart.x + Math.min(0, d.w);
-		const y = this.dragStart.y + Math.min(0, d.h);
-		const width = Math.abs(d.w);
-		const height = Math.abs(d.h);
 		this.boxPreview.visible = true;
-		this.boxPreview.x = x;
-		this.boxPreview.y = y;
-		this.boxPreview.width = width;
-		this.boxPreview.height = height;
+		this.boxPreview.width = d.w;
+		this.boxPreview.height = d.h;
 	}
 
 	_pointerUpBox(p, e) {
 		const d = this._getDragBounds(p, e);
-		const x = this.dragStart.x + Math.min(0, d.w);
-		const y = this.dragStart.y + Math.min(0, d.h);
-		const width = Math.abs(d.w);
-		const height = Math.abs(d.h);
 		this.renderBrush({
 			shape: this.BRUSH_TYPES.BOX,
-			x,
-			y,
-			width,
-			height,
+			x: this.dragStart.x,
+			y: this.dragStart.y,
+			width: d.w,
+			height: d.h,
 			fill: this.brushOpacity,
 		});
 		this.boxPreview.visible = false;
