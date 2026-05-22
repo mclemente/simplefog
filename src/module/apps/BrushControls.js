@@ -47,6 +47,7 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 	async _renderFrame(options) {
 		const frame = await super._renderFrame(options);
 		this.window.close.remove(); // Prevent closing
+		this.window.controls.remove();
 		return frame;
 	}
 
