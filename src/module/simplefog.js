@@ -178,49 +178,49 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				name: "brush",
 				title: game.i18n.localize("SIMPLEFOG.brushTool"),
 				icon: "fas fa-paint-brush",
-				visible: true,
+				visible: canvas.simplefog?.visible,
 				order: 1
 			},
 			grid: {
 				name: "grid",
 				title: game.i18n.localize("SIMPLEFOG.gridTool"),
 				icon: "fas fa-border-none",
-				visible: true, // TODO hide button when no grid is available once V13 fixes https://github.com/foundryvtt/foundryvtt/issues/12906
+				visible: canvas.grid?.type !== 0 && canvas.simplefog?.visible,
 				order: 1
 			},
 			room: {
 				name: "room",
 				title: game.i18n.localize("SIMPLEFOG.roomTool"),
 				icon: "fas fa-block-brick",
-				visible: true,
+				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			polygon: {
 				name: "polygon",
 				title: game.i18n.localize("SIMPLEFOG.polygonTool"),
 				icon: "fas fa-draw-polygon",
-				visible: true,
+				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			box: {
 				name: "box",
 				title: game.i18n.localize("SIMPLEFOG.boxTool"),
 				icon: "far fa-square",
-				visible: true,
+				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			ellipse: {
 				name: "ellipse",
 				title: game.i18n.localize("SIMPLEFOG.ellipseTool"),
 				icon: "far fa-circle",
-				visible: true,
+				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			sceneConfig: {
 				name: "sceneConfig",
 				title: game.i18n.localize("SIMPLEFOG.sceneConfig"),
 				icon: "fas fa-cog",
-				visible: true,
+				visible: canvas.simplefog?.visible,
 				order: 2,
 				onChange: () => new SimplefogConfig(canvas.scene).render(true),
 				button: true
@@ -229,7 +229,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				name: "reset",
 				title: game.i18n.localize("SIMPLEFOG.reset"),
 				icon: "fas fa-trash",
-				visible: true,
+				visible: canvas.simplefog?.visible,
 				order: 2,
 				onChange: () => {
 					foundry.applications.api.DialogV2.wait({
@@ -275,7 +275,6 @@ async function toggleSimpleFog() {
 				callback: () => toggleOffSimpleFog()
 			}
 		});
-		ui.controls.render({ reset: true });
 	} else {
 		await toggleOffSimpleFog();
 	}
@@ -288,4 +287,5 @@ async function toggleOffSimpleFog() {
 		refreshVision: true,
 		refreshOcclusion: true
 	});
+	ui.controls.render({ reset: true });
 }
