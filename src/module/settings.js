@@ -170,22 +170,6 @@ export const registerSettings = function () {
 		default: true,
 		type: Boolean,
 	});
-	game.settings.register("simplefog", "toolHotKeys", {
-		name: "SIMPLEFOG.SETTINGS.toolHotKeys.name",
-		hint: "SIMPLEFOG.SETTINGS.toolHotKeys.hint",
-		scope: "world",
-		config: true,
-		default: "brush",
-		type: String,
-		choices: {
-			brush: "SIMPLEFOG.SETTINGS.toolHotKeys.choices.brush",
-			grid: "SIMPLEFOG.SETTINGS.toolHotKeys.choices.grid",
-			room: "SIMPLEFOG.SETTINGS.toolHotKeys.choices.room",
-			polygon: "SIMPLEFOG.SETTINGS.toolHotKeys.choices.polygon",
-			box: "SIMPLEFOG.SETTINGS.toolHotKeys.choices.box",
-			ellipse: "SIMPLEFOG.SETTINGS.toolHotKeys.choices.ellipse",
-		},
-	});
 	const hasHealthEstimate = game.modules.get("healthEstimate")?.active;
 	game.settings.register("simplefog", "zIndex", {
 		name: "SIMPLEFOG.SETTINGS.zIndex.name",

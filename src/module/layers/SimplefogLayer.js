@@ -73,17 +73,6 @@ export default class SimplefogLayer extends MaskLayer {
 
 	#rightclick;
 
-	_activate() {
-		super._activate();
-		const tools = ["brush", "grid", "room", "polygon", "box", "ellipse"];
-		const userTool = game.user.getFlag("simplefog", "activeTool");
-		const controlTool = ui.controls?.control?.name === "simplefog" ? ui.controls.control.activeTool : null;
-		let tool = userTool ?? controlTool ?? game.settings.get("simplefog", "toolHotKeys");
-		if (!tools.includes(tool)) tool = "brush";
-		if (canvas.grid?.type === 0 && tool === "grid") tool = "brush";
-		this._changeTool(tool, { persist: false, syncUI: true });
-	}
-
 	/* -------------------------------------------- */
 
 	/** @inheritDoc */
@@ -93,18 +82,9 @@ export default class SimplefogLayer extends MaskLayer {
 		this.clearActiveTool();
 	}
 
-	_changeTool(tool = "", { persist = true, syncUI = true } = {}) {
-		const tools = ["brush", "grid", "room", "polygon", "box", "ellipse"];
-		if (!tools.includes(tool)) tool = "brush";
-		if (canvas.grid?.type === 0 && tool === "grid") tool = "brush";
+	_changeTool(tool) {
 		this.clearActiveTool();
 		this.activeTool = tool;
-		if (persist) {
-			this.setUserSetting("activeTool", tool);
-		}
-		if (syncUI) {
-			this._syncActiveToolUI(tool);
-		}
 		this.setPreviewTint();
 		if (this.activeTool === "brush") {
 			this.ellipsePreview.visible = true;
@@ -118,20 +98,6 @@ export default class SimplefogLayer extends MaskLayer {
 			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
 		}
 		this.brushControls.render({ force: true });
-	}
-
-	_syncActiveToolUI(tool) {
-		if (!ui.controls) return;
-		if (ui.controls.control?.name === "simplefog") {
-			ui.controls.control.activeTool = tool;
-		}
-		const controls = ui.controls.controls;
-		const simplefogControl = Array.isArray(controls)
-			? controls.find((c) => c.name === "simplefog")
-			: controls?.simplefog;
-		if (simplefogControl) {
-			simplefogControl.activeTool = tool;
-		}
 	}
 
 	/* -------------------------------------------- */

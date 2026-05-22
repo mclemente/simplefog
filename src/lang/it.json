@@ -15,18 +15,6 @@
         "name": "Abilita automaticamente la nebbia",
         "hint": "Se abilitato, la Nebbia di guerra viene attivata automaticamente alla prima creazione di una scena."
       },
-      "toolHotKeys": {
-        "name": "Strumento predefinito per il tasto rapido",
-        "hint": "Definisce quale strumento viene selezionato usando la scorciatoia da tastiera.",
-        "choices": {
-          "brush": "Pennello",
-          "grid": "Griglia",
-          "room": "Stanza",
-          "polygon": "Poligono",
-          "box": "Rettangolo",
-          "ellipse": "Ellisse"
-        }
-      },
       "zIndex": {
         "name": "Z-Index",
         "hint": "Mostra il livello sopra specifici strati della mappa e i relativi oggetti.",

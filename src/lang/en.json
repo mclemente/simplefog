@@ -15,18 +15,6 @@
 				"name": "Auto Enable Scene Fog",
 				"hint": "When enabled, Simple Fog will automatically be enabled for a scene when it is first created."
 			},
-			"toolHotKeys": {
-				"name": "Hotkey Tool",
-				"hint": "Define which tool will be selected when using the keybinding.",
-				"choices": {
-					"brush": "Brush",
-					"grid": "Grid",
-					"room": "Room",
-					"polygon": "Polygon",
-					"box": "Box",
-					"ellipse": "Ellipse"
-				}
-			},
 			"zIndex": {
 				"name": "Z-Index",
 				"hint": "Displays the overlay over specific canvas layers and its objects.",

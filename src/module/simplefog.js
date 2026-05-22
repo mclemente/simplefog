@@ -153,7 +153,6 @@ Hooks.on("canvasInit", () => {
  */
 Hooks.on("getSceneControlButtons", (controls) => {
 	if (!game.user.isGM) return;
-	let activeTool = game.settings.get("simplefog", "toolHotKeys");
 	controls.simplefog = {
 		name: "simplefog",
 		title: "Simple Fog",
@@ -161,8 +160,10 @@ Hooks.on("getSceneControlButtons", (controls) => {
 		onChange: (event, active) => {
 			if ( active ) canvas.simplefog.activate();
 		},
-		onToolChange: (event, tool) => canvas.simplefog._changeTool(tool.name),
-		activeTool: canvas.grid?.type === 0 && activeTool === "grid" ? "brush" : activeTool,
+		onToolChange: (event, tool, active) => {
+			if ( active ) canvas.simplefog._changeTool(tool.name);
+		},
+		activeTool: "brush",
 		tools: {
 			simplefogtoggle: {
 				name: "simplefogtoggle",
