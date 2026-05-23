@@ -128,11 +128,13 @@ export default class SimplefogLayer extends MaskLayer {
 			canvas.simplefog.blur.quality = this.getSetting("blurQuality");
 		}
 		// React to composite history change
-		if (foundry.utils.hasProperty(data, `flags.simplefog.${this.getHistoryKey()}`)) {
+		const historyKey = this.getHistoryKey();
+		if (foundry.utils.hasProperty(data, `flags.simplefog.${historyKey}`)) {
 			if (this.#suppressHistoryUpdates) return;
-			const history = canvas.scene.getFlag("simplefog", this.getHistoryKey());
+			const history = canvas.scene.getFlag("simplefog", historyKey);
 			if (history === undefined) return;
-			canvas.simplefog.renderStack({ history });
+			const stop = canvas.scene.getFlag("simplefog", `${historyKey}.pointer`);
+			canvas.simplefog.renderStack({ history, stop });
 
 			canvas.perception.update({
 				refreshLighting: true,

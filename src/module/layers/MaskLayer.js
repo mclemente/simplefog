@@ -13,8 +13,6 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		this.pointer = 0;
 		this.gridLayout = {};
 		this.dragStart = { x: 0, y: 0 };
-		// Not actually used, just to prevent foundry from complaining
-		this.history = [];
 		this.BRUSH_TYPES = {
 			ELLIPSE: 0,
 			BOX: 1,
@@ -260,6 +258,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		// Need to unset arrays first, otherwise they get concatenated
 		await canvas.scene.unsetFlag("simplefog", historyKey);
 		await canvas.scene.setFlag("simplefog", historyKey, history);
+		this.pointer = history.pointer;
 		// Clear the history buffer
 		this.historyBuffer = [];
 		this.lock = false;
@@ -313,6 +312,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		history.pointer = Math.max(0, this.pointer - steps);
 		await canvas.scene.unsetFlag("simplefog", historyKey);
 		await canvas.scene.setFlag("simplefog", historyKey, history);
+		this.pointer = history.pointer;
 	}
 
 	/* -------------------------------------------- */
