@@ -7,9 +7,10 @@ Hooks.once("init", async () => {
 	CONFIG.Canvas.layers.simplefog = { group: "interface", layerClass: SimplefogLayer };
 
 	const isActiveControl = () => ui.controls.control.name === "simplefog";
+	const { SHIFT } = KeyboardManager.MODIFIER_KEYS;
 	game.keybindings.register("simplefog", "swap", {
 		name: "Swap to Simple Fog's Controls",
-		hint: "Toggles between the Token and Simple Fog layers. Check the module's settings to define which tool will be selected by default.",
+		hint: "Toggles between the Token and Simple Fog layers.",
 		editable: [
 			{
 				key: "KeyS",
@@ -53,11 +54,7 @@ Hooks.once("init", async () => {
 		],
 		onDown: () => {
 			if (isActiveControl()) {
-				const bc = canvas.simplefog.brushControls;
-				const handler = bc.options.actions.brushOpacity;
-				const slider = bc.element.querySelector("input[name=brushOpacity]");
-				slider.value = slider.value === "100" ? 0 : 100;
-				handler.call(bc);
+				toggleFogEraser(canvas.simplefog.brushOpacity === "0xffffff");
 				return true;
 			}
 		},
@@ -71,18 +68,15 @@ Hooks.once("init", async () => {
 				key: "BracketLeft"
 			}
 		],
-		onDown: () => {
+		onDown: (context) => {
 			if (isActiveControl() && canvas.simplefog.activeTool === "brush") {
-				const bc = canvas.simplefog.brushControls;
-				const handler = bc.options.actions.brushSize;
-				const slider = bc.element.querySelector("input[name=brushSize]");
-				slider.value = Math.max(Number(slider.value) * 0.8, 10).toNearest(10, "floor");
-				handler.call(bc);
-				canvas.simplefog.setBrushSize(slider.value);
+				const size = context.isShift ? 10 : Number(canvas.simplefog.brushSize) * 0.8;
+				const brushSize = Math.max(size, 10).toNearest(10, "floor");
+				canvas.simplefog.setBrushSize(brushSize);
 				return true;
 			}
 		},
-		onUp: () => {},
+		reservedModifiers: [SHIFT],
 		repeat: true,
 		restricted: true,
 	});
@@ -94,17 +88,15 @@ Hooks.once("init", async () => {
 				key: "BracketRight"
 			}
 		],
-		onDown: () => {
+		onDown: (context) => {
 			if (isActiveControl() && canvas.simplefog.activeTool === "brush") {
-				const bc = canvas.simplefog.brushControls;
-				const handler = bc.options.actions.brushSize;
-				const slider = bc.element.querySelector("input[name=brushSize]");
-				slider.value = Math.min(Number(slider.value) * 1.25, 500).toNearest(10, "ceil");
-				handler.call(bc);
-				canvas.simplefog.setBrushSize(slider.value);
+				const size = context.isShift ? 500 : Number(canvas.simplefog.brushSize) * 1.25;
+				const brushSize = Math.min(size, 500).toNearest(10, "ceil");
+				canvas.simplefog.setBrushSize(brushSize);
 				return true;
 			}
 		},
+		reservedModifiers: [SHIFT],
 		repeat: true,
 		restricted: true,
 	});
@@ -212,6 +204,16 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				visible: canvas.simplefog?.visible,
 				order: 2
 			},
+			eraser: {
+				name: "eraser",
+				title: "SIMPLEFOG.eraser",
+				icon: "fas fa-eraser",
+				visible: canvas.simplefog?.visible,
+				order: 2,
+				onChange: (event, active) => toggleFogEraser(active),
+				active: canvas.simplefog?.brushOpacity === "0x000000",
+				toggle: true,
+			},
 			sceneConfig: {
 				name: "sceneConfig",
 				title: "SIMPLEFOG.sceneConfig",
@@ -279,5 +281,12 @@ async function toggleSimpleFog() {
 async function toggleOffSimpleFog() {
 	await canvas.simplefog.toggle();
 	canvas.simplefog.updatePerception();
+	ui.controls.render({ reset: true });
+}
+
+function toggleFogEraser(active) {
+	if (active) canvas.simplefog.brushOpacity = "0x000000";
+	else canvas.simplefog.brushOpacity = "0xffffff";
+	canvas.simplefog.setPreviewTint();
 	ui.controls.render({ reset: true });
 }

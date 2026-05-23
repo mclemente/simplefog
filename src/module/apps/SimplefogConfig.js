@@ -51,16 +51,7 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			fields: game.settings.settings.get("simplefog.config").type.fields,
 			gmColorAlpha: Math.round(canvas.simplefog.getSetting("gmColorAlpha")),
 			gmColorTint: hexToWeb(canvas.simplefog.getSetting("gmColorTint")),
-			playerColorAlpha: Math.round(canvas.simplefog.getSetting("playerColorAlpha")),
 			playerColorTint: hexToWeb(canvas.simplefog.getSetting("playerColorTint")),
-			transition: canvas.simplefog.getSetting("transition"),
-			transitionSpeed: canvas.simplefog.getSetting("transitionSpeed"),
-			blurEnable: canvas.simplefog.getSetting("blurEnable"),
-			blurRadius: canvas.simplefog.getSetting("blurRadius"),
-			blurQuality: canvas.simplefog.getSetting("blurQuality"),
-			autoVisibility: canvas.simplefog.getSetting("autoVisibility"),
-			autoVisGM: canvas.simplefog.getSetting("autoVisGM"),
-			vThreshold: Math.round(canvas.simplefog.getSetting("vThreshold")),
 			fogImageOverlayFilePath: canvas.simplefog.getSetting("fogImageOverlayFilePath"),
 			fogImageOverlayGMAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayGMAlpha")),
 			fogImageOverlayPlayerAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha")),
@@ -93,7 +84,7 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			const defaultSettings = game.settings.get("simplefog", "config");
 			for (const [key, val] of Object.entries(settings)) {
 				const isEqualToDefault = defaultSettings[key] === val || defaultSettings[key]?.css === val;
-				if (!val || isEqualToDefault) await this.scene.unsetFlag("simplefog", key);
+				if (isEqualToDefault) await this.scene.unsetFlag("simplefog", key);
 				else await this.scene.setFlag("simplefog", key, val);
 			}
 		} else {
@@ -110,6 +101,8 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			for (const key of Object.keys(canvas.simplefog.settings)) {
 				await this.scene.unsetFlag("simplefog", key);
 			}
+			canvas.simplefog.updatePerception();
+			if (this.scene) await canvas.draw(this.scene);
 		} else {
 			await game.settings.set("simplefog", "config", undefined);
 		}

@@ -1,53 +1,16 @@
 <div class="standard-form scrollable">
     <fieldset>
-        <legend>
-            <i class="fas fa-crown"></i> {{localize 'SIMPLEFOG.gmFogSettings'}}
-        </legend>
+        <legend></i> {{localize 'SIMPLEFOG.gmFogSettings'}}</legend>
         {{formGroup fields.gmColorTint value=gmColorTint rootId=rootId localize=true}}
         {{formGroup fields.gmColorAlpha value=gmColorAlpha rootId=rootId localize=true}}
-    </fieldset>
-
-    <fieldset>
-        <legend>
-            <i class="fas fa-users"></i> {{localize 'SIMPLEFOG.playerFogSettings'}}
-        </legend>
         {{formGroup fields.playerColorTint value=playerColorTint rootId=rootId localize=true}}
-        {{formGroup fields.playerColorAlpha value=playerColorAlpha rootId=rootId localize=true}}
     </fieldset>
 
     <fieldset>
-        <legend>
-            <i class="fas fa-image"></i> {{localize 'SIMPLEFOG.fogImageOverlaySettings'}}
-        </legend>
+        <legend></i> {{localize 'SIMPLEFOG.fogImageOverlaySettings'}}</legend>
         {{formGroup fields.fogImageOverlayFilePath value=fogImageOverlayFilePath rootId=rootId localize=true}}
         {{formGroup fields.fogImageOverlayGMAlpha value=fogImageOverlayGMAlpha rootId=rootId localize=true}}
         {{formGroup fields.fogImageOverlayPlayerAlpha value=fogImageOverlayPlayerAlpha rootId=rootId localize=true}}
         {{formGroup fields.fogImageOverlayZIndex value=fogImageOverlayZIndex rootId=rootId localize=true}}
-    </fieldset>
-
-    <fieldset>
-        <legend>
-            <i class="fas fa-filter"></i> {{localize 'SIMPLEFOG.filterSettings'}}
-        </legend>
-        {{formGroup fields.blurEnable value=blurEnable rootId=rootId localize=true}}
-        {{formGroup fields.blurRadius value=blurRadius rootId=rootId localize=true}}
-        {{formGroup fields.blurQuality value=blurQuality rootId=rootId localize=true}}
-    </fieldset>
-
-    <fieldset>
-        <legend>
-            <i class="fas fa-adjust"></i> {{localize 'SIMPLEFOG.transitionSettings'}}
-        </legend>
-        {{formGroup fields.transition value=transition rootId=rootId localize=true}}
-        {{formGroup fields.transitionSpeed value=transitionSpeed rootId=rootId localize=true}}
-    </fieldset>
-
-    <fieldset>
-        <legend>
-            <i class="fas fa-low-vision"></i> {{localize 'SIMPLEFOG.visibilitySettings'}}
-        </legend>
-        {{formGroup fields.autoVisibility value=autoVisibility rootId=rootId localize=true}}
-        {{formGroup fields.autoVisGM value=autoVisGM rootId=rootId localize=true}}
-        {{formGroup fields.vThreshold value=vThreshold rootId=rootId localize=true}}
     </fieldset>
 </div>

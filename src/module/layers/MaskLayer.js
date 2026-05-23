@@ -45,67 +45,6 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	/*  Getters and setters for layer props         */
 	/* -------------------------------------------- */
 
-	// Tint & Alpha have special cases because they can differ between GM & Players
-	// And alpha can be animated for transition effects
-
-	getColorAlpha() {
-		let alpha;
-		if (game.user.isGM) alpha = this.getSetting("gmColorAlpha");
-		else alpha = this.getSetting("playerColorAlpha");
-		if (!alpha) {
-			if (game.user.isGM) alpha = this.settings.gmColorAlpha;
-			else alpha = this.settings.playerColorAlpha;
-		}
-		return alpha;
-	}
-
-	/**
-   * Sets the scene's alpha for the primary layer.
-   * @param alpha {Number} 0-100 opacity representation
-   * @param skip {Boolean} Optional override to skip using animated transition
-   */
-	async setColorAlpha(alpha, skip = false) {
-		alpha = alpha / 100;
-		// If skip is false, do not transition and just set alpha immediately
-		if (skip || !this.getSetting("transition")) {
-			this.fogColorLayer.alpha = alpha;
-		}
-		// Loop until transition is complete
-		else {
-			const start = this.fogColorLayer.alpha;
-			const dist = start - alpha;
-			const fps = game.settings.get("core", "maxFPS");
-			const speed = this.getSetting("transitionSpeed");
-			const frame = 1000 / fps;
-			const rate = dist / ((fps * speed) / 1000);
-			let f = (fps * speed) / 1000;
-			while (f > 0) {
-				// Delay 1 frame before updating again
-				// eslint-disable-next-line no-promise-executor-return
-				await new Promise((resolve) => setTimeout(resolve, frame));
-				this.fogColorLayer.alpha -= rate;
-				f -= 1;
-			}
-			// Reset target alpha in case loop overshot a bit
-			this.fogColorLayer.alpha = alpha;
-		}
-	}
-
-	getTint() {
-		let tint;
-		if (game.user.isGM) tint = this.getSetting("gmColorTint");
-		else tint = this.getSetting("playerColorTint");
-		if (!tint) {
-			if (game.user.isGM) tint = this.gmColorTintDefault;
-			else tint = this.playerColorTintDefault;
-		}
-		return tint;
-	}
-
-	setColorTint(tint) {
-		this.fogColorLayer.tint = tint;
-	}
-
 	/**
 	 * @returns {PIXI.RenderTexture}
 	 */
@@ -124,51 +63,6 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	/* -------------------------------------------- */
 	/*  Player Fog Image Overlay                    */
 	/* -------------------------------------------- */
-	getFogImageOverlayTexture(fogImageOverlayFilePath) {
-		if (fogImageOverlayFilePath) {
-			return foundry.canvas.getTexture(fogImageOverlayFilePath);
-		}
-	}
-
-	setFogImageOverlayTexture(fogImageOverlayFilePath) {
-		if (fogImageOverlayFilePath) {
-			const texture = foundry.canvas.getTexture(fogImageOverlayFilePath);
-			this.fogImageOverlayLayer.texture = texture;
-		} else {
-			this.fogImageOverlayLayer.texture = undefined;
-		}
-	}
-
-	getFogImageOverlayAlpha() {
-		let alpha;
-		if (game.user.isGM) alpha = this.getSetting("fogImageOverlayGMAlpha");
-		else alpha = this.getSetting("fogImageOverlayPlayerAlpha");
-		if (!alpha) {
-			if (game.user.isGM) alpha = this.settings.fogImageOverlayGMAlpha;
-			else alpha = this.settings.fogImageOverlayAlpha;
-		}
-		return alpha / 100;
-	}
-
-	async setFogImageOverlayAlpha(alpha, skip = false) {
-		if (!skip && this.getSetting("transition")) {
-			const start = this.fogImageOverlayLayer.alpha;
-			const dist = start - alpha;
-			const fps = game.settings.get("core", "maxFPS");
-			const speed = this.getSetting("transitionSpeed");
-			const frame = 1000 / fps;
-			const rate = dist / ((fps * speed) / 1000);
-			let f = (fps * speed) / 1000;
-			while (f > 0) {
-				// Delay 1 frame before updating again
-				// eslint-disable-next-line no-promise-executor-return
-				await new Promise((resolve) => setTimeout(resolve, frame));
-				this.fogImageOverlayLayer.alpha -= rate;
-				f -= 1;
-			}
-		}
-		this.fogImageOverlayLayer.alpha = alpha;
-	}
 
 	settings = game.settings.get("simplefog", "config");
 
@@ -393,29 +287,19 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	async _draw() {
+		const colorAlpha = game.user.isGM ? this.getSetting("gmColorAlpha") / 100 : 1;
+		const imageAlpha = (game.user.isGM
+			? this.getSetting("fogImageOverlayGMAlpha")
+			: this.getSetting("fogImageOverlayPlayerAlpha")
+		) / 100;
+		const tint = game.user.isGM ? this.getSetting("gmColorTint") : this.getSetting("playerColorTint");
 		// Check if masklayer is flagged visible
 		this.visible = this.getSetting("visible") ?? false;
 
 		// The layer is the primary sprite to be displayed
 		this.fogColorLayer = MaskLayer.getCanvasSprite();
-		this.setColorTint(this.getTint());
-		this.setColorAlpha(this.getColorAlpha(), true);
-
-		this.blur = new PIXI.filters.BlurFilter();
-		this.blur.padding = 0;
-		this.blur.repeatEdgePixels = true;
-		this.blur.blur = this.getSetting("blurRadius");
-		this.blur.quality = this.getSetting("blurQuality");
-
-		// Filters
-		if (this.getSetting("blurEnable")) {
-			this.fogColorLayer.filters = [this.blur];
-		} else {
-			this.fogColorLayer.filters = [];
-		}
-
-		// So you can hit escape on the keyboard and it will bring up the menu
-		this._controlled = {};
+		this.fogColorLayer.alpha = colorAlpha;
+		this.fogColorLayer.tint = tint;
 
 		this.maskTexture = MaskLayer.getMaskTexture();
 		this.maskSprite = new PIXI.Sprite(this.maskTexture);
@@ -431,7 +315,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 
 		// apply image overlay to fog layer after we renderStack to prevent revealing the map
 		const fogImageOverlayFilePath = this.getSetting("fogImageOverlayFilePath");
-		const texture = this.getFogImageOverlayTexture(fogImageOverlayFilePath);
+		const texture = fogImageOverlayFilePath ? foundry.canvas.getTexture(fogImageOverlayFilePath) : null;
 		this.fogImageOverlayLayer = new PIXI.Sprite(texture);
 		const { x, y, width, height } = canvas.dimensions.sceneRect;
 		this.fogImageOverlayLayer.position.set(x, y);
@@ -439,7 +323,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		this.fogImageOverlayLayer.height = height;
 		this.fogImageOverlayLayer.mask = this.maskSprite;
 		this.fogImageOverlayLayer.zIndex = this.getSetting("fogImageOverlayZIndex");
-		this.setFogImageOverlayAlpha(this.getFogImageOverlayAlpha(), true);
+		this.fogImageOverlayLayer.alpha = imageAlpha;
 
 		this.addChild(this.fogImageOverlayLayer);
 		this.addChild(this.fogColorLayer);

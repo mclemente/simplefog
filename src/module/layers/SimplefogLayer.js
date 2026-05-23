@@ -4,7 +4,6 @@
  */
 
 import { Layout } from "../../libs/hexagons.js";
-import { BrushControls } from "../apps/BrushControls.js";
 import { CWSPNoDoors } from "../ClockwiseSweep.js";
 import { hexObjsToArr, hexToPercent, percentToHex } from "../helpers.js";
 import BrushPreview from "./BrushPreview.js";
@@ -24,7 +23,7 @@ export default class SimplefogLayer extends MaskLayer {
 		};
 
 		// React to changes to current scene
-		Hooks.on("updateScene", (scene, data) => this._updateScene(scene, data));
+		Hooks.on("updateScene", this._updateScene.bind(this));
 		Hooks.on("canvasReady", () => {
 			this._onCanvasLevelChange(canvas.level?.id ?? null);
 		});
@@ -34,9 +33,7 @@ export default class SimplefogLayer extends MaskLayer {
 		});
 	}
 
-	brushSize = game.settings.get("simplefog", "brushSize");
-
-	brushOpacity = percentToHex(game.settings.get("simplefog", "brushOpacity"));
+	brushOpacity = percentToHex(0);
 
 	static get layerOptions() {
 		return foundry.utils.mergeObject(super.layerOptions, {
@@ -52,13 +49,7 @@ export default class SimplefogLayer extends MaskLayer {
 		this.#activeTool = tool;
 	}
 
-	get brushControls() {
-		return this.#brushControls ??= new BrushControls();
-	}
-
 	#activeTool;
-
-	#brushControls;
 
 	#gridType;
 
@@ -76,6 +67,7 @@ export default class SimplefogLayer extends MaskLayer {
 
 	_activate() {
 		super._activate();
+		this.brushSize ??= canvas.grid.size / 2;
 		this.boxPreview = new BrushPreview({
 			shape: this.BRUSH_TYPES.BOX,
 			alpha: 0.4,
@@ -106,12 +98,13 @@ export default class SimplefogLayer extends MaskLayer {
 		this.addChild(this.polygonPreview);
 		this.addChild(this.polygonHandle);
 		canvas.interface.grid.addHighlightLayer("simplefog");
+		// For cases when the layer is redrawn
+		if (this.activeTool) this.setPreviewTint();
 	}
 
 	/** @inheritDoc */
 	_deactivate() {
 		super._deactivate();
-		this.brushControls.close({ animate: false });
 		this.clearActiveTool();
 	}
 
@@ -130,7 +123,6 @@ export default class SimplefogLayer extends MaskLayer {
 			canvas.walls.objects.visible = true;
 			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
 		}
-		this.brushControls.render({ force: true });
 	}
 
 	/* -------------------------------------------- */
@@ -140,70 +132,24 @@ export default class SimplefogLayer extends MaskLayer {
 	/**
    * React to updates of canvas.scene flags
    */
-	_updateScene(scene, data) {
+	_updateScene(scene, changed, data, userId) {
 		// Check if update applies to current viewed scene
 		if (!scene._view) return;
-		// React to composite history change
-		if (foundry.utils.hasProperty(data, "flags.simplefog.blurEnable")) {
-			if (this.fogColorLayer !== undefined) {
-				if (this.getSetting("blurEnable")) {
-					this.fogColorLayer.filters = [this.blur];
-				} else {
-					this.fogColorLayer.filters = [];
-				}
-			}
-		}
-		if (foundry.utils.hasProperty(data, "flags.simplefog.blurRadius")) {
-			canvas.simplefog.blur.blur = this.getSetting("blurRadius");
-		}
-		// React to composite history change
-		if (foundry.utils.hasProperty(data, "flags.simplefog.blurQuality")) {
-			canvas.simplefog.blur.quality = this.getSetting("blurQuality");
-		}
-		// React to composite history change
 		const historyKey = this.getHistoryKey();
-		if (foundry.utils.hasProperty(data, `flags.simplefog.${historyKey}`)) {
+		if (foundry.utils.hasProperty(changed, `flags.simplefog.${historyKey}`)) {
 			if (this.#suppressHistoryUpdates) return;
 			const history = canvas.scene.getFlag("simplefog", historyKey);
 			if (history === undefined) return;
 			const stop = canvas.scene.getFlag("simplefog", `${historyKey}.pointer`);
 			canvas.simplefog.renderStack({ history, stop });
 			this.updatePerception();
-		}
-		// React to autoVisibility setting changes
-		if (
-			foundry.utils.hasProperty(data, "flags.simplefog.autoVisibility")
-			|| foundry.utils.hasProperty(data, "flags.simplefog.vThreshold")
+		} else if (
+			scene.id === canvas.scene.id
+			&& game.user.id !== userId
+			&& foundry.utils.hasProperty(changed, "flags.simplefog")
 		) {
 			this.updatePerception();
-		}
-		// React to alpha/tint changes
-		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorAlpha")) {
-			canvas.simplefog.setColorAlpha(data.flags.simplefog.playerColorAlpha);
-		}
-		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.gmColorAlpha")) {
-			canvas.simplefog.setColorAlpha(data.flags.simplefog.gmColorAlpha);
-		}
-		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorTint")) {
-			canvas.simplefog.setColorTint(data.flags.simplefog.playerColorTint);
-		}
-		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.gmColorTint")) {
-			canvas.simplefog.setColorTint(data.flags.simplefog.gmColorTint);
-		}
-
-		// React to Image Overylay file changes
-		if (foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayFilePath")) {
-			canvas.simplefog.setFogImageOverlayTexture(data.flags.simplefog.fogImageOverlayFilePath);
-		}
-
-		if (game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayGMAlpha")) {
-			canvas.simplefog.setFogImageOverlayAlpha(data.flags.simplefog.fogImageOverlayGMAlpha / 100);
-		}
-		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayPlayerAlpha")) {
-			canvas.simplefog.setFogImageOverlayAlpha(data.flags.simplefog.fogImageOverlayPlayerAlpha / 100);
-		}
-		if (foundry.utils.hasProperty(data, "flags.simplefog.fogImageOverlayZIndex")) {
-			canvas.simplefog.fogImageOverlayLayer.zIndex = data.flags.simplefog.fogImageOverlayZIndex;
+			canvas.draw(scene);
 		}
 	}
 
@@ -232,10 +178,9 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	setPreviewTint() {
-		const vt = this.getSetting("vThreshold") / 100;
 		const bo = hexToPercent(this.brushOpacity) / 100;
 		this.#previewTint = 0xff0000;
-		if (bo < vt) this.#previewTint = 0x00ff00;
+		if (bo < 1) this.#previewTint = 0x00ff00;
 		this.ellipsePreview.tint = this.#previewTint;
 		this.boxPreview.tint = this.#previewTint;
 		this.polygonPreview.tint = this.#previewTint;
@@ -251,9 +196,9 @@ export default class SimplefogLayer extends MaskLayer {
    * @param {Number}  Size in pixels
    */
 	async setBrushSize(s) {
-		await this.setUserSetting("brushSize", s);
-		const p = { x: this.ellipsePreview.x, y: this.ellipsePreview.y };
-		this._pointerMoveBrush(p);
+		this.brushSize = s;
+		this.ellipsePreview.width = s * 2;
+		this.ellipsePreview.height = s * 2;
 	}
 
 	/**
