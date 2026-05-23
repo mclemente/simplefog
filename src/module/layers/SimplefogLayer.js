@@ -51,6 +51,8 @@ export default class SimplefogLayer extends MaskLayer {
 
 	#activeTool;
 
+	#gridSize;
+
 	#gridType;
 
 	#lastPosition;
@@ -150,6 +152,12 @@ export default class SimplefogLayer extends MaskLayer {
 		) {
 			this.updatePerception();
 			canvas.draw(scene);
+		} else if (
+			game.user.isGM
+			&& this.activeTool === "grid"
+			&& (changed.grid.size || changed.grid.type)
+		) {
+			this._initGrid();
 		}
 	}
 
@@ -747,7 +755,7 @@ export default class SimplefogLayer extends MaskLayer {
 	_initGrid() {
 		const { size, type } = canvas.scene.grid;
 		this.dupes = [];
-		if (this.#gridType === type) return;
+		if (this.#gridSize === size && this.#gridType === type) return;
 		const legacyHex = !!canvas.scene.flags.core?.legacyHex;
 		const divisor = legacyHex ? 2 : Math.sqrt(3);
 		switch (type) {
@@ -792,5 +800,6 @@ export default class SimplefogLayer extends MaskLayer {
 				break;
 		}
 		this.#gridType = type;
+		this.#gridSize = size;
 	}
 }

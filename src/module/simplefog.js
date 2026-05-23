@@ -172,7 +172,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			grid: {
 				name: "grid",
 				title: "SIMPLEFOG.gridTool",
-				icon: "fas fa-border-none",
+				icon: canvas.grid?.type === 1 ? "fas fa-border-none" : "far fa-hexagon",
 				visible: canvas.grid?.type !== 0 && canvas.simplefog?.visible,
 				order: 1
 			},
