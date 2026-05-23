@@ -135,23 +135,14 @@ export default class SimplefogLayer extends MaskLayer {
 			if (history === undefined) return;
 			const stop = canvas.scene.getFlag("simplefog", `${historyKey}.pointer`);
 			canvas.simplefog.renderStack({ history, stop });
-
-			canvas.perception.update({
-				refreshLighting: true,
-				refreshVision: true,
-				refreshOcclusion: true
-			});
+			this.updatePerception();
 		}
 		// React to autoVisibility setting changes
 		if (
 			foundry.utils.hasProperty(data, "flags.simplefog.autoVisibility")
 			|| foundry.utils.hasProperty(data, "flags.simplefog.vThreshold")
 		) {
-			canvas.perception.update({
-				refreshLighting: true,
-				refreshVision: true,
-				refreshOcclusion: true
-			});
+			this.updatePerception();
 		}
 		// React to alpha/tint changes
 		if (!game.user.isGM && foundry.utils.hasProperty(data, "flags.simplefog.playerColorAlpha")) {
@@ -386,11 +377,7 @@ export default class SimplefogLayer extends MaskLayer {
 			}
 			if (this.#suppressHistoryUpdates) {
 				this.#suppressHistoryUpdates = false;
-				canvas.perception.update({
-					refreshLighting: true,
-					refreshVision: true,
-					refreshOcclusion: true
-				});
+				this.updatePerception();
 			}
 		} else if (e.data.button === 2) {
 			if (this.activeTool === "polygon" && this.#rightclick) {

@@ -125,12 +125,7 @@ Hooks.once("init", async () => {
 Hooks.once("ready", async () => {
 	if (!canvas.ready) return;
 	canvas.simplefog.zIndex = game.settings.get("simplefog", "zIndex");
-
-	canvas.perception.update({
-		refreshLighting: true,
-		refreshVision: true,
-		refreshOcclusion: true
-	});
+	canvas.simplefog.updatePerception();
 });
 
 Hooks.on("createScene", (doc, options, userId) => {
@@ -283,10 +278,6 @@ async function toggleSimpleFog() {
 
 async function toggleOffSimpleFog() {
 	await canvas.simplefog.toggle();
-	canvas.perception.update({
-		refreshLighting: true,
-		refreshVision: true,
-		refreshOcclusion: true
-	});
+	canvas.simplefog.updatePerception();
 	ui.controls.render({ reset: true });
 }

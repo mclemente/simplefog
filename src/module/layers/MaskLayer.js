@@ -226,6 +226,10 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		// Prevent calling update when no lights loaded
 		if (!canvas.sight?.light?.los?.geometry) return;
 		// Update sight layer
+		this.updatePerception();
+	}
+
+	updatePerception() {
 		canvas.perception.update({
 			refreshLighting: true,
 			refreshVision: true,

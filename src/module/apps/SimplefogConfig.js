@@ -101,11 +101,7 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 		}
 
 		// Update sight layer
-		canvas.perception.update({
-			refreshLighting: true,
-			refreshVision: true,
-			refreshOcclusion: true,
-		});
+		canvas.simplefog.updatePerception();
 		if (this.scene) await canvas.draw(this.scene);
 	}
 
