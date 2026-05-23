@@ -6,6 +6,7 @@
  */
 
 import BrushPreview from "./BrushPreview.js";
+import FogColorLayer from "./FogColorLayer.js";
 
 export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	constructor() {
@@ -27,6 +28,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		this._partialSyncInterval = 150;
 		this._partialSyncActive = false;
 		this._activeLevelId = null;
+		this.settings = game.settings.get("simplefog", "config");
 	}
 
 	getHistoryKey() {
@@ -59,12 +61,6 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		// Create the mask elements
 		return PIXI.RenderTexture.create({ width, height, resolution });
 	}
-
-	/* -------------------------------------------- */
-	/*  Player Fog Image Overlay                    */
-	/* -------------------------------------------- */
-
-	settings = game.settings.get("simplefog", "config");
 
 	/**
    * Gets and sets various layer wide properties
@@ -244,20 +240,6 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-   * Returns a blank PIXI Sprite of canvas dimensions
-   */
-	static getCanvasSprite() {
-		const sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
-		const { x, y, width, height } = canvas.dimensions.sceneRect;
-		sprite.width = width;
-		sprite.height = height;
-		sprite.x = x;
-		sprite.y = y;
-		sprite.zIndex = 5000;
-		return sprite;
-	}
-
-	/**
    * Fills the mask layer with solid white
    */
 	setFill() {
@@ -287,24 +269,18 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	async _draw() {
-		const colorAlpha = game.user.isGM ? this.getSetting("gmColorAlpha") / 100 : 1;
 		const imageAlpha = (game.user.isGM
 			? this.getSetting("fogImageOverlayGMAlpha")
 			: this.getSetting("fogImageOverlayPlayerAlpha")
 		) / 100;
-		const tint = game.user.isGM ? this.getSetting("gmColorTint") : this.getSetting("playerColorTint");
 		// Check if masklayer is flagged visible
 		this.visible = this.getSetting("visible") ?? false;
-
-		// The layer is the primary sprite to be displayed
-		this.fogColorLayer = MaskLayer.getCanvasSprite();
-		this.fogColorLayer.alpha = colorAlpha;
-		this.fogColorLayer.tint = tint;
 
 		this.maskTexture = MaskLayer.getMaskTexture();
 		this.maskSprite = new PIXI.Sprite(this.maskTexture);
 
-		this.fogColorLayer.mask = this.maskSprite;
+		// The layer is the primary sprite to be displayed
+		this.fogColorLayer = new FogColorLayer();
 		this.setFill();
 
 		// Allow zIndex prop to function for items on this layer
