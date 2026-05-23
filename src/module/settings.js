@@ -97,6 +97,7 @@ export const registerSettings = function () {
 			nullable: false,
 			initial: 1120,
 			choices: {
+				190: "SIMPLEFOG.SETTINGS.zIndex.choices.belowTokens",
 				220: "SIMPLEFOG.SETTINGS.zIndex.choices.tokens",
 				1020: "SIMPLEFOG.SETTINGS.zIndex.choices.controls",
 				1120: hasHealthEstimate ? "SIMPLEFOG.SETTINGS.zIndex.choices.healthEstimate" : "SIMPLEFOG.SETTINGS.zIndex.choices.interface"

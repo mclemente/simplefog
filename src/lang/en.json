@@ -19,10 +19,11 @@
 				"name": "Z-Index",
 				"hint": "Displays the overlay over specific canvas layers and its objects.",
 				"choices": {
-					"tokens": "Tokens",
-					"controls": "Controls, such as doors",
-					"interface": "Interface, such as scrolling numbers",
-					"healthEstimate": "Interface, such as Health Estimates"
+					"belowTokens": "Under Tokens",
+					"tokens": "Above Tokens",
+					"controls": "Above Controls, such as doors",
+					"interface": "Above Interfaces, such as scrolling numbers",
+					"healthEstimate": "Above Interfaces, such as scrolling numbers and the Health Estimates module"
 				}
 			}
 		},
