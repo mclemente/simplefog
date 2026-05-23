@@ -5,6 +5,8 @@
  * and replaying the mask / undo etc.
  */
 
+import BrushPreview from "./BrushPreview.js";
+
 export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	constructor() {
 		super();
@@ -295,8 +297,6 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		await this.resetMask();
 		this.renderBrush({
 			shape: this.BRUSH_TYPES.BOX,
-			x: 0,
-			y: 0,
 			width: this.width,
 			height: this.height,
 			fill: 0x000000,
@@ -324,61 +324,12 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	/* -------------------------------------------- */
 
 	/**
-   * Creates a PIXI graphic using the given brush parameters
-   * @param data {Object}       A collection of brush parameters
-   * @returns {Object}          PIXI.Graphics() instance
-   *
-   * @example
-   * const myBrush = this.brush({
-   *      shape: "ellipse",
-   *      x: 0,
-   *      y: 0,
-   *      fill: 0x000000,
-   *      width: 50,
-   *      height: 50,
-   *      alpha: 1,
-   *      visible: true
-   * });
-   */
-	brush(data) {
-		// Get new graphic & begin filling
-		const { alpha = 1, fill, height, shape, vertices, visible = true, width, x, y, zIndex } = data;
-		const brush = new PIXI.Graphics();
-		brush.beginFill(fill);
-		// Draw the shape depending on type of brush
-		switch (shape) {
-			case this.BRUSH_TYPES.ELLIPSE:
-				brush.drawEllipse(0, 0, width, height);
-				break;
-			case this.BRUSH_TYPES.BOX:
-				brush.drawRect(0, 0, width, height);
-				break;
-			case this.BRUSH_TYPES.ROUNDED_RECT:
-				brush.drawRoundedRect(0, 0, width, height, 10);
-				break;
-			case this.BRUSH_TYPES.POLYGON:
-				brush.drawPolygon(vertices);
-				break;
-			default:
-				break;
-		}
-		// End fill and set the basic props
-		brush.endFill();
-		brush.alpha = alpha;
-		brush.visible = visible;
-		brush.x = x;
-		brush.y = y;
-		brush.zIndex = zIndex;
-		return brush;
-	}
-
-	/**
    * Gets a brush using the given parameters, renders it to mask and saves the event to history
    * @param data {Object}       A collection of brush parameters
    * @param save {Boolean}      If true, will add the operation to the history buffer
    */
 	renderBrush(data, save = true) {
-		const brush = this.brush(data);
+		const brush = new BrushPreview(data);
 		this.composite(brush);
 		brush.destroy();
 		if (save) this.historyBuffer.push(data);

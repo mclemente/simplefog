@@ -156,7 +156,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			if ( active ) canvas.simplefog.activate();
 		},
 		onToolChange: (event, tool, active) => {
-			if ( active ) canvas.simplefog._changeTool(tool.name);
+			if ( active ) canvas.simplefog._changeTool(event, tool.name);
 		},
 		activeTool: "brush",
 		tools: {

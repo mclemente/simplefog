@@ -7,6 +7,7 @@ import { Layout } from "../../libs/hexagons.js";
 import { BrushControls } from "../apps/BrushControls.js";
 import { CWSPNoDoors } from "../ClockwiseSweep.js";
 import { hexObjsToArr, hexToPercent, percentToHex } from "../helpers.js";
+import BrushPreview from "./BrushPreview.js";
 import MaskLayer from "./MaskLayer.js";
 
 export default class SimplefogLayer extends MaskLayer {
@@ -19,9 +20,7 @@ export default class SimplefogLayer extends MaskLayer {
 		});
 
 		this.DEFAULTS = {
-			handlefill: "0xff6400",
-			handlesize: 20,
-			previewAlpha: 0.4
+			handlesize: 20
 		};
 
 		// React to changes to current scene
@@ -75,6 +74,40 @@ export default class SimplefogLayer extends MaskLayer {
 
 	/* -------------------------------------------- */
 
+	_activate() {
+		super._activate();
+		this.boxPreview = new BrushPreview({
+			shape: this.BRUSH_TYPES.BOX,
+			alpha: 0.4,
+			visible: false
+		});
+		this.ellipsePreview = new BrushPreview({
+			shape: this.BRUSH_TYPES.ELLIPSE,
+			alpha: 0.4,
+			visible: false
+		});
+		this.polygonPreview = new BrushPreview({
+			shape: this.BRUSH_TYPES.POLYGON,
+			alpha: 0.4,
+			visible: false
+		});
+		this.polygonHandle = new BrushPreview({
+			shape: this.BRUSH_TYPES.BOX,
+			fill: 0xff6400,
+			width: this.DEFAULTS.handlesize * 2,
+			height: this.DEFAULTS.handlesize * 2,
+			alpha: 0.4,
+			visible: false,
+			zIndex: 15,
+		});
+
+		this.addChild(this.boxPreview);
+		this.addChild(this.ellipsePreview);
+		this.addChild(this.polygonPreview);
+		this.addChild(this.polygonHandle);
+		canvas.interface.grid.addHighlightLayer("simplefog");
+	}
+
 	/** @inheritDoc */
 	_deactivate() {
 		super._deactivate();
@@ -82,7 +115,7 @@ export default class SimplefogLayer extends MaskLayer {
 		this.clearActiveTool();
 	}
 
-	_changeTool(tool) {
+	_changeTool(event, tool) {
 		this.clearActiveTool();
 		this.activeTool = tool;
 		this.setPreviewTint();
@@ -195,7 +228,7 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	highlightConfig(x, y) {
-		return { x, y, color: this.#previewTint, alpha: this.DEFAULTS.previewAlpha };
+		return { x, y, color: this.#previewTint, alpha: 0.4 };
 	}
 
 	setPreviewTint() {
@@ -585,8 +618,6 @@ export default class SimplefogLayer extends MaskLayer {
 		// render the new shape to history
 		this.renderBrush({
 			shape: this.BRUSH_TYPES.POLYGON,
-			x: 0,
-			y: 0,
 			vertices: verts,
 			fill: this.brushOpacity,
 		});
@@ -659,8 +690,6 @@ export default class SimplefogLayer extends MaskLayer {
 
 		this.renderBrush({
 			shape: this.BRUSH_TYPES.POLYGON,
-			x: 0,
-			y: 0,
 			vertices,
 			fill: this.brushOpacity,
 		});
@@ -743,8 +772,6 @@ export default class SimplefogLayer extends MaskLayer {
 					this.renderBrush({
 						shape: this.BRUSH_TYPES.POLYGON,
 						vertices: vertexArray,
-						x: 0,
-						y: 0,
 						fill: this.brushOpacity,
 					});
 					// Flag cell as drawn in dupes
@@ -820,58 +847,5 @@ export default class SimplefogLayer extends MaskLayer {
 				break;
 		}
 		this.#gridType = type;
-	}
-
-	async _draw() {
-		super._draw();
-		this.boxPreview = this.brush({
-			shape: this.BRUSH_TYPES.BOX,
-			x: 0,
-			y: 0,
-			fill: 0xffffff,
-			alpha: this.DEFAULTS.previewAlpha,
-			width: 100,
-			height: 100,
-			visible: false,
-			zIndex: 10,
-		});
-		this.ellipsePreview = this.brush({
-			shape: this.BRUSH_TYPES.ELLIPSE,
-			x: 0,
-			y: 0,
-			fill: 0xffffff,
-			alpha: this.DEFAULTS.previewAlpha,
-			width: 100,
-			height: 100,
-			visible: false,
-			zIndex: 10,
-		});
-		this.polygonPreview = this.brush({
-			shape: this.BRUSH_TYPES.POLYGON,
-			x: 0,
-			y: 0,
-			vertices: [],
-			fill: 0xffffff,
-			alpha: this.DEFAULTS.previewAlpha,
-			visible: false,
-			zIndex: 10,
-		});
-		this.polygonHandle = this.brush({
-			shape: this.BRUSH_TYPES.BOX,
-			x: 0,
-			y: 0,
-			fill: this.DEFAULTS.handlefill,
-			width: this.DEFAULTS.handlesize * 2,
-			height: this.DEFAULTS.handlesize * 2,
-			alpha: this.DEFAULTS.previewAlpha,
-			visible: false,
-			zIndex: 15,
-		});
-
-		this.addChild(this.boxPreview);
-		this.addChild(this.ellipsePreview);
-		this.addChild(this.polygonPreview);
-		this.addChild(this.polygonHandle);
-		canvas.interface.grid.addHighlightLayer("simplefog");
 	}
 }
