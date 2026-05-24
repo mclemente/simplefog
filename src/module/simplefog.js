@@ -134,7 +134,7 @@ Hooks.on("canvasInit", () => {
 });
 
 Hooks.on("controlToken", (token, active) => {
-	if (canvas.simplefog?.visible) {
+	if (game.user.isGM && canvas.simplefog?.visible) {
 		if (active && token.actor.hasPlayerOwner) {
 			canvas.simplefog.fogColorLayer.alpha = 1;
 			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha") / 100;
