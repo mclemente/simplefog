@@ -133,6 +133,18 @@ Hooks.on("canvasInit", () => {
 	}
 });
 
+Hooks.on("controlToken", (token, active) => {
+	if (canvas.simplefog?.visible) {
+		if (active && token.actor.hasPlayerOwner) {
+			canvas.simplefog.fogColorLayer.alpha = 1;
+			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha") / 100;
+		} else {
+			canvas.simplefog.fogColorLayer.alpha = canvas.simplefog.getSetting("gmColorAlpha") / 100;
+			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayGMAlpha") / 100;
+		}
+	}
+});
+
 // from controls.js
 
 /**
