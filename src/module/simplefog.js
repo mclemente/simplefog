@@ -172,7 +172,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			grid: {
 				name: "grid",
 				title: "SIMPLEFOG.gridTool",
-				icon: canvas.grid?.type === 1 ? "fas fa-border-none" : "far fa-hexagon",
+				icon: "fas fa-grid",
 				visible: canvas.grid?.type !== 0 && canvas.simplefog?.visible,
 				order: 1
 			},
@@ -193,14 +193,14 @@ Hooks.on("getSceneControlButtons", (controls) => {
 			box: {
 				name: "box",
 				title: "SIMPLEFOG.boxTool",
-				icon: "far fa-square",
+				icon: "fas icon-fa-rectangle",
 				visible: canvas.simplefog?.visible,
 				order: 2
 			},
 			ellipse: {
 				name: "ellipse",
 				title: "SIMPLEFOG.ellipseTool",
-				icon: "far fa-circle",
+				icon: "fas icon-fa-ellipse",
 				visible: canvas.simplefog?.visible,
 				order: 2
 			},
