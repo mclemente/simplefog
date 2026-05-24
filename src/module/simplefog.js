@@ -214,6 +214,16 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				active: canvas.simplefog?.brushOpacity === "0x000000",
 				toggle: true,
 			},
+			snap: {
+				name: "snap",
+				title: "CONTROLS.CommonForceSnap",
+				icon: "fa-solid fa-plus",
+				visible: !canvas.grid?.isGridless,
+				order: 2,
+				onChange: (event, toggled) => canvas.forceSnapVertices = toggled,
+				active: canvas.forceSnapVertices,
+				toggle: true
+			},
 			sceneConfig: {
 				name: "sceneConfig",
 				title: "SIMPLEFOG.sceneConfig",

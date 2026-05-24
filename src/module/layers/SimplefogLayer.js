@@ -94,11 +94,21 @@ export default class SimplefogLayer extends MaskLayer {
 			visible: false,
 			zIndex: 15,
 		});
+		// Pointer used for Polygon, Box and Ellipse tools
+		this.genericPointer = new BrushPreview({
+			shape: this.BRUSH_TYPES.ELLIPSE,
+			width: this.DEFAULTS.handlesize / 2,
+			height: this.DEFAULTS.handlesize / 2,
+			alpha: 0.4,
+			visible: false,
+			zIndex: 15
+		});
 
 		this.addChild(this.boxPreview);
 		this.addChild(this.ellipsePreview);
 		this.addChild(this.polygonPreview);
 		this.addChild(this.polygonHandle);
+		this.addChild(this.genericPointer);
 		canvas.interface.grid.addHighlightLayer("simplefog");
 		// For cases when the layer is redrawn
 		if (this.activeTool) this.setPreviewTint();
@@ -125,6 +135,7 @@ export default class SimplefogLayer extends MaskLayer {
 			canvas.walls.objects.visible = true;
 			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
 		}
+		ui.controls.render({ reset: true });
 	}
 
 	/* -------------------------------------------- */
@@ -181,6 +192,21 @@ export default class SimplefogLayer extends MaskLayer {
 		this.addListener("pointermove", this._pointerMove);
 	}
 
+	getPositions(p) {
+		if (!canvas.forceSnapVertices) return { x: p.x, y: p.y };
+		const { type } = canvas.scene.grid;
+		if (type === 1) {
+			const { x, y } = canvas.grid.getTopLeftPoint({ x: p.x, y: p.y });
+			return { x, y };
+		} else if ([2, 3, 4, 5].includes(type)) {
+			const coords = canvas.grid.getCenterPoint({ x: p.x, y: p.y });
+			const cube = canvas.grid.getCube(coords);
+			const offset = canvas.grid.getOffset(cube);
+			const { x, y } = canvas.grid.getTopLeftPoint(offset);
+			return { x, y };
+		}
+	}
+
 	highlightConfig(x, y) {
 		return { x, y, color: this.#previewTint, alpha: 0.4 };
 	}
@@ -192,6 +218,7 @@ export default class SimplefogLayer extends MaskLayer {
 		this.ellipsePreview.tint = this.#previewTint;
 		this.boxPreview.tint = this.#previewTint;
 		this.polygonPreview.tint = this.#previewTint;
+		this.genericPointer.tint = this.#previewTint;
 		if (this.activeTool === "grid" && this.#lastPosition) {
 			const { x, y } = this.#lastPosition;
 			canvas.interface.grid.clearHighlightLayer("simplefog");
@@ -221,6 +248,7 @@ export default class SimplefogLayer extends MaskLayer {
 		this.polygonPreview.clear();
 		this.polygonPreview.visible = false;
 		this.polygonHandle.visible = false;
+		this.genericPointer.visible = false;
 		this.polygon = [];
 		// Cancel op flag only if not in a brush operation
 		if (this.activeTool !== "brush") {
@@ -423,19 +451,27 @@ export default class SimplefogLayer extends MaskLayer {
    * Box Tool
    */
 	_pointerDownBox(p) {
+		const { x, y } = this.getPositions(p);
 		// Set active drag operation
 		this.op = "box";
 		// Set drag start coords
-		this.dragStart.x = p.x;
-		this.dragStart.y = p.y;
+		this.dragStart.x = x;
+		this.dragStart.y = y;
 		// Reveal the preview shape
 		this.boxPreview.visible = true;
-		this.boxPreview.x = p.x;
-		this.boxPreview.y = p.y;
+		this.boxPreview.x = x;
+		this.boxPreview.y = y;
 	}
 
 	_pointerMoveBox(p, e) {
-		if (!this.op) return;
+		if (!this.op) {
+			const { x, y } = this.getPositions(p);
+			this.genericPointer.visible = true;
+			this.genericPointer.x = x;
+			this.genericPointer.y = y;
+			return;
+		}
+		this.genericPointer.visible = false;
 		const d = this._getDragBounds(p, e);
 		this.boxPreview.visible = true;
 		this.boxPreview.width = d.w;
@@ -500,25 +536,30 @@ export default class SimplefogLayer extends MaskLayer {
    * Ellipse Tool
    */
 	_pointerDownEllipse(p) {
+		const { x, y } = this.getPositions(p);
 		// Set active drag operation
 		this.op = "ellipse";
 		// Set drag start coords
-		this.dragStart.x = p.x;
-		this.dragStart.y = p.y;
+		this.dragStart.x = x;
+		this.dragStart.y = y;
 		// Reveal the preview shape
-		this.ellipsePreview.x = p.x;
-		this.ellipsePreview.y = p.y;
+		this.ellipsePreview.x = x;
+		this.ellipsePreview.y = y;
 		this.ellipsePreview.visible = true;
 	}
 
 	_pointerMoveEllipse(p, e) {
-		// If drag operation has started
-		const d = this._getDragBounds(p, e);
-		if (this.op) {
-			// Just update the preview shape
-			this.ellipsePreview.width = d.w * 2;
-			this.ellipsePreview.height = d.h * 2;
+		if (!this.op) {
+			const { x, y } = this.getPositions(p);
+			this.genericPointer.visible = true;
+			this.genericPointer.x = x;
+			this.genericPointer.y = y;
+			return;
 		}
+		this.genericPointer.visible = false;
+		const d = this._getDragBounds(p, e);
+		this.ellipsePreview.width = d.w * 2;
+		this.ellipsePreview.height = d.h * 2;
 	}
 
 	_pointerUpEllipse(p, e) {
@@ -539,8 +580,7 @@ export default class SimplefogLayer extends MaskLayer {
    */
 	_pointerDownPolygon(p) {
 		if (!this.polygon) this.polygon = [];
-		const x = Math.floor(p.x);
-		const y = Math.floor(p.y);
+		const { x, y } = this.getPositions(p);
 		// If this is not the first vertex...
 		if (this.polygon.length) {
 			// Check if new point is close enough to start to close the polygon
@@ -621,9 +661,15 @@ export default class SimplefogLayer extends MaskLayer {
 
 	_pointerMovePolygon(p) {
 		// Show preview with ghost line from last vertex to cursor
+		const { x, y } = this.getPositions(p);
+		this.genericPointer.visible = true;
+		this.genericPointer.x = x;
+		this.genericPointer.y = y;
+
 		if (!this.polygon || this.polygon.length === 0) return;
 		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) {
 			this.polygonPreview.visible = false;
+			this.genericPointer.visible = false;
 			return;
 		}
 		this.polygonPreview.visible = true;
@@ -634,7 +680,7 @@ export default class SimplefogLayer extends MaskLayer {
 		const zoomInverse = 1 / canvas.stage.scale.x;
 		this.polygonPreview.lineStyle(2 * zoomInverse, 0xffff00, 0.6);
 		this.polygonPreview.moveTo(lastVert.x, lastVert.y);
-		this.polygonPreview.lineTo(p.x, p.y);
+		this.polygonPreview.lineTo(x, y);
 	}
 
 	_pointerDownRoom(p, e) {
