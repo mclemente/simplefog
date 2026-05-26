@@ -302,6 +302,7 @@ async function toggleSimpleFog() {
 
 async function toggleOffSimpleFog() {
 	await canvas.simplefog.toggle();
+	if (!canvas.simplefog.activeTool) canvas.simplefog._changeTool("brush");
 	canvas.simplefog.updatePerception();
 	ui.controls.render({ reset: true });
 }
