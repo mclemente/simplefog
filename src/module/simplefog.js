@@ -137,9 +137,11 @@ Hooks.on("controlToken", (token, active) => {
 	if (game.user.isGM && canvas.simplefog?.visible) {
 		if (active && token.actor.hasPlayerOwner) {
 			canvas.simplefog.fogColorLayer.alpha = 1;
+			canvas.simplefog.fogColorLayer.tint = canvas.simplefog.getSetting("playerColorTint");
 			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha") / 100;
 		} else {
 			canvas.simplefog.fogColorLayer.alpha = canvas.simplefog.getSetting("gmColorAlpha") / 100;
+			canvas.simplefog.fogColorLayer.tint = canvas.simplefog.getSetting("gmColorTint");
 			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayGMAlpha") / 100;
 		}
 	}
