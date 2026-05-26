@@ -38,7 +38,7 @@ export default class SimplefogLayer extends MaskLayer {
 	/**
 	 * Sets if an operation is currently happening.
 	 * Has some special cases for features that draw when pointerup event is triggered.
-	 * @type {Boolean|"box"|"ellipse"|"room"}
+	 * @type {Boolean|"box"|"ellipse"|"grid"|"room"}
 	 * */
 	op = false;
 
@@ -758,6 +758,7 @@ export default class SimplefogLayer extends MaskLayer {
    */
 	_pointerDownGrid() {
 		// Set active drag operation
+		this.op = "grid";
 		this._initGrid();
 	}
 
