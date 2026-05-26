@@ -101,8 +101,20 @@ Hooks.once("init", async () => {
 		restricted: true,
 	});
 	game.keybindings.register("simplefog", "forceShape", {
-		name: "Force Drag Shape (Hold)",
-		hint: "Forces the width and height of Rectangle and Ellipse tools to be the same.",
+		name: "Draw Square/Circle Shape (Hold)",
+		hint: "Forces the width and height of the Rectangle and Ellipse tools to be the same.",
+		uneditable: [
+			{
+				key: "Shift"
+			}
+		],
+		repeat: true,
+		restricted: true,
+		precedence: CONST.KEYBINDING_PRECEDENCE.DEFERRED
+	});
+	game.keybindings.register("simplefog", "passThroughDoors", {
+		name: "Pass Through Open Doors (Hold)",
+		hint: "Room Tool's drawing passes through open doors.",
 		uneditable: [
 			{
 				key: "Shift"
