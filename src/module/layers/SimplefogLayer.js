@@ -35,6 +35,15 @@ export default class SimplefogLayer extends MaskLayer {
 
 	brushOpacity = percentToHex(0);
 
+	/**
+	 * Sets if an operation is currently happening.
+	 * Has some special cases for features that draw when pointerup event is triggered.
+	 * @type {Boolean|"box"|"ellipse"|"room"}
+	 * */
+	op = false;
+
+	roomExpand = false;
+
 	static get layerOptions() {
 		return foundry.utils.mergeObject(super.layerOptions, {
 			name: "simplefog",
@@ -373,6 +382,9 @@ export default class SimplefogLayer extends MaskLayer {
 				case "ellipse":
 					this._pointerUpEllipse(p, e);
 					break;
+				case "room":
+					this._pointerUpRoom(p, e);
+					break;
 				default: // Do nothing
 					break;
 			}
@@ -683,7 +695,27 @@ export default class SimplefogLayer extends MaskLayer {
 		this.polygonPreview.lineTo(x, y);
 	}
 
+	_pointerUpRoom(p, e) {
+		if (this.roomExpand) return;
+		this.genericPointer.visible = true;
+		this.genericPointer.x = p.x;
+		this.genericPointer.y = p.y;
+		this._drawRoom(p, e);
+		this.polygonPreview.clear();
+		this.polygonPreview.visible = false;
+	}
+
 	_pointerDownRoom(p, e) {
+		if (!this.roomExpand) {
+			this.op = "room";
+			this.polygonOrigin = { x: p.x, y: p.y };
+			this.genericPointer.visible = false;
+			return;
+		}
+		this._drawRoom(p, e);
+	}
+
+	_drawRoom(p, e) {
 		const vertices = this._getRoomVertices(p, e);
 		if (!vertices) return false;
 
@@ -692,10 +724,14 @@ export default class SimplefogLayer extends MaskLayer {
 			vertices,
 			fill: this.brushOpacity,
 		});
-		return true;
 	}
 
 	_pointerMoveRoom(p, e) {
+		if (!this.op && !this.roomExpand) {
+			this.genericPointer.x = p.x;
+			this.genericPointer.y = p.y;
+			return;
+		}
 		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) {
 			this.polygonPreview.visible = false;
 			return;
@@ -708,9 +744,12 @@ export default class SimplefogLayer extends MaskLayer {
 	}
 
 	_getRoomVertices(p, e) {
+		const { x, y } = !this.roomExpand ? this.polygonOrigin : canvas.mousePosition;
+		const origin = { x, y };
+		const radius = !this.roomExpand ? Math.max(Math.abs(p.x - x), Math.abs(p.y - y)) : 0;
 		const sceneRect = canvas.dimensions.sceneRect;
 		if (p.x < sceneRect.left || p.x > sceneRect.right || p.y < sceneRect.top || p.y > sceneRect.bottom) return [];
-		const sweep = CWSPNoDoors.create(canvas.mousePosition, { type: "sight", edgeTypes: { innerBounds: { mode: 2 } }, shiftKey: e?.shiftKey });
+		const sweep = CWSPNoDoors.create(origin, { type: "sight", edgeTypes: { innerBounds: { mode: 2 } }, radius, shiftKey: e?.shiftKey });
 		return Array.from(sweep.points);
 	}
 
@@ -719,7 +758,6 @@ export default class SimplefogLayer extends MaskLayer {
    */
 	_pointerDownGrid() {
 		// Set active drag operation
-		this.op = "grid";
 		this._initGrid();
 	}
 

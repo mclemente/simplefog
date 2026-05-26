@@ -228,11 +228,21 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				active: canvas.simplefog?.brushOpacity === "0x000000",
 				toggle: true,
 			},
+			expand: {
+				name: "expand",
+				title: "SIMPLEFOG.expand",
+				icon: "fas fa-up-right-and-down-left-from-center",
+				visible: canvas.simplefog?.activeTool === "room",
+				order: 2,
+				onChange: (event, active) => canvas.simplefog.roomExpand = active,
+				active: canvas.simplefog?.roomExpand ?? false,
+				toggle: true
+			},
 			snap: {
 				name: "snap",
 				title: "CONTROLS.CommonForceSnap",
 				icon: "fa-solid fa-plus",
-				visible: !canvas.grid?.isGridless,
+				visible: !canvas.grid?.isGridless && ["box", "ellipse", "polygon"].includes(canvas.simplefog?.activeTool),
 				order: 2,
 				onChange: (event, toggled) => canvas.forceSnapVertices = toggled,
 				active: canvas.forceSnapVertices,

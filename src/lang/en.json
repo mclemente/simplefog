@@ -55,6 +55,7 @@
 		"boxTool": "Box Tool",
 		"ellipseTool": "Ellipse Tool",
 		"eraser": "Erase Fog",
+		"expand": "Expand to Room Size",
 		"sceneConfig": "Scene Configuration",
 		"reset": "Reset Simple Fog",
 		"confirmReset": "Are you sure? Fog of war will be reset.",
