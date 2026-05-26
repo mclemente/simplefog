@@ -120,7 +120,7 @@ export default class SimplefogLayer extends MaskLayer {
 		this.clearActiveTool();
 	}
 
-	_changeTool(event, tool) {
+	_changeTool(tool) {
 		this.clearActiveTool();
 		this.activeTool = tool;
 		this.setPreviewTint();
