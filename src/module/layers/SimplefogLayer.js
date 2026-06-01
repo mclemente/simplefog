@@ -746,7 +746,7 @@ export default class SimplefogLayer extends MaskLayer {
 	_getRoomVertices(p, e) {
 		const { x, y } = !this.roomExpand ? this.polygonOrigin : canvas.mousePosition;
 		const origin = { x, y };
-		const radius = !this.roomExpand ? Math.max(Math.abs(p.x - x), Math.abs(p.y - y)) : 0;
+		const radius = !this.roomExpand ? Math.max(Math.abs(p.x - x), Math.abs(p.y - y)) : null;
 		const sceneRect = canvas.dimensions.sceneRect;
 		if (p.x < sceneRect.left || p.x > sceneRect.right || p.y < sceneRect.top || p.y > sceneRect.bottom) return [];
 		const sweep = CWSPNoDoors.create(origin, { type: "sight", edgeTypes: { innerBounds: { mode: 2 } }, radius, shiftKey: e?.shiftKey });
