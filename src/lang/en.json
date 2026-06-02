@@ -15,6 +15,10 @@
 				"name": "Auto Enable Scene Fog",
 				"hint": "When enabled, Simple Fog will automatically be enabled for a scene when it is first created."
 			},
+			"expandCoverage": {
+				"name": "Expand Fog Coverage",
+				"hint": "Expands the Fog to cover the entire canvas instead of just the playable area."
+			},
 			"zIndex": {
 				"name": "Z-Index",
 				"hint": "Displays the overlay over specific canvas layers and its objects.",

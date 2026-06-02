@@ -245,7 +245,8 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	setFill() {
 		const fill = new PIXI.Graphics();
 		fill.beginFill(0xffffff);
-		const { x, y, width, height } = canvas.dimensions.sceneRect;
+		const dimensions = game.settings.get("simplefog", "expandCoverage") ? canvas.dimensions.rect : canvas.dimensions.sceneRect;
+		const { x, y, width, height } = dimensions;
 		fill.drawRect(x, y, width, height);
 		fill.endFill();
 		this.composite(fill);

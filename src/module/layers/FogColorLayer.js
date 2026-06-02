@@ -1,7 +1,8 @@
 export default class FogColorLayer extends PIXI.Sprite {
 	constructor() {
 		super(PIXI.Texture.WHITE);
-		const { x, y, width, height } = canvas.dimensions.sceneRect;
+		const dimensions = game.settings.get("simplefog", "expandCoverage") ? canvas.dimensions.rect : canvas.dimensions.sceneRect;
+		const { x = 0, y = 0, width, height } = dimensions;
 		this.width = width;
 		this.height = height;
 		this.x = x;
