@@ -1,6 +1,6 @@
 import SimplefogConfig from "./apps/SimplefogConfig.js";
 import SimplefogLayer from "./layers/SimplefogLayer.js";
-import { registerSettings } from "./settings.js";
+import { controlToken, registerSettings } from "./settings.js";
 
 Hooks.once("init", async () => {
 	registerSettings();
@@ -127,6 +127,9 @@ Hooks.once("init", async () => {
 });
 
 Hooks.once("ready", async () => {
+	if (game.settings.get("simplefog", "previewPlayerVision") && game.user.isGM) {
+		Hooks.on("controlToken", (token, active) => controlToken);
+	}
 	if (!canvas.ready) return;
 	canvas.simplefog.zIndex = game.settings.get("simplefog", "zIndex");
 	canvas.simplefog.updatePerception();
@@ -144,22 +147,6 @@ Hooks.on("canvasInit", () => {
 		canvas.loadTexturesOptions.additionalSources.push(overlayFile);
 	}
 });
-
-Hooks.on("controlToken", (token, active) => {
-	if (game.user.isGM && canvas.simplefog?.visible) {
-		if (active && token.actor.hasPlayerOwner) {
-			canvas.simplefog.fogColorLayer.alpha = 1;
-			canvas.simplefog.fogColorLayer.tint = canvas.simplefog.getSetting("playerColorTint");
-			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha") / 100;
-		} else {
-			canvas.simplefog.fogColorLayer.alpha = canvas.simplefog.getSetting("gmColorAlpha") / 100;
-			canvas.simplefog.fogColorLayer.tint = canvas.simplefog.getSetting("gmColorTint");
-			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayGMAlpha") / 100;
-		}
-	}
-});
-
-// from controls.js
 
 /**
  * Add control buttons

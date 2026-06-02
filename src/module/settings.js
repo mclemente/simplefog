@@ -1,6 +1,6 @@
 import SimplefogConfig from "./apps/SimplefogConfig.js";
 
-export const registerSettings = function () {
+export function registerSettings() {
 	const { BooleanField, ColorField, FilePathField, NumberField, SchemaField } = foundry.data.fields;
 	// Register global config settings
 	game.settings.registerMenu("simplefog", "config", {
@@ -21,6 +21,19 @@ export const registerSettings = function () {
 		type: Boolean,
 		requiresReload: true
 	});
+	game.settings.register("simplefog", "previewPlayerVision", {
+		name: "SIMPLEFOG.SETTINGS.previewPlayerVision.name",
+		hint: "SIMPLEFOG.SETTINGS.previewPlayerVision.hint",
+		scope: "world",
+		config: true,
+		default: true,
+		type: Boolean,
+		onChange: (v) => {
+			if (game.user.isGM) {
+				if (v) Hooks.on("controlToken", controlToken);
+				else Hooks.off("controlToken", controlToken);
+			}
+		}
 	});
 	game.settings.register("simplefog", "config", {
 		scope: "world",
@@ -117,3 +130,17 @@ export const registerSettings = function () {
 		onChange: (value) => canvas.simplefog.zIndex = value
 	});
 };
+
+export function controlToken(token, active) {
+	if (canvas.simplefog?.visible) {
+		if (active && token.actor.hasPlayerOwner) {
+			canvas.simplefog.fogColorLayer.alpha = 1;
+			canvas.simplefog.fogColorLayer.tint = canvas.simplefog.getSetting("playerColorTint");
+			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha") / 100;
+		} else {
+			canvas.simplefog.fogColorLayer.alpha = canvas.simplefog.getSetting("gmColorAlpha") / 100;
+			canvas.simplefog.fogColorLayer.tint = canvas.simplefog.getSetting("gmColorTint");
+			canvas.simplefog.fogImageOverlayLayer.alpha = canvas.simplefog.getSetting("fogImageOverlayGMAlpha") / 100;
+		}
+	}
+}

@@ -19,6 +19,10 @@
 				"name": "Expand Fog Coverage",
 				"hint": "Expands the Fog to cover the entire canvas instead of just the playable area."
 			},
+			"previewPlayerVision": {
+				"name": "Preview Player Vision",
+				"hint": "Selecting a player-owned token will preview the canvas as if seem by a player."
+			},
 			"zIndex": {
 				"name": "Z-Index",
 				"hint": "Displays the overlay over specific canvas layers and its objects.",
