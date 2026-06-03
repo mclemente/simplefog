@@ -1,8 +1,3 @@
-// SPDX-FileCopyrightText: 2022 Johannes Loher
-// SPDX-FileCopyrightText: 2022 David Archibald
-//
-// SPDX-License-Identifier: MIT
-
 import fs from "fs-extra";
 import gulp from "gulp";
 import sourcemaps from "gulp-sourcemaps";
@@ -26,7 +21,7 @@ const distDirectory = "./dist";
 const stylesDirectory = `${sourceDirectory}/styles`;
 const stylesExtension = "css";
 const sourceFileExtension = "js";
-const staticFiles = ["assets", "fonts", "lang", "libs", "packs", "templates", "module.json"];
+const staticFiles = ["lang", "templates", "module.json"];
 
 /** ******************/
 /*      BUILD       */
@@ -76,7 +71,7 @@ export function watch() {
 	gulp.watch(
 		staticFiles.map((file) => `${sourceDirectory}/${file}`),
 		{ ignoreInitial: false },
-		copyFiles,
+		copyFiles
 	);
 }
 
@@ -121,7 +116,7 @@ function getDataPaths() {
 		return dataPaths.map((dataPath) => {
 			if (typeof dataPath !== "string") {
 				throw new Error(
-					`Property dataPath in foundryconfig.json is expected to be a string or an array of strings, but found ${dataPath}`,
+					`Property dataPath in foundryconfig.json is expected to be a string or an array of strings, but found ${dataPath}`
 				);
 			}
 			if (!fs.existsSync(path.resolve(dataPath))) {
@@ -146,7 +141,7 @@ export async function link() {
 	}
 
 	const linkDirectories = getDataPaths().map((dataPath) =>
-		path.resolve(dataPath, "Data", destinationDirectory, packageId),
+		path.resolve(dataPath, "Data", destinationDirectory, packageId)
 	);
 
 	const argv = yargs(hideBin(process.argv)).option("clean", {
