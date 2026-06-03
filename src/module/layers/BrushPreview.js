@@ -19,8 +19,6 @@ export default class BrushPreview extends PIXI.Graphics {
 		this.draw(data);
 	}
 
-	#previewTint = 0xff0000;
-
 	draw(data) {
 		const { alpha = 1, fill = 0xffffff, visible = true, x = 0, y = 0, zIndex = 10 } = data;
 		this.beginFill(fill);

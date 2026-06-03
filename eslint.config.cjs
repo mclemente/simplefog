@@ -1,27 +1,41 @@
-// SPDX-FileCopyrightText: 2022 Johannes Loher
-// SPDX-FileCopyrightText: 2022 David Archibald
-//
-// SPDX-License-Identifier: MIT
+const {
+	defineConfig,
+} = require("eslint/config");
 
-module.exports = {
-	parserOptions: {
+const globals = require("globals");
+const js = require("@eslint/js");
+
+const {
+	FlatCompat,
+} = require("@eslint/eslintrc");
+
+const compat = new FlatCompat({
+	baseDirectory: __dirname,
+	recommendedConfig: js.configs.recommended,
+	allConfig: js.configs.all
+});
+
+module.exports = defineConfig([{
+	languageOptions: {
 		ecmaVersion: 13,
-		extraFileExtensions: [".cjs", ".mjs"],
 		sourceType: "module",
+
+		parserOptions: {
+			extraFileExtensions: [".cjs", ".mjs"],
+		},
+
+		globals: {
+			...globals.browser,
+			...globals.jquery,
+			PIXI: false,
+			ClockwiseSweepPolygon: false,
+			InteractionLayer: false,
+			PointSourcePolygon: false,
+		},
 	},
 
-	env: {
-		browser: true,
-		es6: true,
-		jquery: true,
-	},
-
-	extends: [
-		"eslint:recommended",
-		"@typhonjs-fvtt/eslint-config-foundry.js/0.8.0",
-	],
-
-	plugins: [],
+	extends: compat.extends("eslint:recommended", "@typhonjs-fvtt/eslint-config-foundry.js/0.8.0"),
+	plugins: {},
 
 	rules: {
 		"array-bracket-spacing": ["warn", "never"],
@@ -39,7 +53,11 @@ module.exports = {
 		"func-call-spacing": "warn",
 		"func-names": ["warn", "never"],
 		"getter-return": "warn",
-		indent: ["warn", "tab", { SwitchCase: 1 }],
+
+		indent: ["warn", "tab", {
+			SwitchCase: 1,
+		}],
+
 		"lines-between-class-members": "warn",
 		"new-parens": ["warn", "always"],
 		"no-alert": "warn",
@@ -55,14 +73,26 @@ module.exports = {
 		"no-dupe-class-members": "warn",
 		"no-dupe-keys": "warn",
 		"no-duplicate-case": "warn",
-		"no-duplicate-imports": ["warn", { includeExports: true }],
+
+		"no-duplicate-imports": ["warn", {
+			includeExports: true,
+		}],
+
 		"no-else-return": "warn",
-		"no-empty": ["warn", { allowEmptyCatch: true }],
+
+		"no-empty": ["warn", {
+			allowEmptyCatch: true,
+		}],
+
 		"no-empty-character-class": "warn",
 		"no-empty-pattern": "warn",
 		"no-func-assign": "warn",
 		"no-global-assign": "warn",
-		"no-implicit-coercion": ["warn", { allow: ["!!"] }],
+
+		"no-implicit-coercion": ["warn", {
+			allow: ["!!"],
+		}],
+
 		"no-implied-eval": "warn",
 		"no-import-assign": "warn",
 		"no-invalid-regexp": "warn",
@@ -73,7 +103,11 @@ module.exports = {
 		"no-misleading-character-class": "warn",
 		"no-mixed-operators": "warn",
 		"no-multi-str": "warn",
-		"no-multiple-empty-lines": ["warn", { max: 1 }],
+
+		"no-multiple-empty-lines": ["warn", {
+			max: 1,
+		}],
+
 		"no-new-func": "warn",
 		"no-new-object": "warn",
 		"no-new-symbol": "warn",
@@ -97,13 +131,24 @@ module.exports = {
 		"no-unneeded-ternary": "warn",
 		"no-unreachable": "warn",
 		"no-unreachable-loop": "warn",
-		"no-unsafe-negation": ["warn", { enforceForOrderingRelations: true }],
-		"no-unsafe-optional-chaining": ["warn", { disallowArithmeticOperators: true }],
+
+		"no-unsafe-negation": ["warn", {
+			enforceForOrderingRelations: true,
+		}],
+
+		"no-unsafe-optional-chaining": ["warn", {
+			disallowArithmeticOperators: true,
+		}],
+
 		"no-unused-expressions": "warn",
 		"no-useless-backreference": "warn",
 		"no-useless-call": "warn",
 		"no-useless-catch": "warn",
-		"no-useless-computed-key": ["warn", { enforceForClassMembers: true }],
+
+		"no-useless-computed-key": ["warn", {
+			enforceForClassMembers: true,
+		}],
+
 		"no-useless-concat": "warn",
 		"no-useless-constructor": "warn",
 		"no-useless-rename": "warn",
@@ -118,77 +163,110 @@ module.exports = {
 		"rest-spread-spacing": ["warn", "never"],
 		"semi-spacing": "warn",
 		"semi-style": ["warn", "last"],
-		"space-unary-ops": ["warn", { words: true, nonwords: false }],
+
+		"space-unary-ops": ["warn", {
+			words: true,
+			nonwords: false,
+		}],
+
 		"switch-colon-spacing": "warn",
 		"symbol-description": "warn",
 		"template-curly-spacing": ["warn", "never"],
 		"unicode-bom": ["warn", "never"],
-		"use-isnan": ["warn", { enforceForSwitchCase: true, enforceForIndexOf: true }],
-		"valid-typeof": ["warn", { requireStringLiterals: true }],
-		"wrap-iife": ["warn", "inside"],
 
+		"use-isnan": ["warn", {
+			enforceForSwitchCase: true,
+			enforceForIndexOf: true,
+		}],
+
+		"valid-typeof": ["warn", {
+			requireStringLiterals: true,
+		}],
+
+		"wrap-iife": ["warn", "inside"],
 		"arrow-parens": ["warn", "always"],
 		"comma-spacing": "warn",
 		"dot-notation": "warn",
 		"key-spacing": "warn",
-		"keyword-spacing": ["warn", { overrides: { catch: { before: true, after: false } } }],
-		"max-len": [
-			"warn",
-			{
-				code: 120,
-				ignoreComments: true,
-				ignoreTrailingComments: true,
-				ignoreUrls: true,
-				ignoreStrings: true,
-				ignoreTemplateLiterals: true,
-				ignoreRegExpLiterals: true,
+
+		"keyword-spacing": ["warn", {
+			overrides: {
+				catch: {
+					before: true,
+					after: false,
+				},
 			},
-		],
-		"no-extra-boolean-cast": ["warn", { enforceForLogicalOperands: true }],
+		}],
+
+		"max-len": ["warn", {
+			code: 120,
+			ignoreComments: true,
+			ignoreTrailingComments: true,
+			ignoreUrls: true,
+			ignoreStrings: true,
+			ignoreTemplateLiterals: true,
+			ignoreRegExpLiterals: true,
+		}],
+
+		"no-extra-boolean-cast": ["warn", {
+			enforceForLogicalOperands: true,
+		}],
+
 		"no-extra-semi": "warn",
-		"no-multi-spaces": ["warn", { ignoreEOLComments: true }],
+
+		"no-multi-spaces": ["warn", {
+			ignoreEOLComments: true,
+		}],
+
 		"no-throw-literal": "error",
 		"no-trailing-spaces": "warn",
 		"no-useless-escape": "warn",
-		"no-unused-vars": ["warn", { args: "none" }],
+
+		"no-unused-vars": ["warn", {
+			args: "none",
+		}],
+
 		"nonblock-statement-body-position": ["warn", "beside"],
 		"one-var": ["warn", "never"],
-		"operator-linebreak": [
-			"warn",
-			"before",
-			{
-				overrides: { "=": "after", "+=": "after", "-=": "after" },
+
+		"operator-linebreak": ["warn", "before", {
+			overrides: {
+				"=": "after",
+				"+=": "after",
+				"-=": "after",
 			},
-		],
+		}],
+
 		"prefer-template": "warn",
-		"quote-props": ["warn", "as-needed", { keywords: false }],
-		quotes: ["warn", "double", { avoidEscape: true, allowTemplateLiterals: false }],
+
+		"quote-props": ["warn", "as-needed", {
+			keywords: false,
+		}],
+
+		quotes: ["warn", "double", {
+			avoidEscape: true,
+			allowTemplateLiterals: false,
+		}],
+
 		semi: "warn",
 		"space-before-blocks": ["warn", "always"],
-		"space-before-function-paren": [
-			"warn",
-			{
-				anonymous: "always",
-				named: "never",
-				asyncArrow: "always",
-			},
-		],
+
+		"space-before-function-paren": ["warn", {
+			anonymous: "always",
+			named: "never",
+			asyncArrow: "always",
+		}],
+
 		"spaced-comment": "warn",
 	},
 
-	globals: {
-		PIXI: false,
-		ClockwiseSweepPolygon: false,
-		InteractionLayer: false,
-		PointSourcePolygon: false
-	},
+	ignores: ["gulpfile.js", ".eslintrc.js", ".prettierrc.js", "dist", "jsconfig.json"],
+}, {
+	files: ["./*.js", "./*.cjs", "./*.mjs"],
 
-	overrides: [
-		{
-			files: ["./*.js", "./*.cjs", "./*.mjs"],
-			env: {
-				node: true,
-			},
-		}
-	],
-};
+	languageOptions: {
+		globals: {
+			...globals.node,
+		},
+	},
+}]);

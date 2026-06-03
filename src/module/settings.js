@@ -1,7 +1,7 @@
 import SimplefogConfig from "./apps/SimplefogConfig.js";
 
 export function registerSettings() {
-	const { BooleanField, ColorField, FilePathField, NumberField, SchemaField } = foundry.data.fields;
+	const { ColorField, FilePathField, NumberField, SchemaField } = foundry.data.fields;
 	// Register global config settings
 	game.settings.registerMenu("simplefog", "config", {
 		name: "SIMPLEFOG.SETTINGS.config.name",
@@ -129,7 +129,7 @@ export function registerSettings() {
 		}),
 		onChange: (value) => canvas.simplefog.zIndex = value
 	});
-};
+}
 
 export function controlToken(token, active) {
 	if (canvas.simplefog?.visible) {
