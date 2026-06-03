@@ -10,7 +10,7 @@ on:
 
 env:
   package_type: module
-  node_version: 16
+  node_version: 24
 
 jobs:
   lint:
