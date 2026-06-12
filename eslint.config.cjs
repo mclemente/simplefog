@@ -31,6 +31,7 @@ module.exports = defineConfig([{
 			ClockwiseSweepPolygon: false,
 			InteractionLayer: false,
 			PointSourcePolygon: false,
+			_loc: false
 		},
 	},
 

@@ -34,7 +34,7 @@ export default class SimplefogLayer extends MaskLayer {
 		});
 	}
 
-
+	// eslint-disable-next-line no-unused-private-class-members
 	static #paletteClass = SimplefogPalette;
 
 	// @TODO remove all Palette below if https://github.com/foundryvtt/foundryvtt/issues/14521 is completed
