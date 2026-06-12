@@ -194,19 +194,16 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		this.commitHistory();
 	}
 
-	/**
-   * Steps the history buffer back X steps and redraws
-   * @param steps {Integer} Number of steps to undo, default 1
-   */
-	async undo(steps = 1) {
+	async _onUndoKey() {
 		// Grab existing history
 		const historyKey = this.getHistoryKey();
 		const history = canvas.scene.getFlag("simplefog", historyKey) ?? { events: [], pointer: 0 };
 		// Set new pointer & update history
-		history.pointer = Math.max(0, this.pointer - steps);
+		history.pointer = Math.max(0, this.pointer - 1);
 		await canvas.scene.unsetFlag("simplefog", historyKey);
 		await canvas.scene.setFlag("simplefog", historyKey, history);
 		this.pointer = history.pointer;
+		return true;
 	}
 
 	/* -------------------------------------------- */

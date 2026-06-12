@@ -25,24 +25,6 @@ Hooks.once("init", async () => {
 		restricted: true,
 		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
 	});
-	game.keybindings.register("simplefog", "undo", {
-		name: "Undo Change",
-		hint: "",
-		editable: [
-			{
-				key: "KeyZ",
-				modifiers: ["Control"]
-			}
-		],
-		onDown: () => {
-			if (isActiveControl()) {
-				canvas.simplefog.undo();
-				return true;
-			}
-		},
-		restricted: true,
-		precedence: CONST.KEYBINDING_PRECEDENCE.PRIORITY
-	});
 	game.keybindings.register("simplefog", "opacity", {
 		name: "Toggle Opacity",
 		hint: "Toggles the Brush Opacity's bar between Reveal/Hide. Only works while editing Simple Fog's layer.",
