@@ -43,6 +43,14 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		});
 	}
 
+	/**
+	 * Returns the canvas' or the scene's rectangle, based on the coverage setting.
+	 * @returns {PIXI.Rectangle}
+	 */
+	get dimensions() {
+		return game.settings.get("simplefog", "expandCoverage") ? canvas.dimensions.rect : canvas.dimensions.sceneRect;
+	}
+
 	/* -------------------------------------------- */
 	/*  Getters and setters for layer props         */
 	/* -------------------------------------------- */
@@ -187,9 +195,8 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		await this.resetMask();
 		this.renderBrush({
 			shape: this.BRUSH_TYPES.BOX,
-			width: this.width,
-			height: this.height,
 			fill: 0x000000,
+			...this.dimensions
 		});
 		this.commitHistory();
 	}
@@ -242,8 +249,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	setFill() {
 		const fill = new PIXI.Graphics();
 		fill.beginFill(0xffffff);
-		const dimensions = game.settings.get("simplefog", "expandCoverage") ? canvas.dimensions.rect : canvas.dimensions.sceneRect;
-		const { x, y, width, height } = dimensions;
+		const { x, y, width, height } = this.dimensions;
 		fill.drawRect(x, y, width, height);
 		fill.endFill();
 		this.composite(fill);
