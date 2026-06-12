@@ -9,7 +9,7 @@ export default class SimplefogPalette extends BrushControls {
 		initialData: {},
 		position: {
 			scale: .8,
-			width: 375
+			width: 250
 		},
 		form: {
 			closeOnSubmit: false,

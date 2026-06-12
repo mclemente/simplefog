@@ -1,15 +1,19 @@
-#simplefog-filter-config .brush-opacity .visibility-labels a:nth-child(2) {
+#simplefog-filter-config .brush-opacity .visibility-labels a:nth-child(2),
+#simplefogPalette .brush-opacity .visibility-labels a:nth-child(2) {
 	text-align: right;
 }
 
-#simplefog-filter-config .brush-opacity .visibility-labels .spacer {
+#simplefog-filter-config .brush-opacity .visibility-labels .spacer,
+#simplefogPalette .brush-opacity .visibility-labels .spacer {
 	flex: 10;
 }
 
-#simplefog-filter-config-list .flexrow {
+#simplefog-filter-config-list .flexrow,
+#simplefogPalette-list .flexrow {
 	gap: 0.5em;
 }
 
-#simplefog-filter-config .range-value {
+#simplefog-filter-config .range-value,
+#simplefogPalette .range-value {
 	flex: 0 0 38px;
 }
