@@ -1,6 +1,13 @@
 {
 	"SIMPLEFOG": {
 		"fogConfiguration": "Fog Configuration",
+		"BrushControls": {
+			"label": "Simplefog Palette",
+			"opacity": "Brush Opacity",
+			"size": "Brush Size",
+			"hide": "Hide",
+			"reveal": "Reveal"
+		},
 		"SETTINGS": {
 			"config": {
 				"name": "Default Fog Configuration",

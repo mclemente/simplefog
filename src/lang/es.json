@@ -3,10 +3,13 @@
 	"I18N.MAINTAINERS": "@Viriato139ac#0342",
 
 	"SIMPLEFOG": {
-		"brushOpacity": "Opacidad del pincel",
-		"brushSize": "Tamaño del pincel",
-		"hide": "Ocultar",
-		"reveal": "Mostrar",
+		"BrushControls": {
+			"label": "Brush Controls",
+			"opacity": "Opacidad del pincel",
+			"size": "Tamaño del pincel",
+			"hide": "Ocultar",
+			"reveal": "Mostrar"
+		},
 
 		"gmFogSettings": "Ajustes de niebla del GM",
 		"gmColorTint": "Color",

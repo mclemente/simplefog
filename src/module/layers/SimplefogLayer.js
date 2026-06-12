@@ -4,6 +4,7 @@
  */
 
 import { Layout } from "../../libs/hexagons.js";
+import SimplefogPalette from "../apps/SimplefogPalette.js";
 import { CWSPNoDoors } from "../ClockwiseSweep.js";
 import { hexObjsToArr, hexToPercent, percentToHex } from "../helpers.js";
 import BrushPreview from "./BrushPreview.js";
@@ -31,6 +32,46 @@ export default class SimplefogLayer extends MaskLayer {
 			const levelId = position?.level ?? canvas.level?.id ?? null;
 			this._onCanvasLevelChange(levelId);
 		});
+	}
+
+
+	static #paletteClass = SimplefogPalette;
+
+	// @TODO remove all Palette below if https://github.com/foundryvtt/foundryvtt/issues/14521 is completed
+	static get TOGGLE_PALETTE() {
+		return {
+			name: "togglePalette",
+			title: "CONTROLS.Palette",
+			icon: "fa-solid fa-palette",
+			active: !!ui.controls?.paletteOpen || !!canvas.simplefog?.paletteOpen,
+			toggle: true,
+			onChange: (event, toggled) => canvas.simplefog.togglePlaceablePalette(toggled)
+		};
+	}
+
+	get paletteOpen() {
+		return this.#paletteOpen;
+	}
+
+  	#paletteOpen = false;
+
+	async togglePlaceablePalette(toggle) {
+		await ui.placeablesPalette?.close({ animate: false });
+		const paletteClass = SimplefogPalette;
+		if ( !paletteClass || !("togglePalette" in ui.controls.tools) ) return;
+		this.#setPaletteOpen(toggle !== undefined ? !!toggle : this.#paletteOpen);
+		if ( !this.#paletteOpen ) return;
+		const palette = new paletteClass({ initialData: ui.controls.tool.createData ?? {}, position: { top: 180, left: 100 } });
+		await palette.render({ force: true });
+	}
+
+	#setPaletteOpen(paletteOpen) {
+		if ( this.#paletteOpen === paletteOpen ) return;
+		this.#paletteOpen = paletteOpen;
+		for ( const control of Object.values(ui.controls.controls) ) {
+			if ( control.tools.togglePalette ) control.tools.togglePalette.active = paletteOpen;
+		}
+		ui.controls.render();
 	}
 
 	brushOpacity = percentToHex(0);
@@ -121,12 +162,14 @@ export default class SimplefogLayer extends MaskLayer {
 		canvas.interface.grid.addHighlightLayer("simplefog");
 		// For cases when the layer is redrawn
 		if (this.activeTool) this.setPreviewTint();
+		this.togglePlaceablePalette();
 	}
 
 	/** @inheritDoc */
 	_deactivate() {
 		super._deactivate();
 		this.clearActiveTool();
+		this.togglePlaceablePalette(false);
 	}
 
 	_changeTool(tool) {
@@ -144,6 +187,7 @@ export default class SimplefogLayer extends MaskLayer {
 			canvas.walls.objects.visible = true;
 			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
 		}
+		ui.placeablesPalette?.render({ force: true });
 		ui.controls.render({ reset: true });
 	}
 

@@ -1,4 +1,5 @@
 import SimplefogConfig from "./apps/SimplefogConfig.js";
+import { percentToHex } from "./helpers.js";
 
 export function registerSettings() {
 	const { ColorField, FilePathField, NumberField, SchemaField } = foundry.data.fields;
@@ -92,6 +93,20 @@ export function registerSettings() {
 			})
 		}),
 		onChange: (v) => canvas.simplefog.settings = v
+	});
+	game.settings.register("simplefog", "brushOpacity", {
+		scope: "world",
+		config: false,
+		type: new NumberField({
+			required: true,
+			nullable: false,
+			initial: 0,
+			min: 0,
+			max: 100,
+			step: 1,
+			integer: true
+		}),
+		onChange: (v) => canvas.simplefog.brushOpacity = percentToHex(v)
 	});
 	game.settings.register("simplefog", "confirmFogDisable", {
 		name: "SIMPLEFOG.SETTINGS.confirmFogDisable.name",

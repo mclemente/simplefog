@@ -26,10 +26,12 @@
         }
       }
     },
-    "brushOpacity": "Opacità del pennello",
-    "brushSize": "Dimensione del pennello",
-    "hide": "Nascondi",
-    "reveal": "Rivela",
+		"BrushControls": {
+			"opacity": "Opacità del pennello",
+			"size": "Dimensione del pennello",
+			"hide": "Nascondi",
+			"reveal": "Rivela"
+		},
     "gmFogSettings": "Impostazioni nebbia per il GM",
     "gmColorTint": "Colore",
     "gmColorAlpha": "Opacità del colore",

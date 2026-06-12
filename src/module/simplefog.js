@@ -55,6 +55,7 @@ Hooks.once("init", async () => {
 				const size = context.isShift ? 10 : Number(canvas.simplefog.brushSize) * 0.8;
 				const brushSize = Math.max(size, 10).toNearest(10, "floor");
 				canvas.simplefog.setBrushSize(brushSize);
+				ui.placeablesPalette?.render(true);
 				return true;
 			}
 		},
@@ -75,6 +76,7 @@ Hooks.once("init", async () => {
 				const size = context.isShift ? 500 : Number(canvas.simplefog.brushSize) * 1.25;
 				const brushSize = Math.min(size, 500).toNearest(10, "ceil");
 				canvas.simplefog.setBrushSize(brushSize);
+				ui.placeablesPalette?.render(true);
 				return true;
 			}
 		},
@@ -229,6 +231,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 				active: canvas.forceSnapVertices,
 				toggle: true
 			},
+			togglePalette: { ...SimplefogLayer.TOGGLE_PALETTE, order: 2 },
 			sceneConfig: {
 				name: "sceneConfig",
 				title: "SIMPLEFOG.sceneConfig",
@@ -300,7 +303,7 @@ async function toggleOffSimpleFog() {
 	ui.controls.render({ reset: true });
 }
 
-function toggleFogEraser(active) {
+export function toggleFogEraser(active) {
 	if (active) canvas.simplefog.brushOpacity = "0x000000";
 	else canvas.simplefog.brushOpacity = "0xffffff";
 	canvas.simplefog.setPreviewTint();

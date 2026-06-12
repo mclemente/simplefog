@@ -1,9 +1,11 @@
 {
 	"SIMPLEFOG": {
-		"brushOpacity": "ブラシの濃度",
-		"brushSize": "ブラシサイズ",
-		"hide": "濃い",
-		"reveal": "薄い",
+		"BrushControls": {
+			"opacity": "ブラシの濃度",
+			"size": "ブラシサイズ",
+			"hide": "濃い",
+			"reveal": "薄い"
+		},
 
 		"gmFogSettings": "霧の設定（GM用）",
 		"gmColorTint": "色",
