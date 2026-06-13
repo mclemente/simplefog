@@ -13,15 +13,6 @@ export function registerSettings() {
 		restricted: true,
 	});
 
-	game.settings.register("simplefog", "expandCoverage", {
-		name: "SIMPLEFOG.SETTINGS.expandCoverage.name",
-		hint: "SIMPLEFOG.SETTINGS.expandCoverage.hint",
-		scope: "world",
-		config: true,
-		default: false,
-		type: Boolean,
-		requiresReload: true
-	});
 	game.settings.register("simplefog", "previewPlayerVision", {
 		name: "SIMPLEFOG.SETTINGS.previewPlayerVision.name",
 		hint: "SIMPLEFOG.SETTINGS.previewPlayerVision.hint",

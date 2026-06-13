@@ -132,6 +132,16 @@ Hooks.on("canvasInit", () => {
 	}
 });
 
+Hooks.on("initializeCanvasEnvironment", () => {
+	if (
+		!game.user.isGM
+		&& !canvas.scene.tokenVision
+		&& foundry.utils.equals(canvas.app.renderer.background.color, canvas.level.background.color)
+	) {
+		canvas.app.renderer.background.color = new Color(0);
+	}
+});
+
 /**
  * Add control buttons
  */

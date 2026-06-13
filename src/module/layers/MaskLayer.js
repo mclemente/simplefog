@@ -44,11 +44,10 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	/**
-	 * Returns the canvas' or the scene's rectangle, based on the coverage setting.
 	 * @returns {PIXI.Rectangle}
 	 */
 	get dimensions() {
-		return game.settings.get("simplefog", "expandCoverage") ? canvas.dimensions.rect : canvas.dimensions.sceneRect;
+		return game.user.isGM ? canvas.dimensions.sceneRect : canvas.dimensions.rect;
 	}
 
 	/* -------------------------------------------- */
@@ -284,7 +283,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		this.maskSprite = new PIXI.Sprite(this.maskTexture);
 
 		// The layer is the primary sprite to be displayed
-		this.fogColorLayer = new FogColorLayer();
+		this.fogColorLayer = new FogColorLayer(this.dimensions);
 		this.setFill();
 
 		// Allow zIndex prop to function for items on this layer

@@ -22,10 +22,6 @@
 				"name": "Auto Enable Scene Fog",
 				"hint": "When enabled, Simple Fog will automatically be enabled for a scene when it is first created."
 			},
-			"expandCoverage": {
-				"name": "Expand Fog Coverage",
-				"hint": "Expands the Fog to cover the entire canvas instead of just the playable area."
-			},
 			"previewPlayerVision": {
 				"name": "Preview Player Vision",
 				"hint": "Selecting a player-owned token will preview the canvas as if seem by a player."
