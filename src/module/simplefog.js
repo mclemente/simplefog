@@ -112,7 +112,7 @@ Hooks.once("init", async () => {
 
 Hooks.once("ready", async () => {
 	if (game.settings.get("simplefog", "previewPlayerVision") && game.user.isGM) {
-		Hooks.on("controlToken", (token, active) => controlToken);
+		Hooks.on("controlToken", controlToken);
 	}
 	if (!canvas.ready) return;
 	canvas.simplefog.zIndex = game.settings.get("simplefog", "zIndex");
