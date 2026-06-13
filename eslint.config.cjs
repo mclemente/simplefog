@@ -29,6 +29,7 @@ module.exports = defineConfig([{
 			...globals.jquery,
 			PIXI: false,
 			ClockwiseSweepPolygon: false,
+			Color: false,
 			InteractionLayer: false,
 			PointSourcePolygon: false,
 			_loc: false
