@@ -223,9 +223,6 @@ export default class SimplefogLayer extends MaskLayer {
 		) {
 			this._initGrid();
 		}
-		if (changed.tokenVision === false && !game.user.isGM) {
-			canvas.app.renderer.background.color = new Color(0);
-		}
 	}
 
 	async _onCanvasLevelChange(newLevelId) {
