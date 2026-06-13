@@ -32,9 +32,8 @@
 				"choices": {
 					"belowTokens": "Under Tokens",
 					"tokens": "Above Tokens",
-					"controls": "Above Controls, such as doors",
-					"interface": "Above Interfaces, such as scrolling numbers",
-					"healthEstimate": "Above Interfaces, such as scrolling numbers and the Health Estimates module"
+					"controls": "Above Controls (e.g. doors, mouse cursors, pings)",
+					"interface": "Above Interfaces, such as scrolling numbers"
 				}
 			}
 		},

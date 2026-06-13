@@ -115,7 +115,6 @@ export function registerSettings() {
 		default: true,
 		type: Boolean,
 	});
-	const hasHealthEstimate = game.modules.get("healthEstimate")?.active;
 	game.settings.register("simplefog", "zIndex", {
 		name: "SIMPLEFOG.SETTINGS.zIndex.name",
 		hint: "SIMPLEFOG.SETTINGS.zIndex.hint",
@@ -129,7 +128,7 @@ export function registerSettings() {
 				190: "SIMPLEFOG.SETTINGS.zIndex.choices.belowTokens",
 				220: "SIMPLEFOG.SETTINGS.zIndex.choices.tokens",
 				1020: "SIMPLEFOG.SETTINGS.zIndex.choices.controls",
-				1120: hasHealthEstimate ? "SIMPLEFOG.SETTINGS.zIndex.choices.healthEstimate" : "SIMPLEFOG.SETTINGS.zIndex.choices.interface"
+				1120: "SIMPLEFOG.SETTINGS.zIndex.choices.interface"
 			},
 			integer: true
 		}),

@@ -21,8 +21,7 @@
         "choices": {
           "tokens": "Token",
           "controls": "Controlli, come le porte",
-          "interface": "Interfaccia, come i numeri scorrevoli",
-          "healthEstimate": "Interfaccia, come le Stime della Salute"
+          "interface": "Interfaccia, come i numeri scorrevoli"
         }
       }
     },
