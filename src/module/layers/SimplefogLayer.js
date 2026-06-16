@@ -37,18 +37,6 @@ export default class SimplefogLayer extends MaskLayer {
 	// eslint-disable-next-line no-unused-private-class-members
 	static #paletteClass = SimplefogPalette;
 
-	// @TODO remove all Palette below if https://github.com/foundryvtt/foundryvtt/issues/14521 is completed
-	static get TOGGLE_PALETTE() {
-		return {
-			name: "togglePalette",
-			title: "CONTROLS.Palette",
-			icon: "fa-solid fa-palette",
-			active: !!ui.controls?.paletteOpen || !!canvas.simplefog?.paletteOpen,
-			toggle: true,
-			onChange: (event, toggled) => canvas.simplefog.togglePlaceablePalette(toggled)
-		};
-	}
-
 	get paletteOpen() {
 		return this.#paletteOpen;
 	}
@@ -56,9 +44,9 @@ export default class SimplefogLayer extends MaskLayer {
   	#paletteOpen = false;
 
 	async togglePlaceablePalette(toggle) {
-		await ui.placeablesPalette?.close({ animate: false });
+		await this.palette?.close({ animate: false });
 		const paletteClass = SimplefogPalette;
-		if ( !paletteClass || !("togglePalette" in ui.controls.tools) ) return;
+		if ( !paletteClass || !("togglePalette2" in ui.controls.tools) ) return;
 		this.#setPaletteOpen(toggle !== undefined ? !!toggle : this.#paletteOpen);
 		if ( !this.#paletteOpen ) return;
 		const palette = new paletteClass({ initialData: ui.controls.tool.createData ?? {}, position: { top: 180, left: 100 } });
@@ -187,7 +175,7 @@ export default class SimplefogLayer extends MaskLayer {
 			canvas.walls.objects.visible = true;
 			canvas.walls.placeables.forEach((l) => l.renderFlags.set({ refreshState: true }));
 		}
-		ui.placeablesPalette?.render({ force: true });
+		this.palette?.render({ force: true });
 		ui.controls.render({ reset: true });
 	}
 
@@ -288,7 +276,15 @@ export default class SimplefogLayer extends MaskLayer {
 					active: canvas.forceSnapVertices,
 					toggle: true
 				},
-				togglePalette: { ...SimplefogLayer.TOGGLE_PALETTE, order: 2 },
+				togglePalette2: {
+					name: "togglePalette2",
+					title: "CONTROLS.Palette",
+					icon: "fa-solid fa-palette",
+					active: !!canvas.simplefog?.paletteOpen,
+					toggle: true,
+					order: 2,
+					onChange: (event, toggled) => canvas.simplefog.togglePlaceablePalette(toggled)
+				},
 				sceneConfig: {
 					name: "sceneConfig",
 					title: "SIMPLEFOG.sceneConfig",
@@ -430,6 +426,7 @@ export default class SimplefogLayer extends MaskLayer {
 		this.brushSize = s;
 		this.ellipsePreview.width = s * 2;
 		this.ellipsePreview.height = s * 2;
+		this.palette?.render(true);
 	}
 
 	/**

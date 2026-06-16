@@ -55,7 +55,6 @@ Hooks.once("init", async () => {
 				const size = context.isShift ? 10 : Number(canvas.simplefog.brushSize) * 0.8;
 				const brushSize = Math.max(size, 10).toNearest(10, "floor");
 				canvas.simplefog.setBrushSize(brushSize);
-				ui.placeablesPalette?.render(true);
 				return true;
 			}
 		},
@@ -76,7 +75,6 @@ Hooks.once("init", async () => {
 				const size = context.isShift ? 500 : Number(canvas.simplefog.brushSize) * 1.25;
 				const brushSize = Math.min(size, 500).toNearest(10, "ceil");
 				canvas.simplefog.setBrushSize(brushSize);
-				ui.placeablesPalette?.render(true);
 				return true;
 			}
 		},

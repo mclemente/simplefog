@@ -27,12 +27,12 @@ export default class SimplefogPalette extends BrushControls {
 
 	_onClose(options) {
 		super._onClose(options);
-		ui.placeablesPalette = null;
+		canvas.simplefog.palette = null;
 	}
 
 	async _onFirstRender(context, options) {
 		await super._onFirstRender(context, options);
-		ui.placeablesPalette = this;
+		canvas.simplefog.palette = this;
 	}
 
 	async _onRender(context, options) {
