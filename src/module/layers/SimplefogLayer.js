@@ -191,6 +191,149 @@ export default class SimplefogLayer extends MaskLayer {
 		ui.controls.render({ reset: true });
 	}
 
+	static prepareSceneControls() {
+		return {
+			name: "simplefog",
+			title: "Simple Fog",
+			layer: "simplefog",
+			icon: "fas fa-cloud",
+			visible: game.user.isGM,
+			onChange: (event, active) => {
+				if ( active ) canvas.simplefog.activate();
+			},
+			onToolChange: (event, tool, active) => {
+				if ( active ) canvas.simplefog._changeTool(tool.name);
+			},
+			activeTool: "brush",
+			tools: {
+				simplefogtoggle: {
+					name: "simplefogtoggle",
+					icon: "fas fa-eye",
+					visible: true,
+					order: 0,
+					onChange: () => toggleSimpleFog(),
+					title: "SIMPLEFOG.onoff",
+					active: canvas.simplefog?.visible,
+					toggle: true,
+				},
+				brush: {
+					name: "brush",
+					title: "SIMPLEFOG.brushTool",
+					icon: "fas fa-paint-brush",
+					visible: canvas.simplefog?.visible,
+					order: 1
+				},
+				grid: {
+					name: "grid",
+					title: "SIMPLEFOG.gridTool",
+					icon: "fas fa-grid",
+					visible: canvas.grid?.type !== 0 && canvas.simplefog?.visible,
+					order: 1
+				},
+				room: {
+					name: "room",
+					title: "SIMPLEFOG.roomTool",
+					icon: "fas fa-block-brick",
+					visible: canvas.simplefog?.visible,
+					order: 2
+				},
+				polygon: {
+					name: "polygon",
+					title: "SIMPLEFOG.polygonTool",
+					icon: "fas fa-draw-polygon",
+					visible: canvas.simplefog?.visible,
+					order: 2
+				},
+				box: {
+					name: "box",
+					title: "SIMPLEFOG.boxTool",
+					icon: "fas icon-fa-rectangle",
+					visible: canvas.simplefog?.visible,
+					order: 2
+				},
+				ellipse: {
+					name: "ellipse",
+					title: "SIMPLEFOG.ellipseTool",
+					icon: "fas icon-fa-ellipse",
+					visible: canvas.simplefog?.visible,
+					order: 2
+				},
+				eraser: {
+					name: "eraser",
+					title: "SIMPLEFOG.eraser",
+					icon: "fas fa-eraser",
+					visible: canvas.simplefog?.visible,
+					order: 2,
+					onChange: (event, active) => toggleFogEraser(active),
+					active: canvas.simplefog?.brushOpacity === "0x000000",
+					toggle: true,
+				},
+				expand: {
+					name: "expand",
+					title: "SIMPLEFOG.expand",
+					icon: "fas fa-up-right-and-down-left-from-center",
+					visible: canvas.simplefog?.activeTool === "room",
+					order: 2,
+					onChange: (event, active) => canvas.simplefog.roomExpand = active,
+					active: canvas.simplefog?.roomExpand ?? false,
+					toggle: true
+				},
+				snap: {
+					name: "snap",
+					title: "CONTROLS.CommonForceSnap",
+					icon: "fa-solid fa-plus",
+					visible: !canvas.grid?.isGridless && ["box", "ellipse", "polygon"].includes(canvas.simplefog?.activeTool),
+					order: 2,
+					onChange: (event, toggled) => canvas.forceSnapVertices = toggled,
+					active: canvas.forceSnapVertices,
+					toggle: true
+				},
+				togglePalette: { ...SimplefogLayer.TOGGLE_PALETTE, order: 2 },
+				sceneConfig: {
+					name: "sceneConfig",
+					title: "SIMPLEFOG.sceneConfig",
+					icon: "fas fa-cog",
+					visible: canvas.simplefog?.visible,
+					order: 2,
+					onChange: () => new SimplefogConfig(canvas.scene).render(true),
+					button: true
+				},
+				reset: {
+					name: "reset",
+					title: "SIMPLEFOG.reset",
+					icon: "fas fa-trash",
+					visible: canvas.simplefog?.visible,
+					order: 2,
+					onChange: () => {
+						foundry.applications.api.DialogV2.wait({
+							window: { title: game.i18n.localize("SIMPLEFOG.reset") },
+							content: game.i18n.localize("SIMPLEFOG.confirmReset"),
+							buttons: [
+								{
+									label: "Reset",
+									action: "reset",
+									callback: () => canvas.simplefog.resetMask(),
+									icon: "fas fa-trash",
+								},
+								{
+									label: "Blank",
+									action: "blank",
+									callback: () => canvas.simplefog.blankMask(),
+									icon: "fas fa-eye",
+								},
+								{
+									label: "Cancel",
+									icon: "fas fa-times",
+								}
+							]
+						});
+					},
+					button: true
+				}
+			},
+		}
+	}
+
 	/* -------------------------------------------- */
 	/*  Event Listeners and Handlers                */
 	/* -------------------------------------------- */
