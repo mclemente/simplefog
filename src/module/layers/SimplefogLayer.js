@@ -426,7 +426,7 @@ export default class SimplefogLayer extends MaskLayer {
 		this.brushSize = s;
 		this.ellipsePreview.width = s * 2;
 		this.ellipsePreview.height = s * 2;
-		this.palette?.render(true);
+		this.palette?.render({ force: true });
 	}
 
 	/**

@@ -76,9 +76,7 @@ export class BrushControls extends HandlebarsApplicationMixin(ApplicationV2) {
 	static async brushSize(event) {
 		event?.preventDefault();
 		const value = Number(event.target.closest("[data-action]").value);
-		canvas.simplefog.brushSize = value;
-		canvas.simplefog.setPreviewTint();
-		this.render({ force: true });
+		canvas.simplefog.setBrushSize(value);
 	}
 
 	static async brushOpacity(event) {
