@@ -4,6 +4,7 @@
  */
 
 import { Layout } from "../../libs/hexagons.js";
+import SimplefogConfig from "../apps/SimplefogConfig.js";
 import SimplefogPalette from "../apps/SimplefogPalette.js";
 import { CWSPNoDoors } from "../ClockwiseSweep.js";
 import { hexObjsToArr, hexToPercent, percentToHex } from "../helpers.js";
@@ -199,7 +200,21 @@ export default class SimplefogLayer extends MaskLayer {
 					icon: "fas fa-eye",
 					visible: true,
 					order: 0,
-					onChange: () => toggleSimpleFog(),
+					onChange: async (event, active) => {
+						if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
+							await foundry.applications.api.DialogV2.confirm({
+								window: {
+									title: game.i18n.localize("SIMPLEFOG.disableFog")
+								},
+								content: game.i18n.localize("SIMPLEFOG.confirmDisableFog"),
+								yes: {
+									callback: () => canvas.simplefog.toggle()
+								}
+							});
+						} else {
+							canvas.simplefog.toggle();
+						}
+					},
 					title: "SIMPLEFOG.onoff",
 					active: canvas.simplefog?.visible,
 					toggle: true,
@@ -252,7 +267,7 @@ export default class SimplefogLayer extends MaskLayer {
 					icon: "fas fa-eraser",
 					visible: canvas.simplefog?.visible,
 					order: 2,
-					onChange: (event, active) => toggleFogEraser(active),
+					onChange: (event, active) => canvas.simplefog.toggleEraser(active),
 					active: canvas.simplefog?.brushOpacity === "0x000000",
 					toggle: true,
 				},
@@ -327,7 +342,21 @@ export default class SimplefogLayer extends MaskLayer {
 					button: true
 				}
 			},
-		}
+		};
+	}
+
+	async toggle() {
+		await super.toggle();
+		if (!this.activeTool) this._changeTool("brush");
+		this.updatePerception();
+		ui.controls.render({ reset: true });
+	}
+
+	toggleEraser(active) {
+		if (active) this.brushOpacity = "0x000000";
+		else this.brushOpacity = "0xffffff";
+		this.setPreviewTint();
+		ui.controls.render({ reset: true });
 	}
 
 	/* -------------------------------------------- */

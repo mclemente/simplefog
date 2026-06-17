@@ -1,4 +1,3 @@
-import SimplefogConfig from "./apps/SimplefogConfig.js";
 import SimplefogLayer from "./layers/SimplefogLayer.js";
 import { controlToken, registerSettings } from "./settings.js";
 
@@ -36,7 +35,7 @@ Hooks.once("init", async () => {
 		],
 		onDown: () => {
 			if (isActiveControl()) {
-				toggleFogEraser(canvas.simplefog.brushOpacity === "0xffffff");
+				canvas.simplefog.toggleEraser(canvas.simplefog.brushOpacity === "0xffffff");
 				return true;
 			}
 		},
@@ -129,36 +128,3 @@ Hooks.on("canvasInit", () => {
 		canvas.loadTexturesOptions.additionalSources.push(overlayFile);
 	}
 });
-
-/**
- * Toggle Simple Fog
- */
-async function toggleSimpleFog() {
-	if (game.settings.get("simplefog", "confirmFogDisable") && canvas.simplefog.getSetting("visible")) {
-		await foundry.applications.api.DialogV2.confirm({
-			window: {
-				title: game.i18n.localize("SIMPLEFOG.disableFog")
-			},
-			content: game.i18n.localize("SIMPLEFOG.confirmDisableFog"),
-			yes: {
-				callback: () => toggleOffSimpleFog()
-			}
-		});
-	} else {
-		await toggleOffSimpleFog();
-	}
-}
-
-async function toggleOffSimpleFog() {
-	await canvas.simplefog.toggle();
-	if (!canvas.simplefog.activeTool) canvas.simplefog._changeTool("brush");
-	canvas.simplefog.updatePerception();
-	ui.controls.render({ reset: true });
-}
-
-export function toggleFogEraser(active) {
-	if (active) canvas.simplefog.brushOpacity = "0x000000";
-	else canvas.simplefog.brushOpacity = "0xffffff";
-	canvas.simplefog.setPreviewTint();
-	ui.controls.render({ reset: true });
-}
