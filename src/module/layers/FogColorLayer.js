@@ -11,5 +11,7 @@ export default class FogColorLayer extends PIXI.Sprite {
 		this.tint = game.user.isGM ? canvas.simplefog.getSetting("gmColorTint") : canvas.simplefog.getSetting("playerColorTint");
 
 		this.mask = canvas.simplefog.maskSprite;
+		if (canvas.simplefog.getSetting("blurEnable")) this.filters = [canvas.simplefog.blur];
+		else this.filters = [];
 	}
 }

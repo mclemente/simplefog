@@ -54,6 +54,7 @@
 			"6000": "Overlay Image Above Color Tint"
 		},
 
+		"blurEnable": "Enable Blur",
 		"saveAsDef": "Save as Default",
 		"sf": "Simple Fog",
 		"onoff": "Enable/Disable Simple Fog",

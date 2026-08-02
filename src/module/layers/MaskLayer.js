@@ -279,6 +279,11 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		// Check if masklayer is flagged visible
 		this.visible = this.getSetting("visible") ?? false;
 
+		// Filters
+		this.blur = new PIXI.filters.BlurFilter();
+		this.blur.padding = 0;
+		this.blur.repeatEdgePixels = true;
+
 		this.maskTexture = MaskLayer.getMaskTexture();
 		this.maskSprite = new PIXI.Sprite(this.maskTexture);
 

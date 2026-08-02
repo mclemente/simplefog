@@ -2,7 +2,7 @@ import SimplefogConfig from "./apps/SimplefogConfig.js";
 import { percentToHex } from "./helpers.js";
 
 export function registerSettings() {
-	const { ColorField, FilePathField, NumberField, SchemaField } = foundry.data.fields;
+	const { BooleanField, ColorField, FilePathField, NumberField, SchemaField } = foundry.data.fields;
 	// Register global config settings
 	game.settings.registerMenu("simplefog", "config", {
 		name: "SIMPLEFOG.SETTINGS.config.name",
@@ -31,6 +31,7 @@ export function registerSettings() {
 		scope: "world",
 		config: false,
 		type: new SchemaField({
+			blurEnable: new BooleanField({ initial: true, label: "SIMPLEFOG.blurEnable" }),
 			gmColorAlpha: new NumberField({
 				required: true,
 				nullable: false,
@@ -45,8 +46,7 @@ export function registerSettings() {
 			playerColorTint: new ColorField({ required: true, nullable: false, initial: "#000000", label: "SIMPLEFOG.playerColorTint" }),
 			fogImageOverlayFilePath: new FilePathField({
 				categories: ["IMAGE", "VIDEO"],
-				nullable: true,
-				initial: null,
+				initial: "",
 				required: false,
 				label: "SIMPLEFOG.fogImageOverlay",
 				hint: "SIMPLEFOG.fogImageOverlayNotes",

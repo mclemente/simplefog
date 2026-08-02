@@ -52,6 +52,7 @@ export default class SimplefogConfig extends HandlebarsApplicationMixin(Applicat
 			gmColorAlpha: Math.round(canvas.simplefog.getSetting("gmColorAlpha")),
 			gmColorTint: hexToWeb(canvas.simplefog.getSetting("gmColorTint")),
 			playerColorTint: hexToWeb(canvas.simplefog.getSetting("playerColorTint")),
+			blurEnable: canvas.simplefog.getSetting("blurEnable"),
 			fogImageOverlayFilePath: canvas.simplefog.getSetting("fogImageOverlayFilePath"),
 			fogImageOverlayGMAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayGMAlpha")),
 			fogImageOverlayPlayerAlpha: Math.round(canvas.simplefog.getSetting("fogImageOverlayPlayerAlpha")),

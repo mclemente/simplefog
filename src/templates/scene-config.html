@@ -1,13 +1,14 @@
 <div class="standard-form scrollable">
     <fieldset>
-        <legend></i> {{localize 'SIMPLEFOG.gmFogSettings'}}</legend>
+        <legend>{{localize 'SIMPLEFOG.gmFogSettings'}}</legend>
         {{formGroup fields.gmColorTint value=gmColorTint rootId=rootId localize=true}}
         {{formGroup fields.gmColorAlpha value=gmColorAlpha rootId=rootId localize=true}}
         {{formGroup fields.playerColorTint value=playerColorTint rootId=rootId localize=true}}
+        {{formGroup fields.blurEnable value=blurEnable rootId=rootId localize=true}}
     </fieldset>
 
     <fieldset>
-        <legend></i> {{localize 'SIMPLEFOG.fogImageOverlaySettings'}}</legend>
+        <legend>{{localize 'SIMPLEFOG.fogImageOverlaySettings'}}</legend>
         {{formGroup fields.fogImageOverlayFilePath value=fogImageOverlayFilePath rootId=rootId localize=true}}
         {{formGroup fields.fogImageOverlayGMAlpha value=fogImageOverlayGMAlpha rootId=rootId localize=true}}
         {{formGroup fields.fogImageOverlayPlayerAlpha value=fogImageOverlayPlayerAlpha rootId=rootId localize=true}}
