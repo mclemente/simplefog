@@ -387,7 +387,7 @@ export default class SimplefogLayer extends MaskLayer {
 		} else if (
 			game.user.isGM
 			&& this.activeTool === "grid"
-			&& (changed.grid.size || changed.grid.type)
+			&& (changed.grid?.size || changed.grid?.type)
 		) {
 			this._initGrid();
 		}
