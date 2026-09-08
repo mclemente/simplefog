@@ -6,7 +6,8 @@
 import { Layout } from "../../libs/hexagons.js";
 import SimplefogConfig from "../apps/SimplefogConfig.js";
 import SimplefogPalette from "../apps/SimplefogPalette.js";
-import { CWSPNoDoors } from "../ClockwiseSweep.js";
+import { getRoomVertices } from "../roomGeometry.js";
+import { appendHistory } from "../history.js";
 import { hexObjsToArr, hexToPercent, percentToHex } from "../helpers.js";
 import BrushPreview from "./BrushPreview.js";
 import MaskLayer from "./MaskLayer.js";
@@ -395,6 +396,7 @@ export default class SimplefogLayer extends MaskLayer {
 
 	async _onCanvasLevelChange(newLevelId) {
 		if (newLevelId === this._activeLevelId) return;
+		this._historyContextVersion += 1;
 		if (this.historyBuffer.length > 0) {
 			await this.commitHistory();
 		}
@@ -487,7 +489,7 @@ export default class SimplefogLayer extends MaskLayer {
 
 	_onClickLeft(e) {
 		// Don't allow new action if history push still in progress
-		if (this.historyBuffer.length > 0) return;
+		if (this.lock || this.historyBuffer.length > 0) return;
 		const p = canvas.mousePosition;
 		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) return;
 		// Round positions to nearest pixel
@@ -523,7 +525,7 @@ export default class SimplefogLayer extends MaskLayer {
 
 	_onClickLeft2(e) {
 		// Don't allow new action if history push still in progress
-		if (this.historyBuffer.length > 0) return;
+		if (this.lock || this.historyBuffer.length > 0) return;
 		const p = canvas.mousePosition;
 		if (!canvas.dimensions.sceneRect.contains(p.x, p.y)) return;
 		// Round positions to nearest pixel
@@ -739,22 +741,11 @@ export default class SimplefogLayer extends MaskLayer {
 	async commitHistoryPartial() {
 		if (this.historyBuffer.length === 0 || this.lock) return;
 		this.lock = true;
-		const historyKey = this.getHistoryKey();
-		let history = canvas.scene.getFlag("simplefog", historyKey);
-		if (!history) {
-			history = {
-				events: [],
-				pointer: 0,
-			};
+		try {
+			await appendHistory(canvas.scene, this.getHistoryKey(), this.historyBuffer);
+		} finally {
+			this.lock = false;
 		}
-		// Truncate if pointer is behind (undo case)
-		history.events = history.events.slice(0, history.pointer);
-		// Push a shallow copy of the buffer (so final commit can still push the full buffer)
-		history.events.push([...this.historyBuffer]);
-		history.pointer = history.events.length;
-		// Do NOT unset the flag, just set it (partial update)
-		await canvas.scene.setFlag("simplefog", historyKey, history);
-		this.lock = false;
 	}
 
 	/*
@@ -958,12 +949,10 @@ export default class SimplefogLayer extends MaskLayer {
 
 	_getRoomVertices(p, e) {
 		const { x, y } = !this.roomExpand ? this.polygonOrigin : canvas.mousePosition;
-		const origin = { x, y };
 		const radius = !this.roomExpand ? Math.max(Math.abs(p.x - x), Math.abs(p.y - y)) : null;
 		const sceneRect = canvas.dimensions.sceneRect;
 		if (p.x < sceneRect.left || p.x > sceneRect.right || p.y < sceneRect.top || p.y > sceneRect.bottom) return [];
-		const sweep = CWSPNoDoors.create(origin, { type: "sight", edgeTypes: { innerBounds: { mode: 2 } }, radius, shiftKey: e?.shiftKey });
-		return Array.from(sweep.points);
+		return getRoomVertices({ x, y }, { radius, passThroughOpenDoors: !!e?.shiftKey });
 	}
 
 	/**

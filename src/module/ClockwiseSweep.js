@@ -1,4 +1,4 @@
-// CWSP which ignores open doors
+// Room Tool sweep that can treat open doors as boundaries.
 
 export class CWSPNoDoors extends foundry.canvas.geometry.ClockwiseSweepPolygon {
 	_testEdgeInclusion(edge, edgeTypes) {
@@ -15,7 +15,8 @@ export class CWSPNoDoors extends foundry.canvas.geometry.ClockwiseSweepPolygon {
 
 		// Ignore edges which do not block this polygon type
 		const isOpenDoor = edge.type === "wall" && edge.object.isOpen;
-		if ((this.config.shiftKey || !isOpenDoor) && edge[type] === CONST.EDGE_SENSE_TYPES.NONE) return false;
+		const passThroughOpenDoors = this.config.passThroughOpenDoors ?? this.config.shiftKey;
+		if ((passThroughOpenDoors || !isOpenDoor) && edge[type] === CONST.EDGE_SENSE_TYPES.NONE) return false;
 
 		// Ignore edges which are collinear with the origin
 		const side = edge.orientPoint(this.origin);

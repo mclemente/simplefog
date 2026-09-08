@@ -7,6 +7,7 @@
 
 import BrushPreview from "./BrushPreview.js";
 import FogColorLayer from "./FogColorLayer.js";
+import { appendHistory } from "../history.js";
 
 export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	constructor() {
@@ -28,12 +29,25 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		this._partialSyncInterval = 150;
 		this._partialSyncActive = false;
 		this._activeLevelId = null;
+		this._historyContextVersion = 0;
 		this.settings = game.settings.get("simplefog", "config");
 	}
 
 	getHistoryKey() {
 		const levelId = this._activeLevelId ?? canvas.level?.id ?? null;
 		return levelId ? `levelHistory.${levelId}` : "history";
+	}
+
+	_getHistoryContext() {
+		return {
+			scene: canvas.scene, historyKey: this.getHistoryKey(),
+			texture: this.maskTexture, version: this._historyContextVersion
+		};
+	}
+
+	_isHistoryContextCurrent(context) {
+		return canvas.scene === context.scene && this.maskTexture === context.texture
+			&& this._historyContextVersion === context.version;
 	}
 
 	static get layerOptions() {
@@ -144,27 +158,32 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 		if (this.historyBuffer.length === 0) return;
 		if (this.lock) return;
 		this.lock = true;
-		const historyKey = this.getHistoryKey();
-		let history = canvas.scene.getFlag("simplefog", historyKey);
-		// If history storage doesnt exist, create it
-		if (!history) {
-			history = {
-				events: [],
-				pointer: 0,
-			};
+		const count = this.historyBuffer.length;
+		const context = this._getHistoryContext();
+		const buffer = this.historyBuffer;
+		try {
+			const history = await appendHistory(context.scene, context.historyKey, buffer);
+			if (this._isHistoryContextCurrent(context)) this.pointer = history.pointer;
+			buffer.splice(0, count);
+		} finally {
+			this.lock = false;
 		}
-		// If pointer is less than history length (f.x. user undo), truncate history
-		history.events = history.events.slice(0, history.pointer);
-		// Push the new history buffer to the scene
-		history.events.push(this.historyBuffer);
-		history.pointer = history.events.length;
-		// Need to unset arrays first, otherwise they get concatenated
-		await canvas.scene.unsetFlag("simplefog", historyKey);
-		await canvas.scene.setFlag("simplefog", historyKey, history);
-		this.pointer = history.pointer;
-		// Clear the history buffer
-		this.historyBuffer = [];
-		this.lock = false;
+	}
+
+	/** Save an API batch independently of the manual drawing buffer. */
+	async commitHistoryBatch(events, { scene, historyKey }, isCurrent) {
+		if (this.lock) throw new Error("Simple Fog history is busy.");
+		this.lock = true;
+		try {
+			const history = await appendHistory(scene, historyKey, events);
+			if (isCurrent()) {
+				// The scene update hook may already have rendered this batch on the GM.
+				if (this.pointer !== history.pointer) this.renderStack({ history, stop: history.pointer });
+				this.updatePerception();
+			}
+		} finally {
+			this.lock = false;
+		}
 	}
 
 	/**
@@ -172,17 +191,21 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
    * @param save {Boolean} If true, also resets the layer history
    */
 	async resetMask(save = true) {
-		// Fill fog layer with solid
-		this.setFill();
-		// If save, also unset history and reset pointer
-		if (save) {
-			const historyKey = this.getHistoryKey();
-			await canvas.scene.unsetFlag("simplefog", historyKey);
-			await canvas.scene.setFlag("simplefog", historyKey, {
-				events: [],
-				pointer: 0,
-			});
-			this.pointer = 0;
+		if (!save) {
+			this.setFill();
+			return;
+		}
+		if (this.lock) return;
+		this.lock = true;
+		const context = this._getHistoryContext();
+		try {
+			await context.scene.setFlag("simplefog", context.historyKey, { events: [], pointer: 0 });
+			if (this._isHistoryContextCurrent(context)) {
+				this.setFill();
+				this.pointer = 0;
+			}
+		} finally {
+			this.lock = false;
 		}
 	}
 
@@ -191,25 +214,36 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
    * @param save {Boolean} If true, also resets the layer history
    */
 	async blankMask() {
-		await this.resetMask();
-		this.renderBrush({
-			shape: this.BRUSH_TYPES.BOX,
-			fill: 0x000000,
-			...this.dimensions
-		});
-		this.commitHistory();
+		if (this.lock) return;
+		this.lock = true;
+		const context = this._getHistoryContext();
+		try {
+			const { x, y, width, height } = this.dimensions;
+			const history = {
+				events: [[{ shape: this.BRUSH_TYPES.BOX, fill: 0x000000, x, y, width, height }]],
+				pointer: 1
+			};
+			await context.scene.setFlag("simplefog", context.historyKey, history);
+			if (this._isHistoryContextCurrent(context)) this.renderStack({ history, start: 0, stop: 1 });
+		} finally {
+			this.lock = false;
+		}
 	}
 
 	async _onUndoKey() {
-		// Grab existing history
-		const historyKey = this.getHistoryKey();
-		const history = canvas.scene.getFlag("simplefog", historyKey) ?? { events: [], pointer: 0 };
-		// Set new pointer & update history
-		history.pointer = Math.max(0, this.pointer - 1);
-		await canvas.scene.unsetFlag("simplefog", historyKey);
-		await canvas.scene.setFlag("simplefog", historyKey, history);
-		this.pointer = history.pointer;
-		return true;
+		if (this.lock || this.historyBuffer.length || this.op) return false;
+		this.lock = true;
+		const context = this._getHistoryContext();
+		try {
+			const history = foundry.utils.deepClone(context.scene.getFlag("simplefog", context.historyKey)
+				?? { events: [], pointer: 0 });
+			history.pointer = Math.max(0, this.pointer - 1);
+			await context.scene.setFlag("simplefog", context.historyKey, history);
+			if (this._isHistoryContextCurrent(context)) this.pointer = history.pointer;
+			return true;
+		} finally {
+			this.lock = false;
+		}
 	}
 
 	/* -------------------------------------------- */
@@ -272,6 +306,7 @@ export default class MaskLayer extends foundry.canvas.layers.InteractionLayer {
 	}
 
 	async _draw() {
+		this._historyContextVersion += 1;
 		const imageAlpha = (game.user.isGM
 			? this.getSetting("fogImageOverlayGMAlpha")
 			: this.getSetting("fogImageOverlayPlayerAlpha")

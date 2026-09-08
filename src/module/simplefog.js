@@ -1,8 +1,10 @@
 import SimplefogLayer from "./layers/SimplefogLayer.js";
+import { createAPI } from "./api.js";
 import { controlToken, registerSettings } from "./settings.js";
 
 Hooks.once("init", async () => {
 	registerSettings();
+	game.modules.get("simplefog").api = createAPI();
 	CONFIG.Canvas.layers.simplefog = { group: "interface", layerClass: SimplefogLayer };
 
 	const isActiveControl = () => ui.controls.control.name === "simplefog";

@@ -32,6 +32,13 @@ Encounter Library did a review of Simple Fog which explains how it works much be
     - This feature doesn't detect an actual "room", it is limited by sight, so it won't reveal fog over corners.
 - Add an image to the Simple Fog layer which overlays the selected tint for both GMs and Players.
 
+## Fog API
+
+The module exposes `game.modules.get("simplefog").api` with point, door-side and explicit area reveal/apply methods, including `revealFromPoint()` and
+`revealDoorSides()`. These GM-only methods use the existing Room Tool sight geometry
+and save each request as one undoable operation. See [the API reference](docs/api.md)
+for options, return values, examples, and the required in-app verification.
+
 # Build
 
 ## Install all packages
@@ -43,8 +50,12 @@ npm install
 
 ### build
 
-will build the code and copy all necessary assets into the dist folder and make a symlink to install the result into your foundry data; create a
-`foundryconfig.json` file with your Foundry Data path.
+Builds the code and copies assets into `dist`. It does not install or link the module.
+The source manifest contains release placeholders; the release workflow supplies its
+version and download URLs. A local test installation also needs a valid manifest.
+
+Only if you intend to link a build, create a `foundryconfig.json` with the installation
+root containing `Data`:
 
 ```json
 {
@@ -52,11 +63,23 @@ will build the code and copy all necessary assets into the dist folder and make 
 }
 ```
 
-`build` will build and set up a symlink between `dist` and your `dataPath`.
+`npm run link-project` separately links `dist` into that installation's
+`Data/modules/simplefog` directory, if no module already exists there.
 
 ```bash
 npm run-script build
 ```
+
+### Tests
+
+```bash
+npm test
+npm run lint
+```
+
+The automated API tests run on Node 24 without a running Foundry server. See the
+[in-app verification checklist](docs/api.md#verification-before-table-use) before using
+the API at the table.
 
 ### NOTE:
 
