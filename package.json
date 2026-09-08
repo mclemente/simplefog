@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "test": "node --test tests/*.test.mjs",
     "build": "gulp build",
     "build:watch": "gulp watch",
     "link-project": "gulp link",

@@ -15,7 +15,7 @@ const compat = new FlatCompat({
 	allConfig: js.configs.all
 });
 
-module.exports = defineConfig([{
+module.exports = defineConfig([{ ignores: ["dist/**"] }, {
 	languageOptions: {
 		ecmaVersion: 13,
 		sourceType: "module",
@@ -264,7 +264,7 @@ module.exports = defineConfig([{
 
 	ignores: ["gulpfile.js", ".eslintrc.js", ".prettierrc.js", "dist", "jsconfig.json"],
 }, {
-	files: ["./*.js", "./*.cjs", "./*.mjs"],
+	files: ["./*.js", "./*.cjs", "./*.mjs", "tests/**/*.mjs"],
 
 	languageOptions: {
 		globals: {

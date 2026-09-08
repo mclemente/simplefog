@@ -1,4 +1,4 @@
-import { BrushControls } from "./BrushControls";
+import { BrushControls } from "./BrushControls.js";
 
 const { createFontAwesomeIcon } = foundry.applications.fields;
 
